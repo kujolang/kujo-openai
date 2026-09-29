@@ -19,11 +19,20 @@ export func project_ability(definition, digest) {
     if get(definition["input_schema"], "type", "") != "object" || get(definition["output_schema"], "type", "") != "object" { return fail("unsupported_mcp_object_schema") }
     read_only := true
     for effect in definition["effects"] { if effect["kind"] != "read" { read_only = false } }
+    semantics := get(definition, "semantics", null)
+    open_world := true
+    destructive := read_only == false
+    precision := "conservative-v1"
+    if type(semantics) == "dict" {
+        open_world = semantics["open_world"]
+        destructive = semantics["destructive"]
+        precision = "canonical-semantics-v1"
+    }
     return {"ok": true, "tool": {
         "name": tool_name(definition), "title": get(definition, "title", definition["id"]), "description": definition["description"],
         "inputSchema": definition["input_schema"], "outputSchema": definition["output_schema"],
-        "annotations": {"readOnlyHint": read_only, "destructiveHint": read_only == false, "openWorldHint": true, "idempotentHint": definition["idempotency"]["mode"] == "intrinsic"},
-        "_meta": {"kujo/abilityId": definition["id"], "kujo/abilityVersion": definition["version"], "kujo/definitionDigest": digest, "kujo/effects": definition["effects"], "kujo/idempotency": definition["idempotency"], "kujo/annotationPrecision": "conservative-v1"}
+        "annotations": {"readOnlyHint": read_only, "destructiveHint": destructive, "openWorldHint": open_world, "idempotentHint": definition["idempotency"]["mode"] == "intrinsic"},
+        "_meta": {"kujo/abilityId": definition["id"], "kujo/abilityVersion": definition["version"], "kujo/definitionDigest": digest, "kujo/effects": definition["effects"], "kujo/idempotency": definition["idempotency"], "kujo/annotationPrecision": precision, "kujo/semantics": semantics}
     }}
 }
 

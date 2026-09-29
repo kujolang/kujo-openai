@@ -31,15 +31,15 @@ Node's official MCP SDK handles protocol negotiation and dispatch. The bounded t
 | Title / description | unchanged, title falls back to canonical ID |
 | Input / output JSON Schema | unchanged; object roots required by this host |
 | All read effects | `readOnlyHint: true`, otherwise false |
-| Any non-read effect | `destructiveHint: true` conservatively |
-| Open-world unknown in v1 | `openWorldHint: true` conservatively |
+| Explicit `semantics.destructive` | exact `destructiveHint`; otherwise any non-read effect defaults true |
+| Explicit `semantics.open_world` | exact `openWorldHint`; otherwise true |
 | Intrinsic idempotency | `idempotentHint: true`; keyed and none false |
 | Canonical digest / effects / idempotency | namespaced `_meta` |
 | Policy / approval / retry | enforced by canonical runtime/application, not descriptors |
 
 Names are at most 59 ASCII characters, deterministic and stable for one ID/version. Catalog reverse lookup is exact; underscore decoding is prohibited. Cryptographic truncation cannot mathematically eliminate collisions: the registry detects any actual duplicate and rejects the catalog. Do not vary names based on insertion order or catalog neighbors. Multiple exact versions can coexist.
 
-A read effect does not prove a closed world. A write can be destructive without a delete effect. Execution is not a distinct Ability v1 effect. Do not infer any of these from names/resources/descriptions. Local conservative hints are deliberately imprecise; publication needs reviewed host-neutral semantics. No incompatible Ability contract change is introduced.
+A read effect does not prove a closed world. A write can be destructive without a delete effect. Execution is not a distinct Ability v1 effect. Do not infer any of these from names/resources/descriptions. Ability now accepts optional complete host-neutral `semantics` facts, validated in native Kujo and both SDKs. The adapter projects those facts without overrides and preserves `executes_code` in metadata. Definitions without facts retain conservative hints. Facts affect the canonical digest but never grant execution authority. Older strict readers must be upgraded before consuming enriched definitions; existing definitions and digests are unchanged. See Ability’s `docs/effect-semantics.md`.
 
 Unsupported scalar schemas or missing bindings appear in the operator catalog's `unsupported` array. Unexposed/invisible Abilities are omitted without leaking their IDs. The MCP tool list contains supported tools only. No arbitrary call escape hatch is present.
 

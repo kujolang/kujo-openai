@@ -44,3 +44,15 @@ step:=register_ability_exposure(registry,{"schema":"kujo.ability.exposure/v1","a
 assert(len(discover(registry,context,visible)["tools"])==8,"new Ability appears without an OpenAI wrapper")
 assert(invoke(registry,tool_name(future),{"value":"future"},context,services,visible)["ok"],"new Ability executes")
 print("native projection contracts passed")
+
+for scenario in parse_json(read_file("vendor/ability/tests/fixtures/semantics_conformance.json")) {
+ candidate := scenario["definition"]
+ projected := project_ability(candidate,"test-digest")
+ if scenario["expected"] == "ok" {
+  assert(projected["ok"], scenario["label"])
+  annotations := projected["tool"]["annotations"]
+  assert(annotations["openWorldHint"] == candidate["semantics"]["open_world"],"canonical world scope")
+  assert(annotations["destructiveHint"] == candidate["semantics"]["destructive"],"canonical destruction")
+  assert(projected["tool"]["_meta"]["kujo/semantics"] == candidate["semantics"],"all semantic facts preserved")
+ } else { assert(projected["ok"] == false,"invalid canonical semantics cannot be projected") }
+}

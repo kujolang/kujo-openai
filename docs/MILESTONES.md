@@ -39,3 +39,12 @@ Limits: no real ChatGPT model/tunnel evaluation, public endpoint, OAuth acceptan
 The **local infrastructure milestone is verified**. The full mission's end-to-end “review my changes” experience and public installation are **not complete**. Remaining requirements are canonical review-tool registrations, trusted resumable approval/idempotency integration, precise host-neutral effect semantics, hosted identity/isolation, live host acceptance and submission materials. None is replaced by a permissive shell or handcrafted per-product wrapper.
 
 SignalBox holds only the unresolved cross-host effect-semantics observation. Routine verification and session continuity belong in Strata. The repository is created privately; no npm package, public release, plugin directory entry or live hosted service was published.
+
+
+## Host-neutral semantics follow-up — 2026-09-29
+
+Ability now validates optional `semantics` (`open_world`, `destructive`, `executes_code`) in native Kujo, TypeScript, Python and the fixture devkit. Existing definition digests, runtime behavior and authority checks remain unchanged. Fourteen shared positive/negative cases cover missing/extra/mistyped facts and contradictions with declared effects. All upstream suites pass after rebasing onto the independently published Ability 1.2.0 release.
+
+The adapter vendors Ability a9dc8f1b5c766c5fb7469e50e4911cf3bd862cfa unchanged, projects explicit facts, preserves execution metadata, and retains conservative defaults for legacy definitions. Its 17 tests pass, including direct canonical execution equivalence and all 14 semantic projection cases. Updated files: canonical vendor and lock, vendor script, native projection/tests, architecture/extension guidance, and this record. The earlier semantic-gap finding is addressed by this contract; product authors still need to review and declare facts. Enriched definitions require updated strict readers.
+
+Next: supply host-neutral registered review capabilities and verify a real change-review workflow; complete trusted approval continuation, remote execution/authentication integration and live ChatGPT acceptance. The full mission remains active.

@@ -21,6 +21,6 @@ Use `examples/provider.kujo` as a function-level template, and `scripts/configur
 
 ## Host-specific exceptions
 
-Non-object schemas cannot be advertised by this projection and are reported as unsupported. A UI-specific or account-profile tool may need an explicit host extension later; it must not duplicate domain schemas or grant authority. OpenAI annotations are currently conservative; improve canonical host-neutral semantics before adding per-product override files.
+Non-object schemas cannot be advertised by this projection and are reported as unsupported. A UI-specific or account-profile tool may need an explicit host extension later; it must not duplicate domain schemas or grant authority. Declare optional host-neutral `semantics` in the canonical definition for precise annotations. No host-specific override files are needed; absent facts retain conservative defaults.
 
 The native `invoke` API can accept an independently issued bound approval. The generic local process transport deliberately exposes no approval/key controls. Applications needing resumable human approval must supply a trusted control channel and stable invocation binding; exposing an `approved: true` argument is not an implementation of that channel.
