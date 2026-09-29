@@ -10,6 +10,10 @@
     "src/contracts.kujo": "baed37be870e67646ff6e2c8cd76b1d49b007f01008177576f2cbe23535b3b9a",
     "src/registry.kujo": "243c5f2dd0caee5004da4589c24ffc278dd3ffe0765de942b7bd2e21014eefd6",
     "src/runtime.kujo": "15f4487483ea2e2131bae0b5b274db4fc86bb495163235ae9e69d682fda50fe3",
-    "src/profile.kujo": "05d0fea46b5497801cb8a283c596b6b164f808b5fc8cba6984d5afc6c797164e"
+    "src/profile.kujo": "05d0fea46b5497801cb8a283c596b6b164f808b5fc8cba6984d5afc6c797164e",
+    "schema/ability.schema.json": "1a88aa9dabdd5e2de8ace5317dc31bf6a7f0fe1262ef675df546fe52d72c3fc8",
+    "examples/content_find.json": "a9f902e575ac6c418db1eb61e4c41dcb0b2e8440e60ca07cf91750a653797990",
+    "tests/contract_tests.kujo": "f2865063960fa2adb563e3136258fedd6fd7d77f033750a23dacbb077369149e",
+    "tests/runtime_contract_tests.kujo": "f7964a9b006ad87eca8aa453c7837c999070b4114385f67f46719fda24401542"
   }
 }

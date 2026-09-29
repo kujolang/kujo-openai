@@ -1,0 +1,46 @@
+from tests.registry import create_fixture_registry, definition, policy, audit, visible
+from src.projection import discover, invoke, tool_name, project_ability
+from vendor.ability.ability import execute_ability, ability_definition_digest, register_ability_definition, register_ability_binding, register_ability_exposure, approval_binding_digest
+func fixed_clock() {return 1000}
+func fixed_id(kind, invocation) {return kind+"-contract"}
+func invisible(entry,context) {return false}
+func consumes(approval,invocation) {return {"ok":true}}
+func refuses(approval,invocation) {return {"ok":false}}
+func echo(input,context) {return input}
+registry := create_fixture_registry()
+context := {"principal":{"type":"workload","id":"fixture","tenant_id":"local","claims":{}},"invocation_id":"contract-1"}
+services := {"policy":policy,"audit":audit,"clock_ms":fixed_clock,"id_factory":fixed_id}
+for mode in ["read","write","delete","external","denied","failure","keyed"] {
+ name := tool_name({"id":"kujo.fixture."+mode,"version":"1.0.0"})
+ item := null
+ for entry in discover(registry,context,visible)["tools"] {if entry["name"] == name {item=entry}}
+ meta := item["_meta"]
+ invocation := {"schema":"kujo.ability.invocation/v1","invocation_id":"contract-1","ability_id":meta["kujo/abilityId"],"ability_version":"1.0.0","definition_digest":meta["kujo/definitionDigest"],"input":{"value":"same"},"principal":context["principal"],"surface":"mcp","request_id":"contract-1","trace_id":"contract-1","idempotency_key":"","approval":{},"metadata":{"host":"openai","projection":"kujo.openai/v1"}}
+ direct := execute_ability(registry,invocation,services)
+ projected := invoke(registry,name,{"value":"same"},context,services,visible)
+ assert(to_json(direct)==to_json(projected),"projection must preserve canonical execution for "+mode)
+ if mode == "write" {
+  approval := {"schema":"kujo.ability.approval/v1","approval_id":"approved-1","binding_digest":approval_binding_digest(invocation),"approved_by":{"type":"human","id":"reviewer","tenant_id":"local","claims":{}},"issued_at_ms":500,"expires_at_ms":2000,"nonce":"nonce-1","evidence":{}}
+  approved_context := context;approved_context["approval"]:=approval
+  approved_services := services;approved_services["consume_approval"]:=consumes
+  approved := invoke(registry,name,{"value":"same"},approved_context,approved_services,visible)
+  assert(approved["ok"],"trusted application-bound approval must succeed: "+to_json(approved))
+  approved_services["consume_approval"]:=refuses
+  refused := invoke(registry,name,{"value":"same"},approved_context,approved_services,visible)
+  assert(refused["ok"]==false,"failed one-time approval consumption must block")
+  changed := invoke(registry,name,{"value":"changed"},approved_context,services,visible)
+  assert(changed["ok"]==false,"approval cannot authorize changed input")
+ }
+}
+assert(len(discover(registry,context,invisible)["tools"])==0,"private catalog")
+assert(invoke(registry,"unknown",{},context,services,visible)["ok"]==false,"unknown ability")
+unsupported := definition("kujo.fixture.scalar","read","intrinsic")
+unsupported["output_schema"] := {"type":"string"}
+assert(project_ability(unsupported,"unused")["code"]=="unsupported_mcp_object_schema","unsupported output must be explicit")
+future := definition("kujo.future.operation","read","intrinsic")
+step:=register_ability_definition(registry,future);registry=step["registry"]
+step:=register_ability_binding(registry,{"schema":"kujo.ability.binding/v1","ability_id":future["id"],"ability_version":"1.0.0","handler_id":"future-handler","handler_version":"1.0.0","handler":echo,"timeout_ms":1000,"metadata":{}});registry=step["registry"]
+step:=register_ability_exposure(registry,{"schema":"kujo.ability.exposure/v1","ability_id":future["id"],"ability_version":"1.0.0","surface":"mcp","name":"future","enabled":true,"public":false,"metadata":{}});registry=step["registry"]
+assert(len(discover(registry,context,visible)["tools"])==8,"new Ability appears without an OpenAI wrapper")
+assert(invoke(registry,tool_name(future),{"value":"future"},context,services,visible)["ok"],"new Ability executes")
+print("native projection contracts passed")

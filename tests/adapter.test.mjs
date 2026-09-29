@@ -47,3 +47,28 @@ test('receipt paths reject traversal, symlinks and tampering',async()=>{
  await rm(path);await symlink('/etc/passwd',path);await assert.rejects(f.store.read(uri));
  } finally {await rm(f.directory,{recursive:true,force:true});}
 });
+test('concurrent real calls keep invocation identities separate and treat shell text as data',async()=>{
+ const f=await fixture();try {
+ const values=['$(touch /tmp/kujo-openai-must-not-run)','; rm -rf /','hello'];
+ const results=await Promise.all(values.map(value=>f.adapter.call(name('read'),{value})));
+ assert.equal(new Set(results.map(r=>r._meta['kujo/invocationId'])).size,3);
+ assert.deepEqual(results.map(r=>r.structuredContent.value),values);
+ } finally {await rm(f.directory,{recursive:true,force:true});}
+});
+test('transport does not retry a failed or uncertain execution',async()=>{
+ const f=await fixture();try {
+ const tools=await f.adapter.discover();let calls=0;
+ const adapter=new Adapter({request:async request=>{
+  if(request.operation==='discover') return {ok:true,schema:'kujo.openai.catalog/v1',tools,unsupported:[]};
+  calls++;throw new BoundaryError('execution_timeout_uncertain',true);
+ }},f.store);
+ await assert.rejects(adapter.call(name('read'),{value:'a'}));assert.equal(calls,1);
+ } finally {await rm(f.directory,{recursive:true,force:true});}
+});
+test('provider failure without an authoritative receipt remains uncertain',async()=>{
+ const f=await fixture();try {
+ const tools=await f.adapter.discover();
+ const adapter=new Adapter({request:async r=>r.operation==='discover'?{ok:true,schema:'kujo.openai.catalog/v1',tools,unsupported:[]}:{ok:false,code:'invalid_generated_ability_receipt'}},f.store);
+ const result=await adapter.call(name('read'),{value:'a'});assert.equal(JSON.parse(result.content[0].text).status,'completion_uncertain');
+ } finally {await rm(f.directory,{recursive:true,force:true});}
+});
