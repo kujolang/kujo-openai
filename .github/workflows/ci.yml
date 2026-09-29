@@ -1,0 +1,38 @@
+name: Ability host contracts
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install checksum-pinned Kujo
+        shell: bash
+        run: |
+          mkdir -p .local/runtime
+          curl --fail --location --silent --show-error https://github.com/kujolang/kujo/releases/download/v1.6.0/kujo-v1.6.0-linux-x64.tar.gz -o .local/runtime/kujo.tar.gz
+          echo '142372a0c89f91ece2017034b71a3e800969ab2cd7b13dd2ee18eb39efac4504  .local/runtime/kujo.tar.gz' | sha256sum --check
+          tar -xzf .local/runtime/kujo.tar.gz -C .local/runtime
+          runtime_path=$(find "$PWD/.local/runtime" -type f -name kujo -perm /111 | head -1)
+          test -n "$runtime_path"
+          echo "KUJO_BIN=$runtime_path" >> "$GITHUB_ENV"
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - name: Canonical MCP pack integration
+        shell: bash
+        run: |
+          git clone --filter=blob:none https://github.com/kujolang/mcp.git ../mcp
+          git -C ../mcp checkout a7ec0dd8e6bcae303ab1431b4586dfe3e91f3a5a
+          npm run test:integration
+      - run: npm run package
+      - name: Verify reproducible package
+        shell: bash
+        run: |
+          cp dist/SHA256SUMS .local/first-checksums
+          npm run package
+          cmp .local/first-checksums dist/SHA256SUMS

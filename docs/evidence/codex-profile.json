@@ -1,0 +1,10 @@
+{
+  "date": "2026-09-29T23:15:11.130Z",
+  "version": "codex-cli 0.144.4",
+  "isolated_profile": true,
+  "install": true,
+  "dependencies_present": true,
+  "installed_catalog": true,
+  "remove": true,
+  "live_model_test": false
+}

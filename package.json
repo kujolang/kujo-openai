@@ -24,7 +24,11 @@
     "docs",
     "examples",
     "openai.kujo",
-    "kujo.toml"
+    "kujo.toml",
+    "scripts/configure-mcp-pack.mjs",
+    ".codex-plugin",
+    ".mcp.json",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",

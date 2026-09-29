@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "kujo": {
+      "command": "node",
+      "args": [
+        "${PLUGIN_ROOT}/bin/kujo-openai.mjs",
+        "serve"
+      ]
+    }
+  }
+}
