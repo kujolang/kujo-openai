@@ -1,7 +1,7 @@
 import {createHash} from 'node:crypto';
 import {readFile, writeFile, mkdir} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
-const files = ['ability.kujo', 'LICENSE', 'src/index.kujo', 'src/internal.kujo', 'src/contract.kujo', 'src/contracts.kujo', 'src/registry.kujo', 'src/runtime.kujo', 'src/profile.kujo', 'schema/ability.schema.json', 'examples/content_find.json', 'tests/contract_tests.kujo', 'tests/fixtures/semantics_conformance.json', 'tests/runtime_contract_tests.kujo'];
+const files = ['bindings/json_process.kujo', 'packs/repository_review/runtime.kujo', 'packs/repository_review/README.md', 'ability.kujo', 'LICENSE', 'src/index.kujo', 'src/internal.kujo', 'src/contract.kujo', 'src/contracts.kujo', 'src/registry.kujo', 'src/runtime.kujo', 'src/profile.kujo', 'schema/ability.schema.json', 'examples/content_find.json', 'tests/contract_tests.kujo', 'tests/fixtures/semantics_conformance.json', 'tests/runtime_contract_tests.kujo'];
 const sha = b => createHash('sha256').update(b).digest('hex');
 if (process.argv.includes('--verify')) {
  const lock = JSON.parse(await readFile('vendor/LOCK.json'));

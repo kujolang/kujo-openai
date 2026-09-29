@@ -28,14 +28,16 @@
     "scripts/configure-mcp-pack.mjs",
     ".codex-plugin",
     ".mcp.json",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "scripts/configure-review-pack.mjs"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "verify:vendor": "node scripts/vendor.mjs --verify",
     "check": "npm run verify:vendor && npm test",
     "package": "node scripts/package.mjs",
-    "test:integration": "node tests/integration.mjs"
+    "test:integration": "node tests/integration.mjs",
+    "test:review": "node tests/review-integration.mjs"
   },
   "repository": {
     "type": "git",

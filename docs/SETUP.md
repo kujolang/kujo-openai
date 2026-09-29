@@ -33,3 +33,19 @@ An empty catalog usually means no enabled MCP exposures or the visibility callba
 The server pins its supported MCP versions through the exact SDK dependency. Unknown client protocol versions negotiate using the SDK's supported version response; clients must accept the negotiated version or disconnect. The checked-in protocol tests exercise the official matching SDK client. Other host versions require acceptance evidence.
 
 The installed Codex CLI 0.144.4 required the supported `.codex-plugin/plugin.json` and `.mcp.json` compatibility files to retain version and component metadata. Both layouts are packaged and checked for parity. The isolated profile install/list/remove passed; this does not certify live model behavior.
+
+
+## Trusted local change review
+
+Use Ability's canonical repository-review pack to expose actual PatchBrief and ChangeBucket tools. Obtain clean source checkouts at PatchBrief `a4da5942e9668924cd2f2869859bf05b006edda5` and ChangeBucket `030eea63c60449f82c9ba2680227485d318fdb6d` (siblings by default; override `KUJO_PATCHBRIEF_SOURCE` / `KUJO_CHANGEBUCKET_SOURCE`). From this adapter checkout:
+
+```sh
+KUJO_BIN=/absolute/path/to/kujo node scripts/configure-review-pack.mjs /absolute/trusted/repository
+KUJO_OPENAI_CONFIG="$PWD/.local/repository-review/config.json" node bin/kujo-openai.mjs serve
+```
+
+Use this configuration in the installed plugin's MCP environment. The same projection/transport discovers both tools automatically. Inputs are `{}`; the operator selects the repository. The plugin change-review skill describes their responsibilities and limits. Run `KUJO_BIN=/absolute/path/to/kujo npm run test:review` for six real MCP protocol cases with canonical receipts, forged input rejection and hostile-filter rejection.
+
+This profile is for an operator-controlled trusted local Git worktree. Source revisions are checked at provisioning and preserved in canonical receipt audit metadata; they do not cryptographically attest the executable at invocation time. Keep source checkouts and PATH under operator control. The pack rejects executable filters but cannot contain a hostile local actor or concurrent configuration changes. Never expose this profile as a multi-user remote service. See the vendored canonical pack README for the complete trust boundary.
+
+The test config points at a disposable repository after testing; rerun provisioning for your intended repository before using the plugin.

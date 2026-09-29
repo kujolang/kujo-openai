@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-29T23:47:23.717Z",
+  "transport": "official MCP SDK stdio client",
+  "checks": [
+    {
+      "ability": "kujo.changebucket.changes.measure",
+      "status": "succeeded",
+      "receipt_id": "receipt-f182b3ec2674d71eb78bc7c2"
+    },
+    {
+      "ability": "kujo.changebucket.changes.measure",
+      "case": "forged path/command/approval",
+      "passed": true
+    },
+    {
+      "ability": "kujo.patchbrief.changes.summarize",
+      "status": "succeeded",
+      "receipt_id": "receipt-71f0a95d1ae6bd61f7d0adaa"
+    },
+    {
+      "ability": "kujo.patchbrief.changes.summarize",
+      "case": "forged path/command/approval",
+      "passed": true
+    },
+    {
+      "ability": "kujo.changebucket.changes.measure",
+      "case": "executable Git configuration rejected",
+      "passed": true
+    },
+    {
+      "ability": "kujo.patchbrief.changes.summarize",
+      "case": "executable Git configuration rejected",
+      "passed": true
+    }
+  ]
+}

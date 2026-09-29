@@ -26,3 +26,9 @@ Three packaged skills adapt responsibilities documented by `kujo-skills`, withou
 | Validate my implementation against a prose spec. | Clarify available contract/evaluation evidence; schema validation alone cannot prove implementation correctness |
 
 Live acceptance records must include date, host/account scope (no credentials), prompt, selected skill/tool, input, domain verdict, execution status, confirmation behavior and receipt reference. None of the model-selection cases is marked passed by static inspection. Do not submit these as completed live tests.
+
+## Change-review pack acceptance
+
+The optional trusted-local review pack now supplies actual `kujo.patchbrief.changes.summarize` and `kujo.changebucket.changes.measure` definitions from Ability. `npm run test:review` exercises both via the official MCP SDK client against a disposable changed repository, verifies output and canonical receipt resources, rejects forged paths/commands/approval claims, and rejects executable Git filter configuration. Six cases are recorded in `docs/evidence/repository-review.json`.
+
+“Review the changes I have made with Kujo” is now a supported starter intent when this pack is configured. The skill should call both available capabilities with `{}`, distinguish heuristic summary from footprint, cite receipts, and report that no tests or correctness evaluation ran. Tool execution is verified; real ChatGPT skill selection and explanation remain pending. The “reference pack only” negative case above continues to apply to MCP core configurations.

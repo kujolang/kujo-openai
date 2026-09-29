@@ -29,6 +29,14 @@ jobs:
           git clone --filter=blob:none https://github.com/kujolang/mcp.git ../mcp
           git -C ../mcp checkout a7ec0dd8e6bcae303ab1431b4586dfe3e91f3a5a
           npm run test:integration
+      - name: Canonical change review over MCP
+        shell: bash
+        run: |
+          git clone --filter=blob:none https://github.com/kujolang/patchbrief.git ../patchbrief
+          git -C ../patchbrief checkout a4da5942e9668924cd2f2869859bf05b006edda5
+          git clone --filter=blob:none https://github.com/kujolang/changebucket.git ../changebucket
+          git -C ../changebucket checkout 030eea63c60449f82c9ba2680227485d318fdb6d
+          npm run test:review
       - run: npm run package
       - name: Verify reproducible package
         shell: bash
