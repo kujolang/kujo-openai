@@ -1,0 +1,15 @@
+{
+  "run_id": 36644324934,
+  "url": "https://github.com/kujolang/kujo-openai/actions/runs/36644324934",
+  "commit": "1edf35a7fd736500621669d8a94e1d9dadc97587",
+  "conclusion": "success",
+  "runtime": "Kujo 1.6.0 released linux-x64",
+  "node": "22",
+  "gates": [
+    "vendor integrity",
+    "17 automated tests including canonical suites",
+    "5 real MCP pack integration cases",
+    "package",
+    "reproducibility"
+  ]
+}
