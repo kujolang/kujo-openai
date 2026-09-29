@@ -1,0 +1,22 @@
+{
+  "accessed": "2026-09-29",
+  "repositories": {
+    "ability": "d6c970785f8d8bea04de0dce37920c2d0ca1c067",
+    "kujo-cmd": "e7988f5044878933084be16ec9a71d50610beeee",
+    "kujo-pi": "684430cd7757c327e6f5fb46d90d88b8546ce9ff",
+    "mcp": "a7ec0dd8e6bcae303ab1431b4586dfe3e91f3a5a",
+    "kujo-skills": "ab77f5c29623472990ead948b80cc8d0f4467788",
+    "dispatch": "ccfe22810cdfad21b2c5aa101bb1961adb283bb1",
+    "workcell": "e645d80e697cb722d49c35982905b2294da0a627",
+    "runledger": "97cb607a062efeecc7fcdc4e4a4e0308f90d45fe",
+    "eval": "6a5ab09e5c24cc1a842b374afccb64da40db2874",
+    "shipcheck": "111bfc83c832050877cb9d4fd82908aaf6d14749",
+    "scout": "f3a874fa0e95e26c52ef9ec4d23b0f52d8372089",
+    "scent": "969f0fdc853c88cd051248a6ebcd9ce0434d9f43",
+    "spec": "1211f37a09314be7150734bf15a55e9b2ea6504d",
+    "patchbrief": "321d961c19c4ee09713cf1f737ba5e112b0caa5b",
+    "changebucket": "030eea63c60449f82c9ba2680227485d318fdb6d",
+    "kujo": "914131732baa8b8f72c3449deb807aa4caa68ede",
+    "ability-gateway": "d7934e267826aba2525c042e56cc6e74a460e547"
+  }
+}

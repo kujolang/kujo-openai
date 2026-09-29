@@ -1,0 +1,11 @@
+{
+  "schema": "kujo.openai.local/v1",
+  "kujo": "/absolute/path/to/kujo",
+  "entry": "/absolute/path/to/trusted/application/openai.kujo",
+  "cwd": "/absolute/path/to/trusted/application",
+  "stateDirectory": "/absolute/private/path/to/receipts",
+  "modulePaths": ["/absolute/path/to/kujo-openai"],
+  "capabilities": ["--allow-fs-read", "--allow-clock"],
+  "maxConcurrent": 4,
+  "timeoutMs": 30000
+}

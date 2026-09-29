@@ -1,0 +1,12 @@
+// Application integration template. Replace the registry import with your own.
+// This file is deliberately non-executable until that application is configured.
+// The application owns principal, policy, audit, approval and idempotency stores.
+from src.projection import discover, invoke
+
+export func handle_openai_request(registry, context, services, visible) {
+    request := parse_json(read_stdin(1048576))
+    if request["operation"] == "discover" { return discover(registry, context, visible) }
+    if request["operation"] != "invoke" { return {"ok": false, "code": "unsupported_operation"} }
+    context["invocation_id"] := request["invocation_id"]
+    return invoke(registry, request["name"], request["input"], context, services, visible)
+}

@@ -1,0 +1,36 @@
+{
+  "date": "2026-09-29T23:00:19.142Z",
+  "source_commit": "a7ec0dd8e6bcae303ab1431b4586dfe3e91f3a5a",
+  "checks": [
+    {
+      "ability": "kujo.mcp.repository.profile",
+      "status": "succeeded",
+      "receipt_id": "receipt-bf898458969b8548e63c12f4",
+      "passed": true
+    },
+    {
+      "ability": "kujo.mcp.manifest.validate",
+      "status": "succeeded",
+      "receipt_id": "receipt-bac91f108b666f8230b59221",
+      "passed": true
+    },
+    {
+      "ability": "kujo.mcp.manifest.validate",
+      "status": "failed",
+      "receipt_id": "receipt-cc71b877f7ca80edabc85f0c",
+      "passed": true
+    },
+    {
+      "ability": "kujo.mcp.manifest.validate",
+      "status": "failed",
+      "receipt_id": "receipt-a37e2132dc091ede547a5e7c",
+      "passed": true
+    },
+    {
+      "ability": "kujo.mcp.manifest.validate",
+      "status": "failed",
+      "receipt_id": "receipt-b3b34d55b2b1d43c29a24762",
+      "passed": true
+    }
+  ]
+}

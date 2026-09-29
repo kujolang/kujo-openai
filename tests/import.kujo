@@ -1,0 +1,2 @@
+from src.projection import tool_name
+print(tool_name({"id": "kujo.test.echo", "version": "1.0.0"}))

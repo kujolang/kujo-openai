@@ -1,0 +1,24 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "kujo-openai",
+  "version": "0.1.0",
+  "description": "Use registered Kujo Abilities with canonical authority and evidence.",
+  "author": {"name": "Kujolang", "url": "https://kujolang.ai"},
+  "homepage": "https://github.com/kujolang/kujo-openai",
+  "repository": "https://github.com/kujolang/kujo-openai",
+  "license": "MIT",
+  "keywords": ["kujo", "ability", "mcp", "evidence"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Kujo",
+        "shortDescription": "Registered abilities, reviewable evidence",
+        "longDescription": "Discover and invoke application-registered Kujo Abilities. Available workflows depend on your configured application catalog. The reference pack provides bounded MCP repository profiling and manifest validation.",
+        "developerName": "Kujolang",
+        "websiteURL": "https://github.com/kujolang/kujo-openai",
+        "supportURL": "https://github.com/kujolang/kujo-openai/issues",
+        "defaultPrompt": ["Inspect the configured repository with Kujo.", "Validate a generated MCP manifest.", "Show me the evidence behind this Kujo result."]
+      }
+    }
+  }
+}

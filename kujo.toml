@@ -1,0 +1,7 @@
+[project]
+name = "kujo-openai"
+version = "0.1.0"
+description = "Ability host projection for OpenAI"
+[kujo]
+minimum_version = "1.6.0"
+entry = "src/projection.kujo"

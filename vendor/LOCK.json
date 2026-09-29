@@ -1,0 +1,15 @@
+{
+  "repository": "https://github.com/kujolang/ability",
+  "commit": "d6c970785f8d8bea04de0dce37920c2d0ca1c067",
+  "files": {
+    "ability.kujo": "9225d04d8b281fa84f70a7d66a8a5f37d7f1f3f421200fd625582fc3d567c21d",
+    "LICENSE": "37488fedc85c43ba96a6dd438cade3f3c4293792dd97c89591c4832378c2b63d",
+    "src/index.kujo": "1c30a4d2216e7092ee4eeae8dbcb83839d6e24b45dee2e8c4bc4aa340b78fa7d",
+    "src/internal.kujo": "c6de67a4189dddf995aa4d4c724d196b0f6ec3a713b57b73978579fce20f28de",
+    "src/contract.kujo": "6e66884e152200a3abaa3e01b632c12c5d15e3ceb922cd1e2f401a862a7b99db",
+    "src/contracts.kujo": "baed37be870e67646ff6e2c8cd76b1d49b007f01008177576f2cbe23535b3b9a",
+    "src/registry.kujo": "243c5f2dd0caee5004da4589c24ffc278dd3ffe0765de942b7bd2e21014eefd6",
+    "src/runtime.kujo": "15f4487483ea2e2131bae0b5b274db4fc86bb495163235ae9e69d682fda50fe3",
+    "src/profile.kujo": "05d0fea46b5497801cb8a283c596b6b164f808b5fc8cba6984d5afc6c797164e"
+  }
+}

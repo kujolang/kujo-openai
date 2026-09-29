@@ -1,0 +1,30 @@
+from vendor.ability.ability import create_ability_registry, register_ability_definition, register_ability_binding, register_ability_exposure
+from src.projection import discover, invoke
+func definition(id, kind, mode) {
+ return {"schema":"kujo.ability/v1", "id":id, "version":"1.0.0", "description":"Bounded conformance operation.", "input_schema":{"type":"object","properties":{"value":{"type":"string","maxLength":200}},"required":["value"],"additionalProperties":false}, "output_schema":{"type":"object","properties":{"value":{"type":"string"}},"required":["value"],"additionalProperties":false}, "effects":[{"kind":kind,"resource":"kujo.fixture.resource"}],"idempotency":{"mode":mode}}
+}
+func handler(input, context) { return {"value":input["value"]} }
+func bad_handler(input, context) { return parse_json("credential-marker-never-return") }
+func policy(definition, invocation, exposure) {
+ outcome := "allow"
+ if definition["effects"][0]["kind"] != "read" { outcome = "approval_required" }
+ if definition["id"] == "kujo.fixture.denied" { outcome = "deny" }
+ return {"schema":"kujo.ability.policy-decision/v1","decision_id":"fixture-policy","outcome":outcome,"reason":"Fixture policy","requirements":[],"policy_id":"kujo.fixture.policy","policy_version":"1.0.0"}
+}
+func audit(phase, invocation, payload) { return {"ok":true,"event_id":"fixture-"+phase} }
+func visible(entry, context) { return true }
+registry := create_ability_registry()
+for record in [["read","read","intrinsic"],["write","write","none"],["delete","delete","none"],["external","external","keyed"],["denied","read","none"],["failure","read","intrinsic"],["keyed","read","keyed"]] {
+ d := definition("kujo.fixture."+record[0], record[1], record[2])
+ step := register_ability_definition(registry,d); assert(step["ok"],"definition");registry=step["registry"]
+ selected_handler := handler
+ if record[0] == "failure" {selected_handler=bad_handler}
+ step=register_ability_binding(registry,{"schema":"kujo.ability.binding/v1","ability_id":d["id"],"ability_version":d["version"],"handler_id":d["id"]+".handler","handler_version":"1.0.0","handler":selected_handler,"timeout_ms":10000,"metadata":{}});assert(step["ok"],"binding");registry=step["registry"]
+ step=register_ability_exposure(registry,{"schema":"kujo.ability.exposure/v1","ability_id":d["id"],"ability_version":d["version"],"surface":"mcp","name":d["id"],"enabled":true,"public":false,"metadata":{}});assert(step["ok"],"exposure");registry=step["registry"]
+}
+request := parse_json(read_stdin(1048576))
+context := {"principal":{"type":"workload","id":"fixture","tenant_id":"local","claims":{}},"invocation_id":"catalog"}
+if request["operation"] == "discover" { print(to_json(discover(registry,context,visible))) } else {
+ context["invocation_id"] := request["invocation_id"]
+ print(to_json(invoke(registry,request["name"],request["input"],context,{"policy":policy,"audit":audit},visible)))
+}
