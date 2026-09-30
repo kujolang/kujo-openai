@@ -15,7 +15,7 @@ try {
  const config=execFileSync(process.execPath,['scripts/configure-review-pack.mjs',repository,...(release?['--release-signals']:[])],{encoding:'utf8'}).trim();
  const transport=new StdioClientTransport({command:process.execPath,args:[resolve('bin/kujo-openai.mjs')],env:{PATH:process.env.PATH,KUJO_OPENAI_CONFIG:config},stderr:'pipe'});
  client=new Client({name:'canonical-review-integration',version:'1.0.0'});await client.connect(transport);
- const {tools}=await client.listTools();assert.equal(tools.length,release?3:2);const checks=[];
+ const {tools:catalog}=await client.listTools();assert.equal(catalog.length,release?4:3);const tools=catalog.filter(t=>t._meta?.['kujo/abilityId']);const checks=[];
  for(const tool of tools) {
   assert.deepEqual(tool.annotations,{readOnlyHint:true,destructiveHint:false,openWorldHint:false,idempotentHint:true});
   const result=await client.callTool({name:tool.name,arguments:{}});assert.equal(result.isError,false,JSON.stringify(result));if(tool._meta['kujo/abilityId']==='kujo.shipcheck.repository.scan') {
@@ -23,6 +23,7 @@ try {
    assert.equal(result.structuredContent.summary.gate_passed,0);assert.equal(result.structuredContent.summary.total_checks,16);assert.ok(result.structuredContent.summary.failed_errors>0);
   } else assert.equal(result.structuredContent.summary.files_changed,1);
   const resource=await client.readResource({uri:result._meta['kujo/receiptUri']});const receipt=JSON.parse(resource.contents[0].text);assert.equal(receipt.ability_id,tool._meta['kujo/abilityId']);assert.deepEqual(receipt.result,result.structuredContent);assert.equal(receipt.audit.source_revisions["patchbrief.kujo"],"a4da5942e9668924cd2f2869859bf05b006edda5");checks.push({ability:receipt.ability_id,status:receipt.status,receipt_id:receipt.receipt_id});
+  const evidence=await client.callTool({name:'_kujo_receipt_evidence',arguments:{receipt_uri:result._meta['kujo/receiptUri']}});assert.deepEqual(evidence.structuredContent.receipt,receipt);
   const invalid=await client.callTool({name:tool.name,arguments:{path:'../../etc',command:'touch injected',approval:true}});assert.equal(invalid.isError,true);checks.push({ability:receipt.ability_id,case:'forged path/command/approval',passed:true});
  }
  const canary=join(directory,'executed');git(['config','filter.hostile.clean',`touch ${canary}`]);

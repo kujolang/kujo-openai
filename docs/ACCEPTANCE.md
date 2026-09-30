@@ -68,3 +68,22 @@ in `structuredContent`. This observation does not establish which host processin
 stage omitted them. Model-visible receipt retrieval is therefore NOT verified.
 Do not solve this by silently changing canonical output schemas or adding
 unscoped cross-user receipt access.
+
+### Receipt helper implementation checkpoint — 2026-09-30
+
+Added `_kujo_receipt_evidence` as a structured bridge to receipt resources, without
+changing canonical Ability schemas or domain output. The bounded store-instance
+index is explicitly not chat history. Local MCP tests prove exact receipt lookup,
+index restart behavior, malformed-input rejection and no Ability re-execution;
+remote SDK tests prove subject/tenant isolation and scope enforcement. Integrity,
+symlink and diagnostic-redaction tests cover the new lookup boundary.
+
+Verification: `KUJO_BIN="$PWD/../kujo/target/release/kujo" npm run check`:
+18 vendored files verified, **31 tests passed, 0 failed**. The release review
+integration (`KUJO_REVIEW_RELEASE=1 npm run test:review` with the same KUJO_BIN)
+passed **9 cases**, additionally comparing each helper receipt with the original
+resource receipt. Updated evidence is in `evidence/release-review.json`.
+
+The live tunnel has not yet loaded this helper. Restart it, refresh the installed
+Kujo app, then verify exact receipt IDs/URIs in a ChatGPT response. This checkpoint
+does not close the live visibility gap or the full mission.

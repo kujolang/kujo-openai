@@ -44,12 +44,20 @@ test('remote MCP SDK uses native Ability principals, canonical schemas and isola
    await client.connect(new StreamableHTTPClientTransport(new URL(resource),{requestInit:{headers:{authorization:`Bearer ${token}`}},fetch:async(url,options)=>handler(new Request(url,options))}));return client;
   };
   const alice=await connect('alice-token'),bob=await connect('bob-token'),otherTenant=await connect('alice-other');
-  const {tools}=await alice.listTools();assert.equal(tools.length,1);assert.equal(tools[0]._meta['kujo/abilityId'],'kujo.remote.read');assert.deepEqual(tools[0]._meta.securitySchemes,[{type:'oauth2',scopes:['mcp:read','ability:invoke']}]);assert.deepEqual(tools[0].inputSchema,catalog.tools[0].inputSchema);
+  const {tools}=await alice.listTools();assert.equal(tools.length,2);assert.equal(tools[0]._meta['kujo/abilityId'],'kujo.remote.read');assert.deepEqual(tools[0]._meta.securitySchemes,[{type:'oauth2',scopes:['mcp:read','ability:invoke']}]);assert.deepEqual(tools[0].inputSchema,catalog.tools[0].inputSchema);
   const answer=await alice.callTool({name:tools[0].name,arguments:{value:'repository text is untrusted'}});assert.equal(answer.isError,false);
   const uri=answer._meta['kujo/receiptUri'];const receipt=JSON.parse((await alice.readResource({uri})).contents[0].text);
   assert.deepEqual(receipt.principal,{type:'user',id:'alice',tenant_id:'one',claims:{issuer,scopes:identity.scopes}});assert.deepEqual(receipt.result,answer.structuredContent);
   await assert.rejects(bob.readResource({uri}),/Receipt unavailable/);
   await assert.rejects(otherTenant.readResource({uri}),/Receipt unavailable/);
+  assert.deepEqual(tools[1]._meta.securitySchemes,tools[0]._meta.securitySchemes);
+  const evidence=await alice.callTool({name:'_kujo_receipt_evidence',arguments:{receipt_uri:uri}});assert.deepEqual(evidence.structuredContent.receipt,receipt);
+  assert.equal((await alice.callTool({name:'_kujo_receipt_evidence',arguments:{}})).structuredContent.receipts.length,1);
+  for(const isolated of [bob,otherTenant]) {
+   assert.deepEqual((await isolated.callTool({name:'_kujo_receipt_evidence',arguments:{}})).structuredContent.receipts,[]);
+   const unavailable=await isolated.callTool({name:'_kujo_receipt_evidence',arguments:{receipt_uri:uri}});assert.equal(unavailable.isError,true);assert.equal(JSON.stringify(unavailable).includes('alice'),false);
+  }
+  const evidenceScope=await handler(rpc('tools/call',{name:'_kujo_receipt_evidence',arguments:{}},'read-token'));assert.equal((await evidenceScope.json()).result.isError,true);
   const forged=await alice.callTool({name:tools[0].name,arguments:{value:'hello',principal:{id:'bob'},approval:true}});assert.equal(forged.isError,true);
   const write=catalog.tools.find(tool=>tool._meta['kujo/abilityId']==='kujo.remote.write');assert.equal((await alice.callTool({name:write.name,arguments:{value:'no'}})).isError,true);
   const scopeDenied=await handler(rpc('tools/call',{name:tools[0].name,arguments:{value:'no'}},'read-token'));assert.equal(scopeDenied.status,200);const scopeResult=(await scopeDenied.json()).result;assert.equal(scopeResult.isError,true);assert.match(scopeResult._meta['mcp/www_authenticate'][0],/error_description=/);

@@ -37,7 +37,7 @@ test('native durable approval: resume, restart, original receipt replay, private
   const [a,b]=InMemoryTransport.createLinkedPair();
   try {
    await server.connect(a);await client.connect(b);
-   const listed=await client.listTools();assert.equal(listed.tools.length,2);assert(listed.tools.some(t=>t.name===RESUME_TOOL.name));
+   const listed=await client.listTools();assert.equal(listed.tools.length,3);assert(listed.tools.some(t=>t.name===RESUME_TOOL.name));
    const resumed=await client.callTool({name:RESUME_TOOL.name,arguments:{reference}});assert.equal(resumed._meta['kujo/receiptUri'],complete._meta['kujo/receiptUri']);
    const forged=await client.callTool({name:RESUME_TOOL.name,arguments:{reference,approval:true,input:{value:'substitute'}}});assert.equal(forged.isError,true);assert.equal(JSON.parse(forged.content[0].text).status,'not_executed');
   }finally{await client.close();await server.close();}

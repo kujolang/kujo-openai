@@ -28,7 +28,7 @@ test('real loopback HTTP carries official MCP SDK calls, native receipts and fix
   const metadata=await send(port,'/.well-known/oauth-protected-resource/mcp',{host:'kujo.example','x-forwarded-host':'evil.example','x-forwarded-proto':'http'});assert.equal(metadata.status,200);assert.equal(JSON.parse(metadata.body).resource,origin+'/mcp');
   client=new Client({name:'real-http-contract',version:'1'});
   await client.connect(new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/mcp`),{requestInit:{headers:{host:'kujo.example',authorization:'Bearer test-token'}}}));
-  const {tools}=await client.listTools();assert.equal(tools.length,1);
+  const {tools}=await client.listTools();assert.equal(tools.length,2);
   const result=await client.callTool({name:tools[0].name,arguments:{value:'real HTTP'}});assert.equal(result.isError,false);assert.deepEqual(result.structuredContent,{value:'real HTTP'});
   const receipt=JSON.parse((await client.readResource({uri:result._meta['kujo/receiptUri']})).contents[0].text);assert.deepEqual(receipt.principal,principal);
   assert.equal((await send(port,'/mcp',{host:'evil.example'})).status,400);

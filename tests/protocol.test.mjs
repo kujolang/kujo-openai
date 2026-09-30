@@ -11,9 +11,16 @@ test('official MCP client over stdio: initialize, list, call, receipt read, erro
  try {for(let iteration=0;iteration<2;iteration++) {
  const transport=new StdioClientTransport({command:process.execPath,args:[join(root,'bin/kujo-openai.mjs')],env:{PATH:process.env.PATH,KUJO_OPENAI_CONFIG:path},stderr:'pipe'});
  const client=new Client({name:'contract-client',version:'1.0.0'});
- try {await client.connect(transport);assert.equal((await client.listTools()).tools.length,7);
+ try {await client.connect(transport);assert.equal((await client.listTools()).tools.length,8);
  const result=await client.callTool({name:toolName('kujo.fixture.read','1.0.0'),arguments:{value:'MCP'}});assert.equal(result.isError,false);assert.deepEqual(result.structuredContent,{value:'MCP'});
  const receipt=await client.readResource({uri:result._meta['kujo/receiptUri']});assert.equal(JSON.parse(receipt.contents[0].text).status,'succeeded');
+ const recent=await client.callTool({name:'_kujo_receipt_evidence',arguments:{}});
+ assert.equal(recent.isError,false);assert.equal(recent.structuredContent.receipts.length,1);
+ assert.equal(recent.structuredContent.receipts[0].receipt_uri,result._meta['kujo/receiptUri']);
+ const evidence=await client.callTool({name:'_kujo_receipt_evidence',arguments:{receipt_uri:result._meta['kujo/receiptUri']}});
+ assert.deepEqual(evidence.structuredContent.receipt,JSON.parse(receipt.contents[0].text));
+ assert.equal((await client.callTool({name:'_kujo_receipt_evidence',arguments:{receipt_uri:'../../secret'}})).isError,true);
+ assert.equal((await client.callTool({name:'_kujo_receipt_evidence',arguments:{approval:true}})).isError,true);
  assert.equal((await client.callTool({name:'unknown',arguments:{}})).isError,true);
  await client.ping();
  } finally {await client.close();}

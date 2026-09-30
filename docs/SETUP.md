@@ -81,3 +81,5 @@ Check `/health/mcp` for successful initialization and tool discovery: `/readyz`
 alone can report ready while MCP discovery has failed. This compatibility fix has
 local regression coverage and successful live ChatGPT creation/discovery on
 2026-09-30. See ACCEPTANCE.md for the live review and remaining receipt-visibility gap.
+
+After updating a running tunnel's MCP server, restart the local client/server and refresh the installed app's tool catalog. The receipt helper `_kujo_receipt_evidence` should appear alongside the three canonical review tools. Use it to list recent receipt references, then read an exact URI; do not rerun an Ability merely to retrieve evidence. The recent index starts empty after restart.

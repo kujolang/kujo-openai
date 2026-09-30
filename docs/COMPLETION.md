@@ -1,6 +1,6 @@
 # Full-mission completion ledger
 
-This ledger preserves the requested end state. A green local milestone does not complete the mission. Status is evidence-based as of 2026-09-29; live deployment and host behavior require fresh verification.
+This ledger preserves the requested end state. A green local milestone does not complete the mission. Status is evidence-based as of 2026-09-30; live deployment and host behavior require fresh verification.
 
 | Requirement | Current evidence | Status / remaining proof |
 |---|---|---|
@@ -13,14 +13,14 @@ This ledger preserves the requested end state. A green local milestone does not 
 | Input/output schema preservation | Exact projection and real MCP core / PatchBrief integration | Verified for MCP-compatible object schemas; unsupported schemas explicit |
 | Precise effects semantics without name inference | Optional canonical semantics across native/TS/Python/devkit; legacy conservative defaults | Verified; product author declarations still require review |
 | Authority, approval, retries | Canonical tests; local SQLite service tests; native MCP continuation test | Infrastructure verified. Production approval UI/authentication and business reconciliation remain application work |
-| Receipts and provenance | Original canonical receipts, hash-addressed private resources, application audit source revisions | Verified local; remote authenticated evidence access pending |
+| Receipts and provenance | Original canonical receipts, hash-addressed private resources, application audit source revisions | Canonical storage and remote principal isolation tested; structured receipt helper added, live ChatGPT visibility pending |
 | Pure/read/file/write/external/approval/retry/output/failure classes | Native contract fixtures plus real MCP core and review handlers | Representative test coverage; production mutation classes not registered by default |
 | Repository Review skill | Skill, real MCP repository profile; optional review pack | Static/package validation; live ChatGPT selection/explanation pending |
 | Change Review skill | Real PatchBrief + ChangeBucket through Ability/MCP, six integration cases | Tool workflow verified; live ChatGPT skill behavior pending |
 | Release/Ship Review skill | Optional canonical PatchBrief + ChangeBucket + ShipCheck catalog, nine actual MCP cases and composition skill | Tool evidence verified; live model composition/explanation incomplete |
 | Spec/Eval/Scent/Scout workflows where applicable | Source-backed skill guidance and missing-capability handling | Corresponding production canonical registrations/compositions incomplete |
 | Local transport and installation | Official SDK stdio tests; bounded frames/processes; isolated Codex plugin installation | Verified; Windows process containment not certified |
-| ChatGPT local client route | Official Secure MCP Tunnel/developer-mode setup documented | Actual tunnel/workspace connection and live ChatGPT acceptance incomplete |
+| ChatGPT local client route | Official Secure MCP Tunnel/developer-mode setup documented | Private tunnel connected; three canonical read-only tools invoked successfully in ChatGPT (ACCEPTANCE.md); packaged Skills acceptance remains incomplete |
 | Remote trust architecture | REMOTE.md and inspected existing Ability gateway | Resource-server boundary tested with native Ability fixtures; isolated production provider/deployment incomplete |
 | Publicly installable remote plugin | Portable current-format package, skills, metadata, starters | Stable public endpoint, authentication, verified domain and reviewer evidence incomplete |
 | OAuth, per-user grants, isolation, credential custody, revocation/scopes | Official requirements and gateway source reviewed | Introspection, scope and principal/receipt isolation boundary tested; live issuer flows, credential custody and deployment tests incomplete |
@@ -32,7 +32,7 @@ This ledger preserves the requested end state. A green local milestone does not 
 | Extension process | EXTENDING.md, native projection and host-neutral pack/binding examples | Documented and tested for added definitions |
 | Documentation 1–13 | README and ARCHITECTURE/SETUP/REMOTE/SECURITY/EXTENDING/CONTINUATIONS/ACCEPTANCE/SUBMISSION/PRIVACY | Written; unimplemented/live requirements explicitly labeled |
 | Positive/negative submission tests | ACCEPTANCE.md and real protocol integration evidence | Model-selected live cases, dedicated reviewer account/walkthrough video and portal validation incomplete |
-| End-to-end “@Kujo review these changes” | Canonical tools + real MCP + receipts proven | Actual ChatGPT workflow selection and grounded explanation not yet verified |
+| End-to-end “@Kujo review these changes” | Canonical tools + real MCP + receipts proven | Live three-tool change review and grounded domain explanation verified; exact receipt visibility and packaged Skill selection remain pending |
 | Commit/push/clean state and durable memory | Git remote refs, CI runs and Strata handoffs | Recheck at each milestone |
 
 Do not claim remote readiness from local filesystem permissions, a simulated approval, a fixture identity, a green MCP client test, or the existing gateway's fixture-only execution path. Complete each outstanding proof against the intended host and deployment before closing the goal.
