@@ -1,3 +1,4 @@
+import {resolveKujoBinary} from '@kujolang/kujo-runtime';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm,readdir,readFile,realpath} from 'node:fs/promises';
@@ -13,7 +14,7 @@ import {createServer} from '../lib/server.mjs';
 import {RESUME_TOOL} from '../lib/continuations.mjs';
 import {Adapter} from '../lib/adapter.mjs';
 test('native durable approval: resume, restart, original receipt replay, private references',async()=>{
- const directory=await realpath(await mkdtemp(join(tmpdir(),'openai-continuation-'))),root=resolve('.'),kujo=process.env.KUJO_BIN||resolve('../kujo/target/release/kujo'),entry=resolve('tests/continuation-provider.kujo');
+ const directory=await realpath(await mkdtemp(join(tmpdir(),'openai-continuation-'))),root=resolve('.'),kujo=process.env.KUJO_BIN||resolveKujoBinary(),entry=resolve('tests/continuation-provider.kujo');
  const env={PATH:process.env.PATH,KUJO_MODULE_PATH:[root,join(root,'vendor/ability')].join(':')};
  const operator=(mode,id)=>execFileSync(kujo,['run',entry],{cwd:directory,env:{...env,CONTINUATION_MODE:mode,CONTINUATION_ID:id||''},encoding:'utf8'});
  try {

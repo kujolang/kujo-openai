@@ -39,13 +39,15 @@
     "check": "npm run verify:vendor && npm test",
     "package": "node scripts/package.mjs",
     "test:integration": "node tests/integration.mjs",
-    "test:review": "node tests/review-integration.mjs"
+    "test:review": "node tests/review-integration.mjs",
+    "test:setup": "node tests/setup-integration.mjs"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/kujolang/kujo-openai.git"
   },
   "dependencies": {
+    "@kujolang/kujo-runtime": "1.6.0",
     "@modelcontextprotocol/sdk": "1.31.0",
     "ajv": "8.20.0"
   }

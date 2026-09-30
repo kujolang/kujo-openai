@@ -1,9 +1,10 @@
+import {resolveKujoBinary} from '@kujolang/kujo-runtime';
 // Operator-run integration of an existing canonical pack; no product handlers.
 import {writeFile,mkdir,realpath,readFile} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 const source=await realpath(process.argv[2] || '../mcp');
-const binary=await realpath(process.env.KUJO_BIN || execFileSync('which',['kujo'],{encoding:'utf8'}).trim());
+const binary=await realpath(process.env.KUJO_BIN || resolveKujoBinary());
 const expected='a7ec0dd8e6bcae303ab1431b4586dfe3e91f3a5a';
 if (execFileSync('git',['-C',source,'rev-parse','HEAD'],{encoding:'utf8'}).trim()!==expected || execFileSync('git',['-C',source,'status','--porcelain','--','packs/mcp_core','src/make'],{encoding:'utf8'}).trim()) throw Error('MCP source must match the reviewed clean revision '+expected);
 const directory=resolve('.local/mcp-core');await mkdir(directory,{recursive:true,mode:0o700});

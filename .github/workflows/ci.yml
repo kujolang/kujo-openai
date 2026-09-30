@@ -23,6 +23,8 @@ jobs:
           echo "KUJO_BIN=$runtime_path" >> "$GITHUB_ENV"
       - run: npm ci --ignore-scripts
       - run: npm run check
+      - name: Clean local installation with bundled runtime
+        run: npm run test:setup
       - name: Canonical MCP pack integration
         shell: bash
         run: |
