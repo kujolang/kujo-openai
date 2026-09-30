@@ -14,7 +14,7 @@ This release deliberately cannot claim public readiness:
 - No certified multi-user isolation or remote execution profile.
 - Canonical semantic precision is implemented; the deployed catalog and handler certification still need review.
 - Trusted-local change/release packs are implemented; remote equivalents require certified application-owned providers.
-- No live ChatGPT prompt/skill acceptance record, reviewer test account or walkthrough recording.
+- Live ChatGPT three-tool review is recorded in ACCEPTANCE.md; packaged Skill selection and receipt-helper visibility remain unverified. No reviewer test account or walkthrough recording.
 - Public privacy/support/terms metadata must reflect the actual deployment/publisher; no fake production URLs or reviewer credentials are packaged.
 
 The local privacy notice describes local behavior only. It is not a hosted-service policy.
