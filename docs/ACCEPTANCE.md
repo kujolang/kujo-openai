@@ -115,3 +115,43 @@ This resolves the observed receipt-reference visibility gap for this private
 ChatGPT tunnel workflow. It does not prove automatic packaged Skill selection,
 all positive/negative host acceptance cases, or production remote deployment.
 Earlier gap notes above are historical evidence, superseded by this live result.
+
+### Installed Skills and brand package — 2026-09-30
+
+Updated the existing private cloud plugin from its exported archive, preserving
+its registered `.app.json` byte-for-byte and package identity. Version 1.0.3
+contains the three maintained Skills, starter prompts, portable and compatibility
+manifests, and official Kujo K assets. ChatGPT confirmed the upload and displays
+three enabled Skills with the original MCP app still connected. The deployment
+archive is operator-local, not the distributable local-stdio package. SHA256:
+`405de36de9821c26e523858bbf40c1d072028ab739def69b6f2a6990b448ae42`.
+
+The official SVG is preserved in `assets/kujo-logomark.svg`; its 256 × 256 PNG
+render is 7,020 bytes, with provenance in `assets/SOURCE.md`. Both manifests
+reference it for listing/composer icons in both themes. Remote packaging tests
+compare the referenced archived image bytes with the source. All four package
+tests passed; `git diff --check` passed.
+
+A fresh **Try in chat** change review in
+`6abd9559-7134-83ea-b774-b20a789e9aa1` inspected the actual uncommitted branding
+change set through ChangeBucket and PatchBrief. It reported 8 files, 35 additions,
+6 deletions and medium footprint risk, and explicitly said no executable tests
+were run by those Abilities. Exact receipt IDs and content hashes were independently
+matched to the local canonical store:
+
+- `receipt-c0c7f72e846c2669873930c0`:
+  `9310636927f87cee568c6f3cb0a6ccea4f1cbb58a29b11451bc4feac0b9330c3`
+- `receipt-231fab4529015615bb45a25e`:
+  `887b25ac909edc62bf6e8322e7f9c894b1a177180b4e8f0be66a08a04b192403`
+
+This verifies the installed combined package's review behavior. The exposed chat
+activity did not show an explicit Skill-file load, so automatic Skill selection
+is not independently proven by this result alone.
+
+**Open limitation:** ChatGPT still renders its compass placeholder for the plugin
+icon after successful archive updates and a page refresh. Explicit dark variants
+and the portable manifest did not resolve it. No icon-edit control was exposed in
+the inspected existing-app management UI. Do not claim live branding is complete
+or recreate the working connection to hide this limitation. Package field guidance:
+https://developers.openai.com/plugins/deploy/submission and
+https://developers.openai.com/plugins/build/plugins (accessed 2026-09-30).
