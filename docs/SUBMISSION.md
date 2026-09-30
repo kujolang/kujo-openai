@@ -14,7 +14,7 @@ This release deliberately cannot claim public readiness:
 - No certified multi-user isolation or remote execution profile.
 - Canonical semantic precision is implemented; the deployed catalog and handler certification still need review.
 - Trusted-local change/release packs are implemented; remote equivalents require certified application-owned providers.
-- Live ChatGPT three-tool review is recorded in ACCEPTANCE.md; packaged Skill selection and receipt-helper visibility remain unverified. No reviewer test account or walkthrough recording.
+- Live ChatGPT three-tool review is recorded in ACCEPTANCE.md; exact receipt-helper visibility and installed Codex Skill composition are verified. Automatic browser Skill-file loading remains unproven. No reviewer test account or walkthrough recording.
 - Public privacy/support/terms metadata must reflect the actual deployment/publisher; no fake production URLs or reviewer credentials are packaged.
 
 The local privacy notice describes local behavior only. It is not a hosted-service policy.
@@ -31,7 +31,7 @@ The installed Codex CLI 0.144.4 required the supported `.codex-plugin/plugin.jso
 
 ## Remote submission bundle
 
-After choosing the real deployment, create an operator-owned JSON file with exactly these fields:
+After choosing the real deployment, create an operator-owned JSON file with these required fields:
 
 ```json
 {
@@ -53,3 +53,28 @@ node scripts/package.mjs --remote /absolute/operator/remote-package.json
 The result is `dist/remote/kujo-openai-0.1.0-remote.zip`, with its own checksum, dependency inventory and unsigned provenance. It has the portable manifest, a single Streamable HTTP MCP declaration, Skills and documentation. It contains no native runtime, Node dependencies, local stdio command, operator configuration or legacy Codex compatibility manifest. Starters describe remote catalog/evidence access rather than promise unregistered review capabilities. Source manifests and the local archive are untouched. The remote artifact targets the current portable format; legacy Codex profile acceptance is only verified for the separate local bundle.
 
 Tests compare generated manifests against the official schemas, reject missing/unsafe metadata and credential fields, inspect the actual ZIP contents, and compare two builds for reproducibility. They use temporary fixture URLs and never leave a fixture submission archive in the project output directory. These offline checks do not establish domain ownership, endpoint reachability, policy accuracy, OAuth compatibility, live host behavior or directory approval. Supply and verify those before submission.
+
+
+### Reviewer evidence metadata
+
+The remote configuration optionally accepts `review`, copied into
+`extensions.com.openai.review` in the generated portable manifest. Supply it only
+with cases appropriate to the actual deployed catalog and a reviewer-accessible
+walkthrough. This is metadata transport, not evidence that the cases passed.
+Omitting `review` keeps the existing development-package behavior.
+
+`review.test_cases.positive` requires at least five cases and `negative` at least
+three. Each case contains `description`, `prompt`, `tools_triggered` (an empty
+string is valid when no tool should run), and `expected_behavior`. Optional
+`file_attachment_urls` and `expected_output_url` must be credential-free HTTPS
+URLs. `review.demo_recording_url` is required when supplying review metadata.
+Optional `commerce` is boolean; `commerce_description` is text. Unknown fields,
+incomplete case groups, unsafe URLs and oversized metadata fail validation with
+generic diagnostics. Reviewer passwords/tokens belong in the submission portal,
+never in this file or the ZIP. Text fields are operator-owned and must also be
+reviewed for secrets; field validation cannot identify every secret in prose.
+
+These fields follow the official [submission guide](https://developers.openai.com/plugins/deploy/submission)
+(accessed 2026-09-30). Tests verify deep-copy preservation, source-manifest
+immutability, rejection cases, and exact metadata in the reproducible remote ZIP.
+The fixture cases used by tests are not shipped as production review claims.
