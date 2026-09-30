@@ -59,3 +59,24 @@ KUJO_BIN=/absolute/path/to/kujo node scripts/configure-review-pack.mjs /absolute
 ```
 
 This updates the same ignored local configuration with three canonical tools. Existing setup without the option still exposes two. ShipCheck's scan does not execute test suites or approve releases. Inspect its domain gate and individual checks even when the Ability execution succeeds. The ship-review skill combines this evidence with PatchBrief and ChangeBucket, and reports missing test/spec/artifact evidence. All three share the trusted-local restriction; this is not an uploaded-repository sandbox or remote deployment.
+
+### Shared stdio tunnel discovery
+
+The official tunnel client can keep one stdio child alive across host discovery
+attempts. In the live ChatGPT creation attempt on 2026-09-30, ChatGPT tried
+`server/discover`, fell back to MCP 2025-11-25 initialization, then initialized
+again before listing tools. The adapter previously rejected that second handshake.
+It now returns the original successful negotiation for another valid initialization
+with the same protocol version and client capabilities. Client display information
+may differ; it is never authentication or approval evidence. The SDK client state
+and in-flight execution state are not replaced. Changed protocol versions or
+capabilities require a fresh connection. Failed initialization can be retried, and
+an initialized notification cannot enable calls before successful negotiation.
+
+For callers that omit the lifecycle notification, tunnel-client v0.0.15 offers
+`mcp.stdio_send_initialized_notification: true` in its YAML configuration.
+See the [official configuration reference](https://github.com/openai/tunnel-client/blob/v0.0.15/docs/configuration.md), accessed 2026-09-30.
+After modifying the adapter, restart the tunnel to replace its existing stdio child.
+Check `/health/mcp` for successful initialization and tool discovery: `/readyz`
+alone can report ready while MCP discovery has failed. This compatibility fix has
+local regression coverage; live ChatGPT acceptance still needs verification.

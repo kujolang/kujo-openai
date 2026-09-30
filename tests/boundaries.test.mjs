@@ -38,7 +38,7 @@ test('MCP lifecycle and duplicate IDs are rejected without replacing active requ
  const transport=new BoundedStdioTransport(input,output);transport.onmessage=x=>received.push(x);await transport.start();
  const send=x=>input.write(JSON.stringify(x)+'\n');
  send({jsonrpc:'2.0',id:1,method:'tools/list'});assert.ok(response.includes('Initialization required'));
- send({jsonrpc:'2.0',id:2,method:'initialize',params:{}});send({jsonrpc:'2.0',method:'notifications/initialized'});
+ send({jsonrpc:'2.0',id:2,method:'initialize',params:{}});await transport.send({jsonrpc:'2.0',id:2,result:{protocolVersion:'2025-11-25'}});send({jsonrpc:'2.0',method:'notifications/initialized'});
  send({jsonrpc:'2.0',id:3,method:'ping'});send({jsonrpc:'2.0',id:3,method:'ping'});
  assert.ok(response.includes('Duplicate request'));assert.equal(received.filter(r=>r.id===3).length,1);
  send(null);send([]);assert.ok(response.includes('Invalid request'));await transport.close();
