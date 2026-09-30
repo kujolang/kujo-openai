@@ -1,0 +1,45 @@
+// Isolated application fixture. Grant mode is operator environment only;
+// model requests cannot select it. Production applications own this boundary.
+from vendor.ability.services.local_sqlite import initialize_local_store, local_sqlite_services, issue_local_approval
+from vendor.ability.ability import create_ability_registry, register_ability_definition, register_ability_binding, register_ability_exposure, execute_ability
+from src.projection import discover, prepare_invocation
+from tests.registry import definition, policy, visible
+path:=path_absolute(".")+"/continuation.sqlite"
+mode:=env_or("CONTINUATION_MODE","provider")
+if mode=="init" {
+ initialize_local_store(path)
+ db:=db_connect("sqlite",path)
+ db_execute(db,"CREATE TABLE pending(id TEXT PRIMARY KEY, body TEXT NOT NULL, approval TEXT NOT NULL DEFAULT '{}')",[])
+ db_execute(db,"CREATE TABLE business(value TEXT)",[])
+ db_close(db)
+} else if mode=="grant" {
+ id:=env("CONTINUATION_ID")
+ db:=db_connect("sqlite",path)
+ rows:=db_query(db,"SELECT body FROM pending WHERE id=?",[id]);assert(len(rows)==1,"unknown invocation")
+ inv:=parse_json(rows[0]["body"])
+ approval:=issue_local_approval(path,inv,"grant-"+id,"nonce-"+id,{"type":"human","id":"operator","tenant_id":"local","claims":{}},current_timestamp(),current_timestamp()+600000)
+ db_execute(db,"UPDATE pending SET approval=? WHERE id=?",[to_json(approval),id]);db_close(db)
+} else {
+ registry:=create_ability_registry();d:=definition("kujo.continuation.write","write","keyed")
+ handler:=func(input,context){db:=db_connect("sqlite",path);db_query(db,"PRAGMA busy_timeout=5000",[]);db_execute(db,"INSERT INTO business(value) VALUES(?)",[input["value"]]);db_close(db);return input}
+ step:=register_ability_definition(registry,d);registry=step["registry"]
+ step=register_ability_binding(registry,{"schema":"kujo.ability.binding/v1","ability_id":d["id"],"ability_version":"1.0.0","handler_id":"continuation-test","handler_version":"1.0.0","handler":handler,"timeout_ms":10000,"metadata":{}});registry=step["registry"]
+ step=register_ability_exposure(registry,{"schema":"kujo.ability.exposure/v1","ability_id":d["id"],"ability_version":"1.0.0","surface":"mcp","name":"write","enabled":true,"public":false,"metadata":{}});registry=step["registry"]
+ request:=parse_json(read_stdin(1048576))
+ context:={"principal":{"type":"workload","id":"application","tenant_id":"local","claims":{}},"invocation_id":"discovery"}
+ if request["operation"]=="discover" {catalog:=discover(registry,context,visible);catalog["capabilities"]:={"resume":"invocation-v1"};print(to_json(catalog))} else {
+  db:=db_connect("sqlite",path);db_query(db,"PRAGMA busy_timeout=5000",[])
+  if request["operation"]=="invoke" {
+   context["invocation_id"]:=request["invocation_id"];context["idempotency_key"]:=request["invocation_id"]
+   prepared:=prepare_invocation(registry,request["name"],request["input"],context,visible);assert(prepared["ok"],"unknown operation")
+   db_execute(db,"INSERT INTO pending(id,body) VALUES(?,?)",[request["invocation_id"],to_json(prepared["invocation"])])
+  } else {assert(request["operation"]=="resume","unsupported operation")}
+  rows:=db_query(db,"SELECT body,approval FROM pending WHERE id=?",[request["invocation_id"]]);db_close(db)
+  if len(rows)!=1 {print(to_json({"ok":false,"code":"invocation_not_found"}))} else {
+   inv:=parse_json(rows[0]["body"]);inv["approval"]:=parse_json(rows[0]["approval"])
+   assert(to_json(inv["principal"])==to_json(context["principal"]),"principal mismatch")
+   services:=local_sqlite_services(path);services["policy"]:=policy
+   print(to_json(execute_ability(registry,inv,services)))
+  }
+ }
+}

@@ -1,5 +1,6 @@
-from src.projection import tool_name, project_ability, discover, invoke
+from src.projection import tool_name, project_ability, discover, prepare_invocation, invoke
 export tool_name := tool_name
 export project_ability := project_ability
 export discover := discover
 export invoke := invoke
+export prepare_invocation := prepare_invocation

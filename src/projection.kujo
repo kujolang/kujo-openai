@@ -61,7 +61,7 @@ export func discover(registry, context, visible) {
     return {"ok": true, "schema": "kujo.openai.catalog/v1", "tools": tools, "unsupported": unsupported}
 }
 
-export func invoke(registry, name, input, context, services, visible) {
+export func prepare_invocation(registry, name, input, context, visible) {
     catalog := discover(registry, context, visible)
     if catalog["ok"] == false { return catalog }
     selected := null
@@ -76,5 +76,11 @@ export func invoke(registry, name, input, context, services, visible) {
         "idempotency_key": get(context, "idempotency_key", ""), "approval": get(context, "approval", {}),
         "metadata": {"host": "openai", "projection": "kujo.openai/v1"}
     }
-    return execute_ability(registry, invocation, services)
+    return {"ok":true,"invocation":invocation}
+}
+
+export func invoke(registry, name, input, context, services, visible) {
+    prepared:=prepare_invocation(registry,name,input,context,visible)
+    if prepared["ok"]==false {return prepared}
+    return execute_ability(registry,prepared["invocation"],services)
 }

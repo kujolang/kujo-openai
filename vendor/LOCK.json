@@ -1,7 +1,8 @@
 {
   "repository": "https://github.com/kujolang/ability",
-  "commit": "527d7674f232a368e0c7a0abdb018bdfbb850d07",
+  "commit": "44f2e8123b5df9f3abd478426ab5a10ada1ebb3b",
   "files": {
+    "services/local_sqlite.kujo": "ee7bd3671b972f0d1c7f1f24d6ecdbc22be09e488d01b02b9f9112f9cdcfcb14",
     "bindings/json_process.kujo": "13a61d5e605d1a28ff3cd55d58b5e741f3bd1668388a5684962229d471156646",
     "packs/repository_review/runtime.kujo": "7c514649bba18f7c7150c53928de0a616bbc9113dd6662c93455b90689bea4bb",
     "packs/repository_review/README.md": "8d09c41b86466dbaeb35836f435aa078e40f2de1c9b77f518877c000be3d1ab6",
