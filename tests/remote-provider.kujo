@@ -1,0 +1,25 @@
+// Isolated protocol fixture, not a production remote catalog.
+from tests.registry import definition, policy, audit
+from vendor.ability.ability import create_ability_registry, register_ability_definition, register_ability_binding, register_ability_exposure
+from src.projection import discover, invoke
+func handler(input,context){return {"value":input["value"]}}
+func visible(entry,context){return true}
+registry:=create_ability_registry()
+for kind in ["read","write"] {
+ d:=definition("kujo.remote."+kind,kind,"intrinsic")
+ d["semantics"]:={"open_world":false,"destructive":false,"executes_code":false}
+ step:=register_ability_definition(registry,d);assert(step["ok"],"definition");registry=step["registry"]
+ step=register_ability_binding(registry,{"schema":"kujo.ability.binding/v1","ability_id":d["id"],"ability_version":d["version"],"handler_id":d["id"]+".handler","handler_version":"1.0.0","handler":handler,"timeout_ms":10000,"metadata":{}});assert(step["ok"],"binding");registry=step["registry"]
+ step=register_ability_exposure(registry,{"schema":"kujo.ability.exposure/v1","ability_id":d["id"],"ability_version":d["version"],"surface":"mcp","name":d["id"],"enabled":true,"public":false,"metadata":{}});assert(step["ok"],"exposure");registry=step["registry"]
+}
+request:=parse_json(read_stdin(1048576))
+context:=request["trusted_context"]
+context["invocation_id"]:="discovery"
+if request["operation"]=="discover" {
+ result:=discover(registry,context,visible)
+ result["capabilities"]:={"authenticated_context":"principal-v1"}
+ print(to_json(result))
+} else {
+ context["invocation_id"]:=request["invocation_id"]
+ print(to_json(invoke(registry,request["name"],request["input"],context,{"policy":policy,"audit":audit},visible)))
+}
