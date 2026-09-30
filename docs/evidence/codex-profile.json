@@ -1,10 +1,13 @@
 {
-  "date": "2026-09-29T23:48:16.358Z",
+  "date": "2026-09-30T00:12:07.771Z",
+  "archive_sha256": "2796cc5fce7c8eb93c4e4575f544e4453cea664263c955cb3af981131275ef19",
+  "source_commit": "e632f4610ea077797321e0e17361aa87e1628130",
   "version": "codex-cli 0.144.4",
   "isolated_profile": true,
   "install": true,
   "dependencies_present": true,
   "installed_catalog": true,
+  "bundled_native_projection": true,
   "remove": true,
   "live_model_test": false
 }
