@@ -8,7 +8,8 @@
     "node": ">=22"
   },
   "bin": {
-    "kujo-openai": "bin/kujo-openai.mjs"
+    "kujo-openai": "bin/kujo-openai.mjs",
+    "kujo-openai-remote": "bin/kujo-openai-remote.mjs"
   },
   "files": [
     "bin",

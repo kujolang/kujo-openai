@@ -88,3 +88,22 @@ Mount `handleRequest` behind an HTTPS server/proxy that preserves the configured
 `tests/remote.test.mjs` includes five suites for introspection validation/redaction, actual SDK Streamable HTTP requests through the Web Request handler and native Ability execution, separate subject/tenant receipt denial, unsupported catalog admission, scope/revocation checks, malformed/oversized/hostile-origin input, concurrency, cancellation and deadline propagation. These use a controlled introspection fixture and an isolated native provider fixture. They do not certify a live issuer, TLS proxy, OAuth login flow, remote repository sandbox, public deployment or ChatGPT.
 
 Sources checked 2026-09-29: [OpenAI plugin authentication](https://developers.openai.com/plugins/build/auth), [MCP authorization 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization), and the pinned MCP SDK 1.31.0 server transport implementation/types.
+
+## Node HTTP origin
+
+`bin/kujo-openai-remote.mjs /absolute/operator/application.mjs` starts the resource server on **127.0.0.1 only**, behind an operator-controlled TLS terminator. The module is trusted executable application code and must export `{handler, publicOrigin, allowedHosts, port}`. `handler` is the configured `createRemoteHandler` callback above. `publicOrigin` is the fixed HTTPS origin, without a path; `allowedHosts` lists exact authorities accepted from the proxy (including port where present); `port` is an integer from 1024 to 65535. Example module footer:
+
+```js
+export default {
+  handler: handleRequest,
+  publicOrigin: new URL(resource).origin,
+  allowedHosts: ['kujo.example', '127.0.0.1:8443'],
+  port: 8443
+};
+```
+
+Replace example authorities with the deployed values. The TLS proxy must connect over the trusted local interface, preserve the original path and set an allowed Host. Forwarded headers never select the public origin or establish identity. Protect the local host: another local process can contact this listener, but must still pass OAuth and canonical authorization. Do not expose the loopback port through an unauthenticated forwarding service or claim the listener provides TLS itself.
+
+`lib/http-server.mjs` rejects unknown/duplicate security headers and ambiguous request targets, bounds headers and request lifetime, and propagates peer disconnects to the application AbortSignal. Responses and failures do not log credentials or raw exceptions. SIGTERM/SIGINT stop admission, close idle sockets, and close remaining connections after five seconds. The provider must honor cancellation and preserve uncertain execution where required. There is no automatic restart or invocation retry.
+
+The real TCP test uses the official MCP client to initialize, discover, invoke the native canonical fixture and retrieve its receipt through the loopback listener. It also verifies metadata uses the fixed HTTPS resource despite forged forwarding headers, rejects wrong Host/duplicate authorization, and propagates socket disconnect to active application work. This adds actual HTTP transport evidence; live TLS/OAuth/ChatGPT deployment remains outstanding.
