@@ -155,3 +155,31 @@ the inspected existing-app management UI. Do not claim live branding is complete
 or recreate the working connection to hide this limitation. Package field guidance:
 https://developers.openai.com/plugins/deploy/submission and
 https://developers.openai.com/plugins/build/plugins (accessed 2026-09-30).
+
+### Installed-plugin negative and Skill execution checks — 2026-09-30
+
+Browser chat `6abd9614-e0f8-83ea-808d-1cf7e4381d03` asked only for capability
+boundaries and one exact all-zero SHA256 receipt lookup. ChatGPT correctly stated
+that arbitrary shell execution, release publishing and arbitrary filesystem paths
+are unavailable. It reported `ok: false`, `status: not_executed`, and
+`code: receipt_evidence_unavailable`, noting the host's INVALID_ARGUMENT wrapper
+rather than presenting it as execution success. It did not substitute a recent
+receipt. The 51 canonical receipt filenames and sizes were unchanged before and
+after this isolated negative test; no review execution receipt was created.
+This checks host behavior, not adversarial authorization enforcement (covered by
+the independent protocol tests).
+
+The installed v1.0.3 cloud plugin also became available in Codex desktop. Loaded
+its actual `kujo-ship-review/SKILL.md`, resolved the three projected tool identities
+from the connected catalog, and invoked each with empty input against the
+operator-bound repository at `857e3ae`. All three succeeded. ChangeBucket and
+PatchBrief reported a clean working tree; ShipCheck reported 13/16 passes,
+three warnings, zero errors and `gate_passed: 1`. This remains metadata inspection,
+not executable release validation. Each exact receipt URI was then retrieved via
+the connected receipt helper and matched independently against canonical stored
+bytes, identity and timestamps. Structured evidence:
+`evidence/installed-skill-review.json`.
+
+This proves installed-Skill loading and composition in the Codex host. It does
+not retroactively prove automatic browser ChatGPT Skill selection. Public remote
+OAuth/provider deployment and the observed placeholder-icon problem remain open.

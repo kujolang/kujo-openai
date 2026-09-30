@@ -1,0 +1,77 @@
+{
+  "schema": "kujo.openai.host-acceptance/v1",
+  "date": "2026-09-30",
+  "host": "Codex desktop installed cloud plugin",
+  "package_version": "1.0.3",
+  "source_commit": "857e3ae",
+  "skill": "kujo-ship-review",
+  "skill_loaded_from_installed_package": true,
+  "scope": "operator-configured kujo-openai working tree",
+  "results": [
+    {
+      "ok": true,
+      "status": "succeeded",
+      "ability_id": "kujo.changebucket.changes.measure",
+      "receipt_id": "receipt-6ad664000eed49ac47209871",
+      "receipt_uri": "kujo-receipt://sha256/ee5a4573497af4093af90eb4a979f13f0b582189d1b270b3b2eece39a6cc70b8",
+      "invocation_id": "97c74500-d84f-4a9b-be10-d310ab0e0ef7",
+      "started_at_ms": 1790809713817,
+      "completed_at_ms": 1790809714216,
+      "policy": "kujo.repository.review",
+      "domain_summary": {
+        "binary_files": 0,
+        "files_added": 0,
+        "files_changed": 0,
+        "files_deleted": 0,
+        "files_modified": 0,
+        "files_renamed": 0,
+        "lines_added": 0,
+        "lines_deleted": 0,
+        "risk_level": "low",
+        "total_churn": 0
+      },
+      "exact_receipt_lookup_verified": true
+    },
+    {
+      "ok": true,
+      "status": "succeeded",
+      "ability_id": "kujo.patchbrief.changes.summarize",
+      "receipt_id": "receipt-cae47bff3d3e9e6fb62e24d8",
+      "receipt_uri": "kujo-receipt://sha256/36dddb6eba9957709ecac51e80a3229b7edd71ad0e1f4c8bacbebd8b192302d3",
+      "invocation_id": "8abde52e-a4a3-49e4-bee4-ca76c1fe9469",
+      "started_at_ms": 1790809714667,
+      "completed_at_ms": 1790809715084,
+      "policy": "kujo.repository.review",
+      "domain_summary": {
+        "files_changed": 0,
+        "lines_added": 0,
+        "lines_removed": 0
+      },
+      "exact_receipt_lookup_verified": true
+    },
+    {
+      "ok": true,
+      "status": "succeeded",
+      "ability_id": "kujo.shipcheck.repository.scan",
+      "receipt_id": "receipt-6956719365b4f70f824ca409",
+      "receipt_uri": "kujo-receipt://sha256/4dc4862a91340e57bc7c833695016ad9eac01741da5f98ac78e2a437c02b1398",
+      "invocation_id": "8e8ca17d-12c6-4bc2-aeb8-4f8f20dc417b",
+      "started_at_ms": 1790809723506,
+      "completed_at_ms": 1790809723652,
+      "policy": "kujo.repository.review",
+      "domain_summary": {
+        "failed_errors": 0,
+        "gate_passed": 1,
+        "passed": 13,
+        "total_checks": 16,
+        "warnings": 3
+      },
+      "exact_receipt_lookup_verified": true
+    }
+  ],
+  "limitations": [
+    "No executable tests, lint, artifact verification or publishing performed by these Abilities.",
+    "Does not prove automatic Skill activation in browser ChatGPT.",
+    "Public remote OAuth/provider deployment not covered."
+  ]
+}
