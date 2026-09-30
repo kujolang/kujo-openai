@@ -183,3 +183,27 @@ bytes, identity and timestamps. Structured evidence:
 This proves installed-Skill loading and composition in the Codex host. It does
 not retroactively prove automatic browser ChatGPT Skill selection. Public remote
 OAuth/provider deployment and the observed placeholder-icon problem remain open.
+
+### Local setup without manual runtime/source configuration — 2026-09-30
+
+Added explicit `kujo-openai setup` provisioning and locked
+`@kujolang/kujo-runtime@1.6.0`. npm installs the platform binary without lifecycle
+scripts; setup downloads the three reviewed canonical review-pack source commits.
+The existing maintainer provisioning script reuses the same binding generator.
+No Ability definition, schema, effect, policy or handler was duplicated or changed.
+
+Verification on macOS x64: `npm run check` without `KUJO_BIN` passed **35 tests**
+and verified all 18 canonical vendored files. After the final linked-parent guard,
+the three focused setup tests passed again. `npm run test:setup` passed fresh source
+acquisition, repeated setup, nested-directory discovery without config variables,
+three real canonical MCP executions, and exact receipt/result equality. The sparse
+fixture returned a failing ShipCheck domain gate with successful execution.
+The first integration attempt exposed noncanonical macOS temporary paths; setup
+now canonicalizes its owned data root without weakening receipt symlink checks.
+The maintainer configuration command also successfully regenerated the real local
+repository profile. Existing private-tunnel configuration remains usable.
+
+This is a local onboarding milestone, not universal one-click installation.
+Node/Git and an explicit setup/repository-selection action remain required.
+Automatic public-directory dependency installation, browser-to-local connectivity,
+additional default capability packs, and Windows containment are not established.

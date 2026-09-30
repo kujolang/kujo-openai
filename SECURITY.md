@@ -38,3 +38,16 @@ Store receipts outside repositories in a private canonical directory. Parent dir
 ## Unsupported remote execution
 
 Dispatch, Workcell and process-producing abilities are not automatically exposed remotely. [Remote design](docs/REMOTE.md) specifies the additional identity, custody, isolation, egress, approval and reconciliation requirements. No remote security guarantee is asserted by offline tests.
+
+## Explicit local setup
+
+`kujo-openai setup` is an operator CLI action, not an MCP tool or an installation
+hook. It resolves the locked official runtime package, acquires fixed reviewed
+Git commits over HTTPS with global Git configuration/hooks disabled, and binds
+one explicitly selected Git worktree. Setup serializes writes with an owned lock,
+rejects linked cache/config targets, and does not replace dirty source caches.
+Normal MCP startup only reads already provisioned user-owned configuration; it
+never downloads software or interprets repository files as installation authority.
+The package installation does not grant canonical execution approval. Protect the
+user data directory, package installation and source cache as trusted executable
+state. This is not protection against another process with the same user's rights.

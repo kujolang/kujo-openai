@@ -2,7 +2,7 @@
 
 ## Trusted local application
 
-1. Install Node 22+ and Kujo 1.6+ from verified releases.
+1. Install Node 22+ and Git. npm installs the pinned Kujo 1.6.0 native runtime.
 2. Clone this repository and run `npm ci && npm run check`.
 3. Configure an application using `examples/operator-config.json`. All executable, source, working-directory and state paths must be absolute. Keep this file and its application code outside untrusted repositories.
 4. Implement the application provider contract in [EXTENDING](EXTENDING.md). Supply only necessary runtime capabilities. Kujo capability flags are not path-specific sandboxing.
@@ -108,3 +108,31 @@ authenticated local companion to reach a user's machine; the URL itself supplies
 neither local execution nor repository authorization. A relay/companion is a
 separate possible design, not a deployed or approved feature. Keep canonical
 Ability policy, local repository consent and receipt ownership intact.
+
+
+## Automatic local review provisioning
+
+`node bin/kujo-openai.mjs setup /absolute/repository` is the current local setup
+entry point from an installed checkout. A packaged CLI exposes the same action
+as `kujo-openai setup`; this does not assert that this package is published on npm.
+It selects the official platform package, downloads reviewed Git source commits,
+and generates the canonical review-pack binding and private state. Repeat setup
+reuses clean pinned sources. A setup lock prevents simultaneous provisioning;
+after a crash, inspect and remove the stale lock only when no setup is running.
+Modified source caches and symlinks fail closed rather than being deleted.
+
+The default data root is `~/.local/share/kujo/openai`; operator-supplied
+`KUJO_OPENAI_HOME` can relocate it. Startup finds configurations for the current
+working directory or its ancestors in that user-owned root. It never consumes a
+configuration file from the repository, installs software during MCP discovery,
+or grants approval from tool input. `KUJO_OPENAI_CONFIG` remains an explicit
+operator override. The host must launch local MCP in the selected project; if it
+does not, use its supported project/configuration mechanism. Repository selection
+and host trust cannot be silently inferred from a web plugin installation.
+
+Supported runtime artifacts are determined by `@kujolang/kujo-runtime@1.6.0`.
+This does not certify every OS's process containment or the host's dependency
+installation behavior. The local ZIP contains the build machine's installed
+platform dependencies; use npm dependency resolution on the target platform,
+not an archive built on a different OS. Public directory one-click onboarding is
+still an acceptance requirement, not a claim of this CLI milestone.

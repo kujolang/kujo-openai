@@ -16,7 +16,7 @@ Application-owned Ability registry + policy + stores
 
 ## Install and verify
 
-Requires Node 22+, Git and Kujo 1.6+ on macOS/Linux. Windows hard process-tree cancellation is not certified. No API key is needed for offline verification.
+Requires Node 22+ and Git. npm installs the pinned Kujo 1.6.0 platform runtime automatically; no separate Kujo installation is needed. macOS/Linux execution is tested. Windows hard process-tree cancellation is not certified. No API key is needed for offline verification.
 
 ```sh
 npm ci
@@ -24,6 +24,28 @@ npm run check
 ```
 
 The canonical Ability runtime is vendored unchanged at a reviewed commit with SHA-256 verification. `npm run verify:vendor` checks every pinned file. Node handles protocol and process lifetime only; execution uses Kujo.
+
+## Set up local repository review
+
+From this checkout, after `npm ci`:
+
+```sh
+node bin/kujo-openai.mjs setup /path/to/your/repository
+```
+
+Setup acquires the pinned canonical review-tool sources, uses the bundled native
+runtime and stores configuration privately under your user data directory. It
+requires no Kujo account, API key, sibling ecosystem checkouts or environment
+variable editing. Once provisioned, launch the plugin's local MCP server with that
+repository (or a child directory) as its working directory. It discovers the
+saved configuration and exposes PatchBrief, ChangeBucket and ShipCheck through
+Ability. Other application registries still use explicit trusted configuration.
+
+This removes manual provisioning for the local review pack; it is **not yet a
+one-click public-directory installation**. Browser ChatGPT still needs a supported
+connection to the local machine. The public-directory/local bootstrap integration
+and Windows containment remain unverified. `npm run test:setup` exercises fresh
+source acquisition and real MCP calls without a preinstalled Kujo binary.
 
 ## Run a real canonical pack
 

@@ -4,7 +4,7 @@
 
 `plugin.json`, `mcp.json` and `skills/` use the current portable Agent Plugins layout documented by OpenAI. The adapter does not use historical `ai-plugin.json` or GPT Actions. `npm run check` validates manifests against the fetched Agent Plugins 1.0 schemas. Schema source URLs are embedded in the manifests; fetched 2026-09-29.
 
-Run `npm run package` after `npm ci`. It builds a ZIP with locked production Node dependencies, source/skills/docs, checksum, dependency inventory and unsigned provenance. Kujo itself is an operator-installed runtime; it is not downloaded or executed during plugin installation. The operator must provide a trusted application configuration. The package is local authoring/testing material and does not install into a live user profile.
+Run `npm run package` after `npm ci`. It builds a ZIP with locked production Node dependencies, source/skills/docs, checksum, dependency inventory and unsigned provenance. The locked npm dependencies include the platform-selected Kujo runtime. npm installation uses no lifecycle scripts. The local ZIP includes the build platform runtime and is not a universal cross-platform binary bundle. The operator must provide a trusted application configuration. The package is local authoring/testing material and does not install into a live user profile.
 
 ## Public submission blockers
 
