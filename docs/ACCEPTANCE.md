@@ -32,3 +32,9 @@ Live acceptance records must include date, host/account scope (no credentials), 
 The optional trusted-local review pack now supplies actual `kujo.patchbrief.changes.summarize` and `kujo.changebucket.changes.measure` definitions from Ability. `npm run test:review` exercises both via the official MCP SDK client against a disposable changed repository, verifies output and canonical receipt resources, rejects forged paths/commands/approval claims, and rejects executable Git filter configuration. Six cases are recorded in `docs/evidence/repository-review.json`.
 
 “Review the changes I have made with Kujo” is now a supported starter intent when this pack is configured. The skill should call both available capabilities with `{}`, distinguish heuristic summary from footprint, cite receipts, and report that no tests or correctness evaluation ran. Tool execution is verified; real ChatGPT skill selection and explanation remain pending. The “reference pack only” negative case above continues to apply to MCP core configurations.
+
+## Release-review pack acceptance
+
+`KUJO_REVIEW_RELEASE=1 npm run test:review` provisions the optional canonical ShipCheck definition alongside PatchBrief and ChangeBucket. Nine official MCP SDK cases exercise the three actual CLIs, reject forged input fields, and reject executable Git configuration without executing the canary. ShipCheck's output schema is compared exactly with its published schema. The sparse fixture fails readiness checks while returning a successful canonical receipt; this proves domain failure is not silently treated as readiness success. Evidence: `docs/evidence/release-review.json`.
+
+This verifies transport and evidence composition prerequisites. Live ChatGPT skill selection and its final readiness explanation remain unverified until the authenticated host acceptance run. No claim is made that these scans execute tests.

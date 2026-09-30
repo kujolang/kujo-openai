@@ -37,6 +37,9 @@ jobs:
           git clone --filter=blob:none https://github.com/kujolang/changebucket.git ../changebucket
           git -C ../changebucket checkout 030eea63c60449f82c9ba2680227485d318fdb6d
           npm run test:review
+          git clone --filter=blob:none https://github.com/kujolang/shipcheck.git ../shipcheck
+          git -C ../shipcheck checkout 111bfc83c832050877cb9d4fd82908aaf6d14749
+          KUJO_REVIEW_RELEASE=1 npm run test:review
       - run: npm run package
       - name: Verify reproducible package
         shell: bash

@@ -49,3 +49,13 @@ Use this configuration in the installed plugin's MCP environment. The same proje
 This profile is for an operator-controlled trusted local Git worktree. Source revisions are checked at provisioning and preserved in canonical receipt audit metadata; they do not cryptographically attest the executable at invocation time. Keep source checkouts and PATH under operator control. The pack rejects executable filters but cannot contain a hostile local actor or concurrent configuration changes. Never expose this profile as a multi-user remote service. See the vendored canonical pack README for the complete trust boundary.
 
 The test config points at a disposable repository after testing; rerun provisioning for your intended repository before using the plugin.
+
+## Release signals in the review pack
+
+To add canonical ShipCheck release metadata scanning, obtain its clean reviewed checkout at `111bfc83c832050877cb9d4fd82908aaf6d14749` (sibling `shipcheck`, or `KUJO_SHIPCHECK_SOURCE`) and provision with:
+
+```sh
+KUJO_BIN=/absolute/path/to/kujo node scripts/configure-review-pack.mjs /absolute/trusted/repository --release-signals
+```
+
+This updates the same ignored local configuration with three canonical tools. Existing setup without the option still exposes two. ShipCheck's scan does not execute test suites or approve releases. Inspect its domain gate and individual checks even when the Ability execution succeeds. The ship-review skill combines this evidence with PatchBrief and ChangeBucket, and reports missing test/spec/artifact evidence. All three share the trusted-local restriction; this is not an uploaded-repository sandbox or remote deployment.

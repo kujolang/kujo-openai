@@ -2,14 +2,16 @@
 import {writeFile,mkdir,realpath} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
 import {execFileSync} from 'node:child_process';
-if(!process.argv[2]) throw Error('Usage: node scripts/configure-review-pack.mjs /absolute/trusted/repository');
+if(!process.argv[2] || process.argv.slice(3).some(arg=>arg!=='--release-signals')) throw Error('Usage: node scripts/configure-review-pack.mjs /absolute/trusted/repository [--release-signals]');
+const release=process.argv.includes('--release-signals');
 const repository=await realpath(process.argv[2]);
 const binary=await realpath(process.env.KUJO_BIN || execFileSync('which',['kujo'],{encoding:'utf8'}).trim());
 const git=await realpath(execFileSync('which',['git'],{encoding:'utf8'}).trim());
 if(execFileSync(git,['-C',repository,'rev-parse','--show-toplevel'],{encoding:'utf8'}).trim()!==repository) throw Error('Select a Git worktree root');
 const revisions={'patchbrief.kujo':'a4da5942e9668924cd2f2869859bf05b006edda5','changebucket.kujo':'030eea63c60449f82c9ba2680227485d318fdb6d'};
+if(release) revisions['shipcheck.kujo']='111bfc83c832050877cb9d4fd82908aaf6d14749';
 const sources={};
-for(const product of ['patchbrief','changebucket']) {
+for(const product of (release?['patchbrief','changebucket','shipcheck']:['patchbrief','changebucket'])) {
  const source=await realpath(process.env[`KUJO_${product.toUpperCase()}_SOURCE`] || `../${product}`);
  if(execFileSync(git,['-C',source,'rev-parse','HEAD'],{encoding:'utf8'}).trim()!==revisions[`${product}.kujo`] || execFileSync(git,['-C',source,'status','--porcelain'],{encoding:'utf8'}).trim()) throw Error(`${product} must match reviewed clean revision ${revisions[`${product}.kujo`]}`);
  sources[product]=source;

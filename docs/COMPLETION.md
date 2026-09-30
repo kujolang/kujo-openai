@@ -17,7 +17,7 @@ This ledger preserves the requested end state. A green local milestone does not 
 | Pure/read/file/write/external/approval/retry/output/failure classes | Native contract fixtures plus real MCP core and review handlers | Representative test coverage; production mutation classes not registered by default |
 | Repository Review skill | Skill, real MCP repository profile; optional review pack | Static/package validation; live ChatGPT selection/explanation pending |
 | Change Review skill | Real PatchBrief + ChangeBucket through Ability/MCP, six integration cases | Tool workflow verified; live ChatGPT skill behavior pending |
-| Release/Ship Review skill | Catalog-aware skill describes responsibilities honestly | Real release-review catalog/composition and live acceptance incomplete |
+| Release/Ship Review skill | Optional canonical PatchBrief + ChangeBucket + ShipCheck catalog, nine actual MCP cases and composition skill | Tool evidence verified; live model composition/explanation incomplete |
 | Spec/Eval/Scent/Scout workflows where applicable | Source-backed skill guidance and missing-capability handling | Corresponding production canonical registrations/compositions incomplete |
 | Local transport and installation | Official SDK stdio tests; bounded frames/processes; isolated Codex plugin installation | Verified; Windows process containment not certified |
 | ChatGPT local client route | Official Secure MCP Tunnel/developer-mode setup documented | Actual tunnel/workspace connection and live ChatGPT acceptance incomplete |

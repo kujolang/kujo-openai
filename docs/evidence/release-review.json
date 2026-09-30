@@ -1,11 +1,11 @@
 {
-  "date": "2026-09-30T00:21:22.248Z",
+  "date": "2026-09-30T00:20:10.381Z",
   "transport": "official MCP SDK stdio client",
   "checks": [
     {
       "ability": "kujo.changebucket.changes.measure",
       "status": "succeeded",
-      "receipt_id": "receipt-2a3cc6cda0c179543e591ae5"
+      "receipt_id": "receipt-83c1ae05edd77f8841766d98"
     },
     {
       "ability": "kujo.changebucket.changes.measure",
@@ -15,10 +15,20 @@
     {
       "ability": "kujo.patchbrief.changes.summarize",
       "status": "succeeded",
-      "receipt_id": "receipt-5635b55d26b7c5f4e2b7c5ab"
+      "receipt_id": "receipt-4beda8f2f8d06c4c1e36decc"
     },
     {
       "ability": "kujo.patchbrief.changes.summarize",
+      "case": "forged path/command/approval",
+      "passed": true
+    },
+    {
+      "ability": "kujo.shipcheck.repository.scan",
+      "status": "succeeded",
+      "receipt_id": "receipt-15d75eedc3215b5c6d3c6762"
+    },
+    {
+      "ability": "kujo.shipcheck.repository.scan",
       "case": "forged path/command/approval",
       "passed": true
     },
@@ -29,6 +39,11 @@
     },
     {
       "ability": "kujo.patchbrief.changes.summarize",
+      "case": "executable Git configuration rejected",
+      "passed": true
+    },
+    {
+      "ability": "kujo.shipcheck.repository.scan",
       "case": "executable Git configuration rejected",
       "passed": true
     }

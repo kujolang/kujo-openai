@@ -5,6 +5,8 @@ description: Assess readiness to ship from available Kujo repository, specificat
 
 Discover the connected Kujo catalog. Establish the target repository and release scope. Select only relevant registered Abilities: repository/context inspection, a supplied Spec contract, ChangeBucket footprint, PatchBrief diff summary, an applicable Eval suite, and ShipCheck release signals.
 
+When the operator has enabled the canonical repository review pack with release signals, compose the discovered PatchBrief changes summary, ChangeBucket footprint and ShipCheck repository scan. Resolve their current projected names from the catalog using canonical identities; do not guess hashed tool names. Use the operator-bound repository and empty inputs. Read ShipCheck's `summary.gate_passed`, `failed_errors`, warnings and individual checks; a successful Ability receipt can contain a failed readiness gate. Attach receipt references to the corresponding evidence.
+
 Do not assume that those products are registered. The reference MCP core pack supplies repository metadata and manifest validation only. Report missing release evidence and leave the readiness verdict incomplete when essential checks are unavailable.
 
 ShipCheck scans metadata and release signals; it does not execute tests, linters, artifact verification or publishing. An informational scan is different from a blocking gate. Spec schema validation does not prove implementation conformance. PatchBrief's proposed tests do not prove test success. Evaluate domain verdicts separately from Ability execution status.
