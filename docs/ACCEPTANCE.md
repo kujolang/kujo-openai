@@ -87,3 +87,31 @@ resource receipt. Updated evidence is in `evidence/release-review.json`.
 The live tunnel has not yet loaded this helper. Restart it, refresh the installed
 Kujo app, then verify exact receipt IDs/URIs in a ChatGPT response. This checkpoint
 does not close the live visibility gap or the full mission.
+
+### Live structured receipt lookup verified — 2026-09-30
+
+After restarting the private tunnel and using the existing app's **Refresh tools**
+action, discovery returned all three canonical review tools plus
+`_kujo_receipt_evidence` (protocol 2025-11-25). In the same live review chat
+`6abd89b1-3a0c-83ea-8672-00c16d465557`, a fresh read-only review followed by receipt
+lookup produced exact model-visible canonical IDs and URIs. No receipt identifiers
+were supplied in the test prompt. ChatGPT reported individual URI lookups and
+distinguished successful execution from the domain readiness verdict.
+
+| Canonical Ability | Receipt ID | SHA256 receipt address |
+|---|---|---|
+| kujo.changebucket.changes.measure | receipt-9510b84b963d32a9c684742a | b5c63f3506eee95779b6b6503df629aecd3a0a433b1642a15417a663894ff9ae |
+| kujo.patchbrief.changes.summarize | receipt-311bd4160634196cd412c344 | e4da8f70b45d2c522e1e480160df8aefe0c6bc6282777ad1751dcd1dcd2d0f17 |
+| kujo.shipcheck.repository.scan | receipt-3c57c7bc89b4bae3ed1fceac | 87d58527f9ee81cf04d89a08b9be46e12ec8540fee5949fd5e05491fef1cc2aa |
+
+All three statuses were `succeeded`. Each URI is
+`kujo-receipt://sha256/<address>`. Independently verified each stored file's hash,
+receipt ID and status against ChatGPT's displayed response. The domain evidence
+was a clean working tree and ShipCheck 13/16 passes, three warnings, zero errors;
+test/lint/publish readiness was explicitly not claimed. Code under test: c6f39d1
+(including the receipt helper from 650edcf).
+
+This resolves the observed receipt-reference visibility gap for this private
+ChatGPT tunnel workflow. It does not prove automatic packaged Skill selection,
+all positive/negative host acceptance cases, or production remote deployment.
+Earlier gap notes above are historical evidence, superseded by this live result.
