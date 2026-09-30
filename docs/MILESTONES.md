@@ -61,7 +61,7 @@ The adapter's 17 contract/protocol tests and six actual change-review MCP cases 
 
 Limits: trusted operator-controlled POSIX checkout only; Git configuration guards are not race-free containment. Source pins are verified at provisioning, not cryptographic runtime attestation. No remote exposure or live ChatGPT acceptance is implied. Next: trusted approval/idempotency continuation, safe remote canonical runtime integration, remaining registered workflows and live host/submission acceptance. The full mission is not complete.
 
-## Durable approval and continuation milestone — 2026-09-30
+## Durable approval and continuation milestone — 2026-09-29
 
 Ability `44f2e8123b5df9f3abd478426ab5a10ada1ebb3b` adds `services/local_sqlite.kujo`, an optional implementation of existing canonical audit, one-time grant consumption and keyed idempotency callbacks. Canonical policy, approval digests, execution ordering and receipt schemas are unchanged. Operator-issued exact grants can be revoked and consumed atomically. Completed keys replay original validated receipt bytes; started keys remain unresolved after interruption rather than permitting automatic duplicate execution. Audit stores commitments rather than raw input. Business and receipt commits remain separate, so this is not exactly-once execution.
 
@@ -70,3 +70,5 @@ The adapter adds an opt-in `invocation-v1` continuation protocol, private input-
 Files: Ability service, documentation and native/Node tests; adapter continuation store, adapter/server/backend/CLI integration, native projection export, pinned canonical vendor, `docs/CONTINUATIONS.md` and native continuation integration test. Tests: full Ability suite passes in interpreter and VM; eight competing processes produce one fixture business write, restart replays the original receipt, altered/revoked/forged grants fail, conflicts and persistent started state fail closed, and corrupted receipt storage is rejected. Adapter suite: 18 tests pass, including actual native approval and MCP continuation, changed-definition rejection, unsupported-provider rejection, private descriptor contents and forged-control rejection.
 
 Remaining: production application approval UI/authentication and reconciliation are application-owned and have not been deployed; remote canonical execution/isolation, remaining workflows, live ChatGPT acceptance and public submission are still incomplete. Next integrate the canonical runtime behind a remotely authenticated provider without exposing the trusted-local review profile to untrusted tenants.
+
+Post-push verification: Ability CI `36648221588` passed at `44f2e81`; adapter CI `36648673780` passed at `59e91a7`, including core tests, real MCP core/review integrations and reproducible packaging. The full requirement ledger is [COMPLETION.md](COMPLETION.md); local continuation infrastructure is not a substitute for production approval or remote/live-host acceptance.
