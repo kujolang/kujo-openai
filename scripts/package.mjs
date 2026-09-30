@@ -14,7 +14,7 @@ const output=remote?'dist/remote':'dist';
 const temporary=await mkdtemp(join(tmpdir(),'kujo-openai-package-')),stage=join(temporary,'kujo-openai');
 await mkdir(stage);await mkdir(output,{recursive:true});
 try {
- const included=remote?['skills','docs','LICENSE']: [...pkg.files,'package.json','package-lock.json','node_modules'];
+ const included=remote?['skills','docs','assets','LICENSE']: [...pkg.files,'package.json','package-lock.json','node_modules'];
  for(const path of included) await cp(path,join(stage,path),{recursive:true,filter:source=>!source.endsWith('/.bin')});
  if(remote){
   await writeFile(join(stage,'plugin.json'),JSON.stringify(remote.plugin,null,2)+'\n');

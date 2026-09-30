@@ -15,6 +15,10 @@
       "Review the changes I have made with Kujo.",
       "Inspect the configured repository with Kujo.",
       "Show me the evidence behind this Kujo result."
-    ]
+    ],
+    "logo": "./assets/kujo-icon.png",
+    "composerIcon": "./assets/kujo-icon.png",
+    "logoDark": "./assets/kujo-icon.png",
+    "composerIconDark": "./assets/kujo-icon.png"
   }
 }
