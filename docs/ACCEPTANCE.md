@@ -38,3 +38,33 @@ The optional trusted-local review pack now supplies actual `kujo.patchbrief.chan
 `KUJO_REVIEW_RELEASE=1 npm run test:review` provisions the optional canonical ShipCheck definition alongside PatchBrief and ChangeBucket. Nine official MCP SDK cases exercise the three actual CLIs, reject forged input fields, and reject executable Git configuration without executing the canary. ShipCheck's output schema is compared exactly with its published schema. The sparse fixture fails readiness checks while returning a successful canonical receipt; this proves domain failure is not silently treated as readiness success. Evidence: `docs/evidence/release-review.json`.
 
 This verifies transport and evidence composition prerequisites. Live ChatGPT skill selection and its final readiness explanation remain unverified until the authenticated host acceptance run. No claim is made that these scans execute tests.
+
+## Live ChatGPT tunnel acceptance — 2026-09-30
+
+At adapter commit `26c5cfa`, private ChatGPT MCP app creation and connection
+succeeded after the repeated-initialization correction. Tunnel `/health/mcp`
+reported `status: ok`, `state: discovered`, complete discovery of three tools,
+and MCP 2025-11-25. The installed Kujo plugin displayed Connected.
+
+Live prompt: “Review the changes in the configured repository with Kujo. Explain
+what ran, what the evidence says, and include receipt references. Do not modify
+files.” ChatGPT selected canonical PatchBrief, ChangeBucket and ShipCheck tools;
+all three locally stored receipts reported succeeded. The target was this
+repository, clean at HEAD `26c5cfa`. ChatGPT accurately explained zero diff/churn
+and ShipCheck 13/16 passing checks, three warnings and zero errors, and explicitly
+said tests, linters and publishing had not run. This proves live tool selection,
+execution and result explanation, not packaged Skill selection or public deployment.
+
+Canonical receipt IDs (verified from the private local store):
+- PatchBrief: `receipt-126f19bf9052c33bb6be5fdc`
+- ChangeBucket: `receipt-7560a585de247266f843df99`
+- ShipCheck: `receipt-360fdf7a8ccee66793ae5bbb`
+
+**Open acceptance failure:** ChatGPT initially labeled timestamps and summaries
+as receipt references. Asked explicitly for canonical `receipt_id`/`receipt_uri`
+without rerunning tools, it reported those fields were not exposed to it. The
+adapter emits them in text content and `_meta`, with the unchanged domain result
+in `structuredContent`. This observation does not establish which host processing
+stage omitted them. Model-visible receipt retrieval is therefore NOT verified.
+Do not solve this by silently changing canonical output schemas or adding
+unscoped cross-user receipt access.

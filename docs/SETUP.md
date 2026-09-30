@@ -79,4 +79,5 @@ See the [official configuration reference](https://github.com/openai/tunnel-clie
 After modifying the adapter, restart the tunnel to replace its existing stdio child.
 Check `/health/mcp` for successful initialization and tool discovery: `/readyz`
 alone can report ready while MCP discovery has failed. This compatibility fix has
-local regression coverage; live ChatGPT acceptance still needs verification.
+local regression coverage and successful live ChatGPT creation/discovery on
+2026-09-30. See ACCEPTANCE.md for the live review and remaining receipt-visibility gap.
