@@ -83,3 +83,28 @@ local regression coverage and successful live ChatGPT creation/discovery on
 2026-09-30. See ACCEPTANCE.md for the live review and subsequent verified structured receipt lookup.
 
 After updating a running tunnel's MCP server, restart the local client/server and refresh the installed app's tool catalog. The receipt helper `_kujo_receipt_evidence` should appear alongside the three canonical review tools. Use it to list recent receipt references, then read an exact URI; do not rerun an Ability merely to retrieve evidence. The recent index starts empty after restart.
+
+## Intended end-user installation experience
+
+Owner clarification (2026-09-30): Kujo should execute on each installing user's
+computer. The intended product installs the appropriate Kujo runtime and required
+packages for macOS, Windows or Linux, configures the Ability adapter, and avoids
+manual tunnel/API-key/configuration steps. `https://mcp.kujolang.ai/mcp` is the
+preferred public address if a remote entry point is needed. This preference does
+not mean all repository execution should move to a Kujo-hosted service.
+
+This is a product requirement, not implemented one-click installation. Current
+OpenAI packaging documentation says web plugin installation does not deploy local
+hook scripts; hooks require user trust, and npm marketplace installation skips
+lifecycle scripts. Public MCP submission currently requires a remote HTTPS
+endpoint or coordination with OpenAI for local MCP support. Source:
+https://developers.openai.com/plugins/build/plugins (accessed 2026-09-30).
+
+Therefore investigate a supported desktop-local distribution with packaged,
+versioned platform runtimes and explicit host trust first. Do not assume running
+install.sh/npm postinstall on directory installation is supported. A cloud ChatGPT
+connection to the preferred public address would still need an installed,
+authenticated local companion to reach a user's machine; the URL itself supplies
+neither local execution nor repository authorization. A relay/companion is a
+separate possible design, not a deployed or approved feature. Keep canonical
+Ability policy, local repository consent and receipt ownership intact.
