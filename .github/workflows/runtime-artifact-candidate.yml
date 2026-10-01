@@ -1,0 +1,86 @@
+name: Candidate npm artifact acceptance
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/runtime-artifact-candidate.yml
+permissions:
+  contents: read
+  actions: read
+jobs:
+  rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Wait for the exact rehearsal to finish successfully
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..20}; do
+            gh api repos/kujolang/kujo/actions/runs/36811793883 > rehearsal.json
+            node -e 'const r=require("./rehearsal.json"); const a=require("node:assert/strict"); a.equal(r.head_sha,"9fbad956eecd37448d6dc2f3568105cd1da7b0b0"); a.equal(r.event,"workflow_dispatch");'
+            status=$(node -p 'require("./rehearsal.json").status')
+            if [ "$status" = completed ]; then
+              node -e 'require("node:assert/strict").equal(require("./rehearsal.json").conclusion,"success")'
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "Rehearsal remains incomplete; no candidate acceptance was run."
+          exit 1
+  installed-candidate:
+    needs: rehearsal
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            artifact: linux-x64
+          - os: ubuntu-24.04-arm
+            artifact: linux-arm64
+          - os: macos-15
+            artifact: macos-arm64
+          - os: macos-15-intel
+            artifact: macos-x64
+          - os: windows-latest
+            artifact: windows-x64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      KUJO_CANDIDATE_RUN: '36811793883'
+      KUJO_TEST_RUNTIME_COMMIT: 9fbad956eecd37448d6dc2f3568105cd1da7b0b0
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Verify completed immutable rehearsal and download exact npm packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/kujolang/kujo/actions/runs/$KUJO_CANDIDATE_RUN" > candidate-run.json
+          node --input-type=module -e 'import assert from "node:assert/strict"; import {readFileSync} from "node:fs"; const run=JSON.parse(readFileSync("candidate-run.json")); assert.equal(run.head_sha,process.env.KUJO_TEST_RUNTIME_COMMIT); assert.equal(run.conclusion,"success"); assert.equal(run.event,"workflow_dispatch");'
+          gh run download "$KUJO_CANDIDATE_RUN" --repo kujolang/kujo --name "release-${{ matrix.artifact }}" --name release-npm-runtime --dir .local/runtime-artifacts
+      - name: Select platform tarballs without executing them
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readdirSync,appendFileSync} from 'node:fs';
+          import {resolve,join,basename} from 'node:path';
+          const files=[];
+          function walk(dir){for(const entry of readdirSync(dir,{withFileTypes:true})){const p=join(dir,entry.name);if(entry.isDirectory())walk(p);else files.push(p);}}
+          walk(resolve('.local/runtime-artifacts'));
+          for(const [key,prefix] of [['KUJO_TEST_RUNTIME_TARBALL','kujolang-kujo-runtime-'],['KUJO_TEST_PLATFORM_TARBALL',`kujolang-kujo-${process.platform}-${process.arch}-`]]) {
+            const matches=files.filter(p=>basename(p).startsWith(prefix)&&p.endsWith('.tgz'));
+            assert.equal(matches.length,1,'Exactly one expected tarball required');
+            appendFileSync(process.env.GITHUB_ENV,`${key}=${matches[0]}\n`);
+          }
+          JS
+      - run: npm ci --ignore-scripts
+      - name: Install candidate npm artifacts and exercise all canonical tools
+        run: npm run test:install

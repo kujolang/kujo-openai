@@ -328,3 +328,26 @@ fixture installs the native handler and enters a busy loop; the forced-stop
 fallback must bound the host response. Neither path reports successful execution
 or retries. This is verified POSIX cleanup, not a sandbox or a Windows job-object
 claim. Deliberately detached descendants remain outside the local guarantee.
+
+### Candidate npm artifact acceptance
+
+`runtime-artifact-candidate.yml` installs the optimized npm tarballs produced by
+runtime rehearsal [36811793883](https://github.com/kujolang/kujo/actions/runs/36811793883)
+on all five native targets. It first requires a successful manual workflow at
+source `9fbad956eecd37448d6dc2f3568105cd1da7b0b0`. The isolated consumer installs
+both runtime packages and the adapter with lifecycle scripts disabled. Before
+executing Kujo, the test checks the installed binary's source commit, platform,
+version, and SHA-256 against its metadata. It then exercises the real canonical
+review tools and receipts through the installed adapter.
+
+For a local rehearsal, pass absolute `.tgz` paths in
+`KUJO_TEST_RUNTIME_TARBALL` and `KUJO_TEST_PLATFORM_TARBALL`, together with the
+exact 40-character `KUJO_TEST_RUNTIME_COMMIT`, to `npm run test:install`.
+Incomplete inputs fail closed. With all three variables absent, the test uses
+the declared registry dependency as before. Provenance and digest rejection
+contracts run in the normal unit suite.
+
+This opt-in is test-only. Candidate results do not establish published-package
+acceptance, public ChatGPT installation, or authorization to publish a runtime.
+The rehearsal packages retain version 1.6.0 and must never replace that existing
+registry release. Record workflow results separately after they complete.
