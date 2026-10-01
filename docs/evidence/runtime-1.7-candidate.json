@@ -1,0 +1,46 @@
+{
+  "schema": "kujo.openai.versioned-runtime-evidence/v1",
+  "observed_at": "2026-10-01",
+  "runtime_version": "1.7.0",
+  "runtime_commit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+  "pull_request": "https://github.com/kujolang/kujo/pull/17",
+  "workflow": "https://github.com/kujolang/kujo/actions/runs/36817611559",
+  "release_gate": {
+    "job_id": 110225999097,
+    "conclusion": "success",
+    "cargo_test": {
+      "targets": 98,
+      "passed": 2891,
+      "failed": 0,
+      "ignored": 17
+    },
+    "candidate_identity_contract": "passed",
+    "fixture_runs": [
+      {
+        "passed": 150,
+        "failed": 0,
+        "skipped": 11
+      },
+      {
+        "passed": 150,
+        "failed": 0,
+        "skipped": 11
+      }
+    ],
+    "optional_audit_tools": "cargo-audit and cargo-deny absent; skipped, not audited",
+    "log_sha256": "248219be5aba627787e3e915b35c918e439256b80f4992914e85e22f02a88acf"
+  },
+  "native_artifact_jobs": {
+    "windows-x64": 110229780370,
+    "linux-arm64": 110229780371,
+    "macos-x64": 110229780398,
+    "linux-x64": 110229780420,
+    "macos-arm64": 110229780479
+  },
+  "remaining": [
+    "Native artifact builds are in progress; do not infer their success from the release gate.",
+    "Validate exact versioned packages with the candidate install harness on all five platforms.",
+    "Publication requires explicit release authorization, then published-package verification and adapter dependency update.",
+    "Public ChatGPT local installation support remains a separate host requirement."
+  ]
+}

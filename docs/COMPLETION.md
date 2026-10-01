@@ -63,3 +63,13 @@ not published-package acceptance: runtime 1.6.0 is still the dependency and the
 optimized five-platform artifact cohort and installed-candidate matrix have now
 passed; see [artifact evidence](evidence/runtime-artifact-candidate.json). A newly
 versioned, authorized runtime release and registry-based acceptance remain required.
+
+The unpublished 1.7.0 preparation is tracked in
+[runtime PR #17](https://github.com/kujolang/kujo/pull/17). Its corrected commit
+`f68750b368e6ebaf4dcaf588b4984651bb4d9670` passed the full release gate:
+2,891 Rust tests passed, none failed, 17 ignored; both fixture runs passed
+150 tests with 11 skipped. The candidate identity contract also passed.
+Optional cargo-audit/cargo-deny were absent and skipped. Five optimized artifact
+builds remain in progress at this observation; publication and registry-based
+acceptance are still outstanding. See
+[versioned candidate evidence](evidence/runtime-1.7-candidate.json).
