@@ -191,7 +191,7 @@ func TestPrivateCreationAndInheritedFiles(t *testing.T) {
 		t.Fatal("private DACL did not inherit", e)
 	}
 	current := currentSID(t)
-	private := "D:P(A;;FA;;;" + current + ")(A;;FA;;;SY)(A;;FA;;;BA)"
+	private := "D:P(A;OICI;FA;;;" + current + ")(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)"
 	setDACL(t, directory, private+"(A;;GR;;;WD)")
 	if e := MkdirPrivate(directory); e == nil {
 		t.Fatal("unsafe existing state repaired or accepted")
