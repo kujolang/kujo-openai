@@ -36,7 +36,8 @@
     "PRIVACY.md",
     "SUPPORT.md",
     "TESTING.md",
-    "OPENAI_LOCAL_MCP_APPROVAL.md"
+    "OPENAI_LOCAL_MCP_APPROVAL.md",
+    "native/README.md"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",

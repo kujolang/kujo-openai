@@ -6,6 +6,8 @@ It is not yet the default plugin package or the finished onboarding experience. 
 
 ## Build and run with a reviewed provider
 
+These commands require the source checkout (or source archive). The legacy npm/plugin package includes this guide for reference; it does not ship the native build sources or a native executable.
+
 From this directory:
 
 ```sh
