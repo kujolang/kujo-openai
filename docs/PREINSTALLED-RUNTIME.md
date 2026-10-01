@@ -19,9 +19,9 @@ Durable local evidence → MCP tool/resource result
 | Kujo runtime | Stable 1.7 provider family; actual 1.7.0 exercised | Other releases require acceptance; `mcp make` is still only a generator |
 | Experimental native entrypoint | `kujo-openai-native --serve --project ABSOLUTE`; optional trusted `--serve-config` | Bundled canonical read-only project profile; public host installation remains unverified |
 | Default plugin entrypoint | Existing Node development profile | Must migrate packaging only after native platform/onboarding acceptance |
-| Discovery | Known user install directory, absolute PATH, or explicit operator path; project shadows rejected | Windows ACL verification fails closed; POSIX ACL coverage remains limited |
+| Discovery | Known user install directory, absolute PATH, or explicit operator path; project shadows rejected | Windows ACL component verified; launcher integration pending; POSIX ACL coverage remains limited |
 | Canonical execution | Identity/schema/effect projection, policy, approvals and receipts remain in Ability | No host-supplied authority; invocation-v1 continuation references preserve canonical resume |
-| Receipt storage | Private root, file+directory sync, atomic publication, integrity-checked retrieval | Unsupported filesystem durability fails before calls; Windows equivalent still pending |
+| Receipt storage | Canonical bytes and content-addressed retrieval; Unix synced atomic files, staged Windows transactional database | Windows launcher acceptance pending; unsupported storage fails closed |
 | Folder selection | Explicit launch configuration excludes project code from trusted code/state | Not an OS sandbox or proof of a provider's scope; real host grants remain unverified |
 
 The version check accepts `>=1.7.0 <1.8.0` for provider compatibility, not as a claim that every patch/platform combination was tested. Build-time Go and the pinned official Go MCP SDK are compiled into the host; they are not end-user runtime prerequisites. No Node, Git, npm or API credential is used by the verified native execution path.
@@ -43,6 +43,6 @@ Diagnostic mode alone reports `provider_runtime_ready` for a compatible installa
 
 ## Still required before the selected product can ship
 
-final native platform packaging; Windows trusted executable/ACL and durable storage support; actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
+final native platform packaging; Windows launcher integration with tested ACL/receipt components; actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
 
 See [native build/run/test instructions](../native/README.md) and [submission checklist](PREINSTALLED-SUBMISSION.md). Earlier bootstrap/hosted designs and the diagnostic-only audit are historical evidence, not the current product plan.

@@ -90,7 +90,7 @@ def build(target, output):
         binary = pathlib.Path(temporary)/('kujo-openai-native.exe' if system == 'windows' else 'kujo-openai-native')
         run(['go', 'build', '-mod=readonly', '-trimpath', '-buildvcs=false', '-ldflags=-buildid=', '-o', str(binary), './preflight'], env)
         files[binary.name] = (binary.read_bytes(), 0o755)
-    status = 'blocked_windows_permissions_and_storage' if system == 'windows' else 'requires_host_acceptance'
+    status = 'blocked_windows_launcher_acceptance' if system == 'windows' else 'requires_host_acceptance'
     files['README.md'] = (('''# Kujo native adapter — local preview
 
 Requires a separately installed Kujo 1.7.x runtime. Nothing in this archive
