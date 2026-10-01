@@ -43,7 +43,7 @@ func serveProjectBundle(ctx context.Context, binary, project, state string) erro
 	for cursor := state; ; cursor = filepath.Dir(cursor) {
 		info, err := os.Lstat(cursor)
 		if err == nil {
-			if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() || trustedPermissions(info) != nil {
+			if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() || trustedPermissions(cursor, info) != nil {
 				return errors.New("unsafe_project_state")
 			}
 		} else if !os.IsNotExist(err) {
@@ -53,17 +53,17 @@ func serveProjectBundle(ctx context.Context, binary, project, state string) erro
 			break
 		}
 	}
-	if e = os.MkdirAll(state, 0700); e != nil {
+	if e = makePrivateDirectory(state); e != nil {
 		return errors.New("private_state_unavailable")
 	}
 	hash := sha256.Sum256([]byte(selected))
 	state = filepath.Join(state, hex.EncodeToString(hash[:]))
 	for _, path := range []string{state, filepath.Join(state, "audit"), filepath.Join(state, "receipts")} {
-		if e = os.MkdirAll(path, 0700); e != nil {
+		if e = makePrivateDirectory(path); e != nil {
 			return errors.New("private_state_unavailable")
 		}
 		info, e := os.Lstat(path)
-		if e != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 || info.Mode().Perm()&0077 != 0 || trustedPermissions(info) != nil {
+		if e != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 || privatePermissions(path, info) != nil {
 			return errors.New("unsafe_project_state")
 		}
 	}

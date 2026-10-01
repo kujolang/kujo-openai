@@ -36,7 +36,7 @@ func loadOperator(path string) (operatorConfig, error) {
 		return config, errors.New("absolute_operator_config_required")
 	}
 	info, e := os.Lstat(path)
-	if e != nil || !info.Mode().IsRegular() || info.Mode().Perm()&0077 != 0 || info.Size() > provider.Limit {
+	if e != nil || !info.Mode().IsRegular() || privatePermissions(path, info) != nil || info.Size() > provider.Limit {
 		return config, errors.New("unsafe_operator_config")
 	}
 	file, e := os.Open(path)

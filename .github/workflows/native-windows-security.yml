@@ -20,3 +20,28 @@ jobs:
       - name: Vet Windows security implementation
         working-directory: native
         run: go vet ./internal/windowstrust ./internal/receipts
+
+      - name: Prepare checksum-pinned native Kujo runtime
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'kujo-native.zip'
+          Invoke-WebRequest 'https://github.com/kujolang/kujo/releases/download/v1.7.0/kujo-v1.7.0-windows-x64.zip' -OutFile $archive
+          if ((Get-FileHash $archive -Algorithm SHA256).Hash.ToLower() -ne 'ed0094f5add39c282bcafe82505ede0ae3059f9c1056dd44112fab47abb03cf3') { throw 'Runtime checksum mismatch' }
+          $destination = Join-Path $env:RUNNER_TEMP 'kujo-native'
+          Expand-Archive $archive -DestinationPath $destination
+          $binary = @(Get-ChildItem $destination -Recurse -Filter kujo.exe)
+          if ($binary.Count -ne 1) { throw 'Expected one native runtime' }
+          "KUJO_NATIVE_TEST_BIN=$($binary[0].FullName)" >> $env:GITHUB_ENV
+      - name: Build native host
+        working-directory: native
+        shell: pwsh
+        run: |
+          go build -trimpath -o ../dist/kujo-openai-native.exe ./preflight
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "KUJO_NATIVE_HOST_BIN=$((Resolve-Path ../dist/kujo-openai-native.exe).Path)" >> $env:GITHUB_ENV
+      - name: Native Windows MCP acceptance without Node or Git on child PATH
+        working-directory: native
+        run: go test -count=1 -v ./integration ./preflight
+      - name: Vet native launcher
+        working-directory: native
+        run: go vet ./preflight ./integration

@@ -85,7 +85,7 @@ func trusted(path string, excluded []string) (string, error) {
 			if err != nil {
 				return "", errors.New("runtime_permission_denied")
 			}
-			if err = trustedPermissions(info); err != nil {
+			if err = trustedPermissions(p, info); err != nil {
 				return "", err
 			}
 			if filepath.Dir(p) == p {

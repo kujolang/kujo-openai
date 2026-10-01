@@ -24,12 +24,12 @@ func TestNativeExecutableWithoutNodeOrGit(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	trusted, e := os.MkdirTemp(home, ".kujo-native-acceptance-")
+	trusted, e := trustedTestDirectory(home, ".kujo-native-acceptance-")
 	if e != nil {
 		t.Fatal(e)
 	}
 	defer os.RemoveAll(trusted)
-	runtimeCopy := filepath.Join(trusted, "kujo")
+	runtimeCopy := filepath.Join(trusted, runtimeFilename())
 	source, e := os.Open(runtime)
 	if e != nil {
 		t.Fatal(e)
@@ -60,8 +60,8 @@ func TestNativeExecutableWithoutNodeOrGit(t *testing.T) {
 	defer cancel()
 	start := func() (*mcp.ClientSession, *bytes.Buffer) {
 		cmd := exec.Command(host, "--serve-config", configPath, "--project", project)
-		cmd.Dir = string(os.PathSeparator) // GUI-like CWD; only explicit project selection controls exclusion.
-		cmd.Env = []string{"HOME=" + home, "PATH="}
+		cmd.Dir = testWorkingDirectory(home) // GUI-like CWD; only explicit project selection controls exclusion.
+		cmd.Env = testEnvironment(home)
 		stderr := &bytes.Buffer{}
 		cmd.Stderr = stderr
 		client := mcp.NewClient(&mcp.Implementation{Name: "native-acceptance", Version: "1"}, nil)
@@ -134,7 +134,7 @@ func TestBundledProjectWithoutSourceCheckout(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	trusted, e := os.MkdirTemp(home, ".kujo-bundle-acceptance-")
+	trusted, e := trustedTestDirectory(home, ".kujo-bundle-acceptance-")
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -143,7 +143,7 @@ func TestBundledProjectWithoutSourceCheckout(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	installed := filepath.Join(trusted, "kujo")
+	installed := filepath.Join(trusted, runtimeFilename())
 	if e = os.WriteFile(installed, raw, 0700); e != nil {
 		t.Fatal(e)
 	}
@@ -167,8 +167,8 @@ func TestBundledProjectWithoutSourceCheckout(t *testing.T) {
 			}
 		}
 		cmd := exec.Command(host, "--serve", "--kujo", installed, "--project", project, "--state-directory", badState)
-		cmd.Env = []string{"HOME=" + home, "PATH="}
-		cmd.Dir = "/"
+		cmd.Env = testEnvironment(home)
+		cmd.Dir = testWorkingDirectory(home)
 		diagnostic, e := cmd.CombinedOutput()
 		if e == nil || !(bytes.Contains(diagnostic, []byte("trusted_state_must_be_outside_project")) || bytes.Contains(diagnostic, []byte("unsafe_project_state"))) {
 			t.Fatal("unsafe state accepted", e, string(diagnostic))
@@ -179,8 +179,8 @@ func TestBundledProjectWithoutSourceCheckout(t *testing.T) {
 	defer cancel()
 	start := func() *mcp.ClientSession {
 		cmd := exec.Command(host, "--serve", "--kujo", installed, "--project", project, "--state-directory", state)
-		cmd.Dir = "/"
-		cmd.Env = []string{"HOME=" + home, "PATH="}
+		cmd.Dir = testWorkingDirectory(home)
+		cmd.Env = testEnvironment(home)
 		stderr := &bytes.Buffer{}
 		cmd.Stderr = stderr
 		client := mcp.NewClient(&mcp.Implementation{Name: "bundle-test", Version: "1"}, nil)

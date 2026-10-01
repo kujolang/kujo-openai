@@ -8,7 +8,7 @@ import (
 	"syscall"
 )
 
-func trustedPermissions(info os.FileInfo) error {
+func trustedPermissions(_ string, info os.FileInfo) error {
 	stat, ok := info.Sys().(*syscall.Stat_t)
 	if !ok {
 		return errors.New("runtime_permissions_unverified")
@@ -21,3 +21,11 @@ func trustedPermissions(info os.FileInfo) error {
 	}
 	return nil
 }
+
+func privatePermissions(path string, info os.FileInfo) error {
+	if info.Mode().Perm()&0077 != 0 {
+		return errors.New("unsafe_private_path")
+	}
+	return trustedPermissions(path, info)
+}
+func makePrivateDirectory(path string) error { return os.MkdirAll(path, 0700) }
