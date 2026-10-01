@@ -56,4 +56,18 @@ Tests without those variables explicitly skip real-runtime/executable cases. The
 
 The current CI matrix prepares checksum-pinned official runtime archives as a **test prerequisite**, then runs these checks on macOS x64/ARM64 and Linux x64/ARM64. CI installation is not behavior performed by the plugin. Check actual job results before claiming platform verification.
 
-The SDK is pinned to `github.com/modelcontextprotocol/go-sdk v1.7.0`; all module checksums are in `go.sum`. See the [official SDK](https://github.com/modelcontextprotocol/go-sdk) (accessed 2026-10-01). The release packaging, dependency-license inventory and signing path for native artifacts still need completion.
+The SDK is pinned to `github.com/modelcontextprotocol/go-sdk v1.7.0`; all module checksums are in `go.sum`. See the [official SDK](https://github.com/modelcontextprotocol/go-sdk) (accessed 2026-10-01). Native preview archives now have a reproducible build and dependency-license inventory. Publisher signing/notarization and public plugin packaging remain incomplete.
+
+## Native preview archives
+
+From the repository root, maintainers can build an archive without npm:
+
+```sh
+python3 scripts/package-native.py --target darwin/arm64 --target linux/amd64
+```
+
+Targets are `darwin`, `linux` or `windows`, each with `amd64` or `arm64`. The command verifies embedded source hashes and Go module integrity, cross-compiles with CGO disabled, and writes ZIPs plus SHA-256 sidecars to `dist/native`. Each archive includes the official K assets, Kujo/Go/dependency license notices, exact module versions/checksums, source digests and binary provenance. Build-time Python/Go are not runtime requirements.
+
+These are **native adapter artifacts, not public plugin ZIPs**. Windows artifacts still fail closed at runtime. Artifacts have no publisher signature/notarization; checksums alone do not establish publisher identity. The default plugin manifest remains the legacy development profile until supported native distribution and host authorization are validated.
+
+Run `KUJO_NATIVE_TEST_BIN=/absolute/installed/kujo python3 scripts/test-native-package.py` to build twice, compare hashes, check archive paths/modes/branding/licenses, reject a tampered executable, and run both real MCP acceptance tests using the extracted binary. Runtime prerequisite absence fails this acceptance command explicitly. CI runs it on the native Unix matrix.

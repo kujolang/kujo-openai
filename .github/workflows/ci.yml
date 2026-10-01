@@ -128,3 +128,5 @@ jobs:
       - name: Vet native diagnostic
         working-directory: native
         run: go vet ./...
+      - name: Reproduce native archive and run its extracted executable
+        run: python3 scripts/test-native-package.py
