@@ -6,7 +6,7 @@ It is not yet the default plugin package or the finished onboarding experience. 
 
 ## Build and run
 
-Build from this source checkout:
+Build from this source checkout with Go 1.26.8. Native packaging requires this exact patched toolchain and records it in artifact provenance; Go is never an end-user prerequisite. Older preview binaries built with Go 1.25.3 must be rebuilt because the dependency audit found affected standard-library symbols.
 
 ```sh
 cd native

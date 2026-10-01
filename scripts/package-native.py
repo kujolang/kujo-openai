@@ -55,6 +55,10 @@ def build(target, output):
     env = {**os.environ, 'GOOS': system, 'GOARCH': architecture, 'CGO_ENABLED': '0',
            'GOWORK': 'off', 'GOFLAGS': '', 'GOTOOLCHAIN': 'local',
            'GOAMD64': 'v1', 'GOARM64': 'v8.0', 'GOEXPERIMENT': ''}
+    required_go = re.search(r'^go (\S+)$', (ROOT/'native/go.mod').read_text(encoding='utf-8'), re.M).group(1)
+    actual_go = run(['go', 'env', 'GOVERSION'], env)
+    if actual_go != 'go' + required_go:
+        raise ValueError(f'native packaging requires Go {required_go}; found {actual_go}. Select the pinned maintainer toolchain before building.')
     version = json.loads((ROOT/'package.json').read_text(encoding="utf-8"))['version']
     if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', version):
         raise ValueError('invalid package version')
