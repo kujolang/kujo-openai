@@ -1,0 +1,25 @@
+{
+  "schema": "kujo.openai.runtime-publication-evidence/v1",
+  "observed_at": "2026-10-01",
+  "version": "1.7.0",
+  "owner_authorization": "UNBLOCK_V1_RELEASE supplied directly in this chat on 2026-10-01",
+  "preparation_pr": "https://github.com/kujolang/kujo/pull/17",
+  "merge_commit": "813072040a1ac643312f5163fcfa4f26474c9095",
+  "candidate_commit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+  "merge_candidate_trees_identical": true,
+  "tag": "v1.7.0",
+  "tag_object": "7ac17556895f3a6cf3a962aa29ddcc85265deb65",
+  "signature": {
+    "local_verification": "passed",
+    "github_verified": true,
+    "github_reason": "valid"
+  },
+  "publication_workflow": "https://github.com/kujolang/kujo/actions/runs/36850604536",
+  "publication_status": "in_progress",
+  "limitations": [
+    "Tag existence does not prove artifacts or npm packages were published.",
+    "Published native and npm installation smoke tests remain required.",
+    "Adapter remains pinned to 1.6.0 until publication and registry acceptance.",
+    "Public OpenAI local-host installation support remains unconfirmed."
+  ]
+}

@@ -78,3 +78,13 @@ tool executions and exact receipt lookups. A local Intel Mac installation of the
 same CI packages also passed. Publication jobs were skipped. Runtime publication,
 registry-based acceptance and public ChatGPT local-host support remain outstanding.
 See [versioned candidate evidence](evidence/runtime-1.7-candidate.json).
+
+### Authorized 1.7.0 publication
+
+On 2026-10-01 the owner supplied `UNBLOCK_V1_RELEASE`. Runtime PR #17 was
+merged as `813072040a1ac643312f5163fcfa4f26474c9095`; its tree exactly matches
+the tested candidate. Signed tag `v1.7.0` was verified locally and by GitHub.
+The [tagged publication workflow](https://github.com/kujolang/kujo/actions/runs/36850604536)
+is running. This removes the authorization blocker; it does not establish
+publication, registry installation or public-host support. See
+[publication evidence](evidence/runtime-1.7-publication.json).
