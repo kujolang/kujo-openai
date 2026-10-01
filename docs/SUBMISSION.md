@@ -19,7 +19,39 @@ This release deliberately cannot claim public readiness:
 
 The local privacy notice describes local behavior only. It is not a hosted-service policy.
 
-## Deployment path
+## Distribution decision and host support
+
+The intended product installs the runtime on the user's computer. The remote
+bundle below is an optional deployment profile, not a replacement for that
+requirement. Public directory installation of a local executable remains a host
+integration prerequisite, not a missing domain configuration.
+
+The official [packaging guide](https://developers.openai.com/plugins/build/plugins)
+(accessed 2026-09-30) directs local MCP publishers who cannot use a hosted endpoint
+to their OpenAI contact. It also states that npm sources skip lifecycle scripts,
+and web plugin installation does not deploy hook scripts. Hook trust is separate
+from installing a plugin. We must not promise a silent install.sh or postinstall
+bootstrap based on these mechanisms.
+
+The next host-support request should establish all of the following before a
+public local package is represented as install-and-use:
+
+- Which directory surfaces support local stdio MCP and platform-specific binaries?
+- Does an npm plugin source install transitive/optional dependencies, or only
+  extract the selected package? Is a self-contained platform bundle required?
+- How does the host provide an explicitly selected local repository and persist
+  its authorization across restarts without accepting model-supplied authority?
+- Which mechanism supplies Node/Git prerequisites, updates, uninstall cleanup,
+  and any browser-to-local authenticated connection?
+- What local MCP review, signing, and platform acceptance evidence is required?
+
+No support request has been sent by this repository. The existing private tunnel
+proves developer connectivity only. The existing public mcp.kujolang.ai service
+is a read-only catalog; its live overview explicitly states that commands never
+execute. It must not be repurposed into a privileged relay without a separate
+architecture and authorization review.
+
+## Optional hosted deployment path
 
 Follow current [packaging](https://developers.openai.com/plugins/build/plugins), [submission](https://developers.openai.com/plugins/deploy/submission), and [remote review](https://developers.openai.com/plugins/deploy/app-review) docs (accessed 2026-09-29). Implement and verify `REMOTE.md`, then build the dedicated remote profile below with the real HTTPS endpoint and include that server in the initial uploaded ZIP. The current submission accepts one connected MCP per plugin.
 

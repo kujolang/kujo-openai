@@ -4,6 +4,7 @@ import {mkdtemp,mkdir,writeFile,rm,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
+import {pathToFileURL} from 'node:url';
 import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 const temporary=await mkdtemp(join(tmpdir(),'kujo-install-acceptance-'));
@@ -16,7 +17,12 @@ try {
  await writeFile(join(repository,'sample.txt'),'before\n');git(['add','.']);git(['commit','-qm','fixture']);await writeFile(join(repository,'sample.txt'),'after\n');
  const env={PATH:process.env.PATH,HOME:process.env.HOME,USERPROFILE:process.env.USERPROFILE,SystemRoot:process.env.SystemRoot,KUJO_OPENAI_HOME:home};
  const setup=()=>JSON.parse(execFileSync(process.execPath,[entry,'setup',repository],{cwd:repository,env,encoding:'utf8',timeout:600000}));
- const first=setup(),second=setup();assert.equal(first.config,second.config);assert.equal(first.repository,await realpath(repository));
+ // Run initial provisioning in the isolated environment with library diagnostics.
+ // All paths, input and Git remotes here are test-owned; production CLI diagnostics
+ // remain redacted. The second run still exercises the installed public CLI.
+ const setupModule=pathToFileURL(resolve(entry,'../../lib/setup.mjs')).href;
+ const initialScript=`import {setupLocal} from ${JSON.stringify(setupModule)}; console.log(JSON.stringify(await setupLocal({repository:process.argv[1]})));`;
+ const first=JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',initialScript,repository],{cwd:repository,env,encoding:'utf8',timeout:600000})),second=setup();assert.equal(first.config,second.config);assert.equal(first.repository,await realpath(repository));
  await mkdir(join(repository,'nested'));
  const catalog=JSON.parse(execFileSync(process.execPath,[entry,'catalog'],{cwd:join(repository,'nested'),env,encoding:'utf8'}));assert.equal(catalog.tools.length,3);
  client=new Client({name:'kujo-clean-install-acceptance',version:'1.0.0'});
