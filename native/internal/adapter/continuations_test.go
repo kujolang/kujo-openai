@@ -47,6 +47,11 @@ func TestCanonicalContinuationApprovalAndRestart(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
+	t.Cleanup(func() {
+		if refs != nil {
+			refs.Close()
+		}
+	})
 	a, e := NewWithContinuations(b, store, refs)
 	if e != nil {
 		t.Fatal(e)
@@ -79,7 +84,6 @@ func TestCanonicalContinuationApprovalAndRestart(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	defer refs.Close()
 	a, _ = NewWithContinuations(b, store, refs)
 	done, e := a.Resume(ctx, reference)
 	if e != nil || done.IsError {
@@ -146,7 +150,6 @@ func TestContinuationPersistBeforeInvokeAndUncertainty(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
-			defer refs.Close()
 			executions := 0
 			b := backendFunc(func(_ context.Context, request map[string]any) (json.RawMessage, error) {
 				if request["operation"] == "discover" {
