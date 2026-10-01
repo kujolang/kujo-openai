@@ -35,7 +35,7 @@ The directory is protected by the ACL helper and held open for read access witho
 
 Windows x64 run [36909954515](https://github.com/kujolang/kujo-openai/actions/runs/36909954515), job `110529852890`, commit `c784a35`: **18 top-level tests and 16 subtests passed, zero failures/skips**, plus Windows vet. Ten receipt tests cover concurrent instances/reopen, exact canonical bytes, malformed/oversized values, bounded index and closed store, tampering, missing database, lock deadline, reparse/directory identity, corrupt/empty database, private ACLs, committed child-process exit and forced termination before commit. The interrupted transaction remains absent, the previous receipt survives, and subsequent writes recover the process lock.
 
-The lock test permits the dependency's 50 ms polling interval around its deadline; it still rejects unbounded waiting. These tests establish process-crash behavior on the CI filesystem, not simulated power-loss guarantees for every disk or network storage. Network paths remain unsupported. The launcher still deliberately rejects Windows until the full native path is integrated and tested.
+The lock test permits the dependency's 50 ms polling interval around its deadline; it still rejects unbounded waiting. These tests establish process-crash behavior on the CI filesystem, not simulated power-loss guarantees for every disk or network storage. Network paths remain unsupported. At that milestone the launcher deliberately rejected Windows; the integrated evidence below supersedes that restriction.
 
 The macOS regression passed **50 top-level tests and 16 subtests** with race detection and no test skips/failures. Both real executable acceptance tests passed again after rebuilding the host; `go vet ./...` passed. Windows x64/ARM64 test executables cross-compiled; only x64 was executed. A Windows preview archive built successfully with bbolt's license included, and remains explicitly `submission_ready: false`. Logs: `.local/windows-receipts-c784a35.log`, `.local/native-windows-store-regression.json`, `.local/native-windows-store-integration.json`.
 
@@ -49,3 +49,18 @@ Run [36912436042](https://github.com/kujolang/kujo-openai/actions/runs/369124360
 Two failures were corrected without weakening trust boundaries. CI checkout ACLs were not suitable trusted provider code, so the test copies canonical sources into private operator state. Canonical MCP repository profiling concatenated `/` onto Windows verbatim paths; upstream MCP commit `e02905d` now uses native path joins and maintains slash-separated relative display names. Its full regression suite passed on macOS. The adapter vendors that immutable source, not a separate Windows handler. Upstream draft [PR 11](https://github.com/kujolang/mcp/pull/11) remains unmerged. Model/project-owned import aliases are rejected even when their target is outside the project.
 
 The launcher does not turn `--project` into an OS permission grant. Host-controlled folder authorization, final plugin platform selection, publisher signing and actual ChatGPT installation remain separate unresolved work. Local Windows x64 acceptance must not be represented as public directory approval. Evidence logs: `.local/windows-launcher-f945d22.log`, `.local/mcp-windows-path-regression.log`, `.local/native-windows-profile-integration.json`.
+
+## Patched full-suite and artifact acceptance
+
+Run [36916707980](https://github.com/kujolang/kujo-openai/actions/runs/36916707980),
+job `110552349742`, commit `c3801c0`, used Go 1.26.8 and passed **52 top-level
+tests plus 25 subtests, zero failures/skips**, followed by vet. The Windows
+archive built twice identically; both executable acceptance cases passed from
+the extracted archive and modified executable bytes were rejected. Its SHA-256
+was `e298766e6dd2d4ea926b55ca2f4c38dd4537778bef131b131a423902e40c1a34`.
+Evidence: `.local/windows-go1268-c3801c0.log`.
+
+This also verifies native path separators in provenance, exact vendored bytes
+under Windows checkout, UTF-8 metadata independent of the Windows code page,
+and canonical continuation/restart with native filesystem joins. Windows ARM64
+remains cross-built and audited only; no compatible real runtime was executed.

@@ -21,7 +21,7 @@ This release is a **single-operator local adapter**, not a sandbox or multi-user
 | Destruction / external effects | Conservative annotations and canonical policy; no unrestricted shell surface | An `allow` policy is application authority; verify it before exposing consequential abilities |
 | Malicious MCP client | Official SDK dispatch, strict framing, lifecycle checks, unknown tool denial | Local process launch credentials remain the host boundary |
 | Dependency compromise | Exact npm lock, vendor commit/checksums, minimal transport dependencies, integrity gate | Checksums do not replace trusted release provenance and review |
-| Cancellation / timeout | POSIX native cleanup signal then bounded group kill; uncertainty, no retry | Detached children and already committed effects can survive; Windows process-tree containment is uncertified; externally isolate such workloads |
+| Cancellation / timeout | POSIX native cleanup signal then bounded group kill; uncertainty, no retry | Detached children and already committed effects can survive; Windows Kujo 1.7 child cleanup is exercised by native cancellation/timeout tests; externally isolate workloads requiring stronger containment |
 
 ## Authentication
 
@@ -69,3 +69,17 @@ The native executable now also accepts explicit `--serve-config` and `--project`
 The provider runner strips ambient PATH and environment, sends only fixed capabilities and JSON data, and preserves uncertain completion on interruption. Stdio has a 1 MiB input frame, 4 MiB output frame and 32-pending-request bound; notifications cannot be used to make untracked tool calls. The SDK handles protocol dispatch. Receipt files are atomically published only after file sync, then directory sync; `os.Root` confines file operations. Integrity and inode checks reject tampering and link replacement. Runtime discovery additionally compares filesystem identities to catch case aliases on case-insensitive volumes.
 
 The native host does not expose an approval issuer or shell tool. Resume-capable catalogs fail explicitly pending native recovery support. Windows remains blocked at the executable trust boundary; cross-compilation is not certification. The default packaged manifest is still the reference Node profile and must not be presented as this native implementation.
+
+## Native build security
+
+Native packages require Go 1.26.8, pinned in `native/go.mod` and CI. The
+packager rejects other compilers and records the actual compiler in provenance.
+Go and the vulnerability checker are maintainer tools, never end-user dependencies.
+The binary audit uses pinned govulncheck against macOS, Linux and Windows binaries
+on x64 and ARM64. A clean scan reflects the vulnerability database at scan time;
+it does not establish host isolation or publisher authenticity.
+
+The former Go 1.25.3 preview binaries contained affected standard-library symbols
+reported by the binary audit. Rebuild them with the patched toolchain before use.
+See [verification evidence](TESTING.md#native-toolchain-audit). No public release
+was published by this task.
