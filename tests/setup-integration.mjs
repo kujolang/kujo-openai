@@ -8,7 +8,7 @@ import {Client} from '@modelcontextprotocol/sdk/client/index.js';
 import {StdioClientTransport} from '@modelcontextprotocol/sdk/client/stdio.js';
 const temporary=await mkdtemp(join(tmpdir(),'kujo-install-acceptance-'));
 const repository=join(temporary,'repository'),home=join(temporary,'state');
-const entry=resolve('bin/kujo-openai.mjs');
+const entry=process.env.KUJO_TEST_INSTALLED_ENTRY || resolve('bin/kujo-openai.mjs');
 let client;
 try {
  await mkdir(repository);const git=args=>execFileSync('git',['-C',repository,...args],{stdio:'pipe'});

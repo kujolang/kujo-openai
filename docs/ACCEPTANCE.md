@@ -207,3 +207,19 @@ This is a local onboarding milestone, not universal one-click installation.
 Node/Git and an explicit setup/repository-selection action remain required.
 Automatic public-directory dependency installation, browser-to-local connectivity,
 additional default capability packs, and Windows containment are not established.
+
+### Installed npm distribution acceptance — 2026-09-30
+
+`npm run test:install` packs the release file list, installs that tarball into an
+isolated consumer directory with lifecycle scripts disabled, and launches the
+installed CLI with its own production dependencies. It reuses the real setup/MCP
+acceptance scenario: pinned source acquisition, repeat setup, nested project
+lookup, all three canonical review executions, and exact receipt equality.
+No runtime or provider configuration override is supplied. This catches missing
+published files and runtime dependencies that checkout-only tests would miss.
+
+Local macOS x64 verification passed, together with **35/35** contract tests and
+verification of all 18 vendored canonical files. Linux and macOS CI now run the
+same installed-distribution check independently. This proves npm installation,
+not OpenAI marketplace dependency resolution, automatic repository selection, or
+Windows containment; those remain separate acceptance requirements.

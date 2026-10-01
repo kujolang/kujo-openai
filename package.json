@@ -40,7 +40,8 @@
     "package": "node scripts/package.mjs",
     "test:integration": "node tests/integration.mjs",
     "test:review": "node tests/review-integration.mjs",
-    "test:setup": "node tests/setup-integration.mjs"
+    "test:setup": "node tests/setup-integration.mjs",
+    "test:install": "node tests/package-install-integration.mjs"
   },
   "repository": {
     "type": "git",
