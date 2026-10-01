@@ -358,7 +358,18 @@ source commit: fresh setup, repeat setup, nested project discovery, three real
 canonical MCP executions, and exact receipt lookups. Native/npm binary identity,
 metadata and checksums were also verified for both Linux and both macOS targets.
 Windows and the CI-produced neutral package remained pending at that observation.
-See [the partial artifact evidence](evidence/runtime-artifact-candidate.json).
+See [the artifact evidence](evidence/runtime-artifact-candidate.json).
 The five-platform CI acceptance run is
 [36816195097](https://github.com/kujolang/kujo-openai/actions/runs/36816195097);
 its result must be checked before claiming that milestone.
+
+The rehearsal subsequently completed successfully on all five native targets,
+including Windows, and its neutral npm package passed. Publication steps were
+skipped. Acceptance run 36816195097 then passed **all five installed-candidate
+jobs**: each verified source/binary provenance and ran fresh setup, repeat setup,
+nested discovery, three canonical tools and exact receipt lookups with install
+scripts disabled. The downloaded Windows binary matched its native archive and
+npm package; the CI neutral tarball matched the exact-source local pack's file
+contents. The local Intel Mac install also passed using both CI-produced packages.
+The evidence JSON records every artifact, job ID and binary digest. This closes
+candidate distribution acceptance, not registry publication or host installation.

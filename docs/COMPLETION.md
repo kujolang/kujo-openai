@@ -60,4 +60,6 @@ receipt/source-revision checks. Native cancellation and timeout tests passed
 [evidence/windows-candidate.json](evidence/windows-candidate.json) for immutable
 source pins and the successful workflow run. This closes candidate integration,
 not published-package acceptance: runtime 1.6.0 is still the dependency and the
-new optimized five-platform artifact cohort is still being rehearsed.
+optimized five-platform artifact cohort and installed-candidate matrix have now
+passed; see [artifact evidence](evidence/runtime-artifact-candidate.json). A newly
+versioned, authorized runtime release and registry-based acceptance remain required.

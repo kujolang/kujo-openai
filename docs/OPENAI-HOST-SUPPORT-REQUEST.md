@@ -14,8 +14,9 @@ commands, or a separately configured Kujo runtime.
 The adapter projects canonical Ability definitions, enforces Kujo authority, and
 preserves execution receipts. It has a lifecycle-script-free npm package with a
 platform-selected native runtime dependency and works through local stdio MCP.
-Linux/macOS clean-package execution is verified; Windows integration and a new
-runtime artifact cohort are still being validated. Private-tunnel ChatGPT calls
+Clean candidate-package installation and execution are verified on Linux
+x64/arm64, macOS x64/arm64 and Windows x64. The new runtime still requires
+versioning and publication before registry-based Windows support is available. Private-tunnel ChatGPT calls
 have verified three canonical review tools and their receipts. These tests do
 not establish public local installation support.
 

@@ -51,25 +51,62 @@
       "archive_sha256": "cd01c1e056f8a2a6777d3bf4ae45d686a7f0b5242beb84acf1b81ebf1984ce56",
       "native_npm_binary_match": true,
       "lifecycle_scripts_absent": true
+    },
+    {
+      "artifact_id": 11141840955,
+      "metadata": {
+        "runtimeVersion": "1.6.0",
+        "gitCommit": "9fbad956eecd37448d6dc2f3568105cd1da7b0b0",
+        "target": "win32-x64",
+        "sha256": "dd576c8c5a23cb166c9b7678046090596f99812cb535d9824aa9480792b15a11"
+      },
+      "archive_sha256": "45e66624e90265863c83d5856e6ad905bf87b6f4f32abfbaaf85a8328d574948",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true
     }
   ],
-  "pending_artifacts": [
-    "windows-x64",
-    "neutral npm runtime from CI"
-  ],
+  "pending_artifacts": [],
   "local_installed_candidate": {
     "target": "darwin-x64",
     "platform_artifact_id": 11141162945,
-    "neutral_runtime": "packed locally from exact runtime source commit",
+    "neutral_runtime": "CI artifact 11141004859; additional local isolated install passed",
     "lifecycle_scripts": "disabled",
     "canonical_tools_passed": 3,
     "exact_receipt_lookups": "passed",
     "repeat_setup_and_nested_discovery": "passed"
   },
   "limitations": [
-    "Partial cohort evidence; runtime workflow still in progress at observation.",
-    "Rehearsal version 1.6.0 must not replace the existing published release.",
-    "Candidate npm acceptance workflow 36816195097 is pending; this is not five-platform install acceptance.",
-    "Public ChatGPT local installation and published-package compatibility are not established."
-  ]
+    "Candidate tarballs retain version 1.6.0 and must never replace the existing published release.",
+    "Public ChatGPT local installation and published-package Windows compatibility are not established.",
+    "A new runtime version must be prepared, authorized, published, pinned and tested through the registry before claiming released support."
+  ],
+  "runtime_workflow_conclusion": "success",
+  "publication_steps": "skipped",
+  "neutral_runtime": {
+    "artifact_id": 11141004859,
+    "tarball_sha256": "89f72780c581d5e6fc9679526494dfffb9775f0c6e00e2a375c5e90bde458115",
+    "file_contents_match_exact_source_local_pack": true,
+    "platform_dependency_count": 5,
+    "version": "1.6.0",
+    "lifecycle_scripts_absent": true
+  },
+  "installed_candidate_acceptance": {
+    "workflow": "https://github.com/kujolang/kujo-openai/actions/runs/36816195097",
+    "adapter_commit": "040332525b53062ea32a3d99009f77c59c659e5b",
+    "conclusion": "success",
+    "jobs": {
+      "darwin-x64": 110223110659,
+      "win32-x64": 110223110704,
+      "linux-arm64": 110223110706,
+      "darwin-arm64": 110223110711,
+      "linux-x64": 110223110715
+    },
+    "per_platform": {
+      "canonical_tool_executions_passed": 3,
+      "exact_receipt_lookups": "passed",
+      "repeat_setup_and_nested_discovery": "passed",
+      "lifecycle_scripts": "disabled"
+    },
+    "log_sha256": "adeb6bd6c7c3133a98687ece35f51143e98414fb7bf9d2f148979f5642a794d4"
+  }
 }
