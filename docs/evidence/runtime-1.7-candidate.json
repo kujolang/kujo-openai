@@ -38,8 +38,6 @@
     "macos-arm64": 110229780479
   },
   "remaining": [
-    "Intel Mac native artifact build remains in progress; neutral npm packaging follows all native builds.",
-    "Validate exact versioned packages with the candidate install harness on all five platforms.",
     "Publication requires explicit release authorization, then published-package verification and adapter dependency update.",
     "Public ChatGPT local installation support remains a separate host requirement."
   ],
@@ -105,6 +103,57 @@
       "native_npm_binary_match": true,
       "lifecycle_scripts_absent": true,
       "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11143347713,
+      "job_id": 110229780398,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "darwin-x64",
+        "sha256": "f185457baa5aca7ac44081dad978a3a876b0f95dca3390f5b1f586a05164345e"
+      },
+      "archive_sha256": "af14877128946c2fa8f45676b5029d1c09aa24bc087cdbd57b1806799e7507ab",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
     }
-  ]
+  ],
+  "neutral_runtime": {
+    "artifact_id": 11143473940,
+    "package": "@kujolang/kujo-runtime",
+    "version": "1.7.0",
+    "sha256": "f008f6ee55ed70783e91b3f8223f934a711f7c7356ed940bcdab13cd2a281e5d",
+    "optional_dependency_versions": "1.7.0",
+    "lifecycle_scripts_absent": true,
+    "source_packed_contents_match": true
+  },
+  "workflow_conclusion": "success",
+  "publication_jobs": "skipped",
+  "installed_candidate_acceptance": {
+    "workflow": "https://github.com/kujolang/kujo-openai/actions/runs/36822256533",
+    "adapter_commit": "3d9f081bd731f9ae800544894eb93470f37d9201",
+    "conclusion": "success",
+    "jobs": {
+      "linux-x64": 110240192878,
+      "darwin-x64": 110240192883,
+      "darwin-arm64": 110240192889,
+      "linux-arm64": 110240192901,
+      "win32-x64": 110240192962
+    },
+    "per_platform": {
+      "canonical_tool_executions_passed": 3,
+      "exact_receipt_lookups": "passed",
+      "fresh_repeat_setup_and_nested_discovery": "passed",
+      "lifecycle_scripts": "disabled"
+    },
+    "log_sha256": "bce512854ea3f92096b06d83c65201d51b81b61b879a5752158cf6d0bd676646"
+  },
+  "local_installed_candidate": {
+    "target": "darwin-x64",
+    "platform_artifact_id": 11143347713,
+    "neutral_artifact_id": 11143473940,
+    "result": "passed: fresh/repeat setup, nested discovery, three canonical tools and exact receipts",
+    "log_sha256": "fe431356ccbf2f7ce416d79577b78e9f86fd15651a97c4a5923526ae68ee2f2d"
+  }
 }

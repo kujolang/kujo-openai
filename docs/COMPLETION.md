@@ -70,9 +70,11 @@ The unpublished 1.7.0 preparation is tracked in
 2,891 Rust tests passed, none failed, 17 ignored; both fixture runs passed
 150 tests with 11 skipped. The candidate identity contract also passed.
 Optional cargo-audit/cargo-deny were absent and skipped. All 25 PR checks passed.
-Optimized artifacts for both Linux targets, macOS
-ARM and Windows x64 have verified source/version/digests and native/npm binary
-identity. Native version, hello and LSP smoke checks passed for these artifacts.
-The Intel Mac build remains in progress at this observation; publication and
-registry-based acceptance are still outstanding. See
-[versioned candidate evidence](evidence/runtime-1.7-candidate.json).
+All five optimized native artifacts and the neutral npm package have verified
+source/version/digests, native/npm binary identity and lifecycle-script absence.
+The versioned candidate installation matrix passed on all five targets, including
+Windows: each performed fresh/repeat setup, nested discovery, three canonical
+tool executions and exact receipt lookups. A local Intel Mac installation of the
+same CI packages also passed. Publication jobs were skipped. Runtime publication,
+registry-based acceptance and public ChatGPT local-host support remain outstanding.
+See [versioned candidate evidence](evidence/runtime-1.7-candidate.json).

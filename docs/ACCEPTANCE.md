@@ -331,8 +331,8 @@ claim. Deliberately detached descendants remain outside the local guarantee.
 
 ### Candidate npm artifact acceptance
 
-`runtime-artifact-candidate.yml` installs the optimized npm tarballs produced by
-runtime rehearsal [36811793883](https://github.com/kujolang/kujo/actions/runs/36811793883)
+The initial `runtime-artifact-candidate.yml` cohort installed optimized npm
+tarballs produced by runtime rehearsal [36811793883](https://github.com/kujolang/kujo/actions/runs/36811793883)
 on all five native targets. It first requires a successful manual workflow at
 source `9fbad956eecd37448d6dc2f3568105cd1da7b0b0`. The isolated consumer installs
 both runtime packages and the adapter with lifecycle scripts disabled. Before
@@ -383,3 +383,24 @@ rejects mixed resolver/binary versions before execution. This follows npm's
 default registry acceptance uses no override. A negative local integration with
 the real 1.7.0 resolver package and 1.6.0 native artifact correctly failed the
 version check before setup or tool execution.
+
+### Versioned 1.7.0 candidate acceptance
+
+The workflow now pins runtime commit `f68750b368e6ebaf4dcaf588b4984651bb4d9670`
+and successful rehearsal
+[36817611559](https://github.com/kujolang/kujo/actions/runs/36817611559).
+All five native artifacts and the neutral npm package are version 1.7.0.
+Native version/hello/LSP smoke checks passed; downloaded archives and npm binaries
+matched, with source, platform, version and digest verification before execution.
+Publication jobs were skipped.
+
+Adapter acceptance [36822256533](https://github.com/kujolang/kujo-openai/actions/runs/36822256533)
+at `3d9f081bd731f9ae800544894eb93470f37d9201` passed on Linux x64/arm64,
+macOS x64/arm64 and Windows x64. Each lifecycle-disabled isolated installation
+performed fresh/repeat setup, nested repository discovery, three real canonical
+tool executions and exact receipt lookups. The local Intel Mac test also passed
+using the same CI-produced neutral and native packages. See the
+[versioned evidence](evidence/runtime-1.7-candidate.json) for jobs, artifacts and
+digests. The production dependency remains 1.6.0 until an authorized 1.7.0
+publication and separate registry-based acceptance; no public ChatGPT local
+installation guarantee follows from these candidate tests.
