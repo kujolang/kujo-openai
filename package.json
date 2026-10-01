@@ -48,7 +48,7 @@
     "url": "https://github.com/kujolang/kujo-openai.git"
   },
   "dependencies": {
-    "@kujolang/kujo-runtime": "1.6.0",
+    "@kujolang/kujo-runtime": "1.7.0",
     "@modelcontextprotocol/sdk": "1.31.0",
     "ajv": "8.20.0"
   }

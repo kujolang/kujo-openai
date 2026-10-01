@@ -15,8 +15,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p .local/runtime
-          curl --fail --location --silent --show-error https://github.com/kujolang/kujo/releases/download/v1.6.0/kujo-v1.6.0-linux-x64.tar.gz -o .local/runtime/kujo.tar.gz
-          echo '142372a0c89f91ece2017034b71a3e800969ab2cd7b13dd2ee18eb39efac4504  .local/runtime/kujo.tar.gz' | sha256sum --check
+          curl --fail --location --silent --show-error https://github.com/kujolang/kujo/releases/download/v1.7.0/kujo-v1.7.0-linux-x64.tar.gz -o .local/runtime/kujo.tar.gz
+          echo '526729faff88d19f985cd471ab8602a87070a539ceff7984e12352e30a229c4a  .local/runtime/kujo.tar.gz' | sha256sum --check
           tar -xzf .local/runtime/kujo.tar.gz -C .local/runtime
           runtime_path=$(find "$PWD/.local/runtime" -type f -name kujo -perm /111 | head -1)
           test -n "$runtime_path"
@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-22.04, ubuntu-24.04-arm, macos-15-intel, macos-15, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
