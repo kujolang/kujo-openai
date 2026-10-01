@@ -15,9 +15,9 @@ The adapter projects canonical Ability definitions, enforces Kujo authority, and
 preserves execution receipts. It has a lifecycle-script-free npm package with a
 platform-selected native runtime dependency and works through local stdio MCP.
 Clean candidate-package installation and execution are verified on Linux
-x64/arm64, macOS x64/arm64 and Windows x64. The new runtime still requires
-versioning and publication before registry-based Windows support is available. Private-tunnel ChatGPT calls
-have verified three canonical review tools and their receipts. These tests do
+x64/arm64, macOS x64/arm64 and Windows x64. The runtime 1.7.0 candidate is
+prepared but still requires publication and registry-based acceptance before
+published Windows support is available. Private-tunnel ChatGPT calls have verified three canonical review tools and their receipts. These tests do
 not establish public local installation support.
 
 The [packaging guide](https://developers.openai.com/plugins/build/plugins)

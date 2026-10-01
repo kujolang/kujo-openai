@@ -38,7 +38,7 @@
     "macos-arm64": 110229780479
   },
   "remaining": [
-    "Windows and Intel Mac native artifact builds remain in progress; neutral npm packaging follows all native builds.",
+    "Intel Mac native artifact build remains in progress; neutral npm packaging follows all native builds.",
     "Validate exact versioned packages with the candidate install harness on all five platforms.",
     "Publication requires explicit release authorization, then published-package verification and adapter dependency update.",
     "Public ChatGPT local installation support remains a separate host requirement."
@@ -88,6 +88,20 @@
         "sha256": "77582d08d638f8ed346b8787126d75ee9b9cce07efe572d73333e6a8361fc48f"
       },
       "archive_sha256": "eaafc24d19f148bae1a78ad6ed71aca072faf8610c10661c84e9ab0ae734ada5",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11143966834,
+      "job_id": 110229780370,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "win32-x64",
+        "sha256": "dbc6ba84026d88e993f78978c682e3dfa0116c30d38513c19c522f540f858428"
+      },
+      "archive_sha256": "018a91174afe6be005699df96e37ceec1346a06c15ce59de175fc8afc10bca81",
       "native_npm_binary_match": true,
       "lifecycle_scripts_absent": true,
       "native_version_hello_lsp_smoke": "passed"
