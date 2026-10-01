@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 import pathlib
+import re
 import subprocess
 import tempfile
 import sys
@@ -23,7 +24,7 @@ def inspect(path):
         assert not any(n.startswith('/') or '..' in pathlib.PurePosixPath(n).parts or '\\' in n for n in names)
         assert not any('node_modules' in n or n.endswith('.mjs') or n in ('mcp.json', 'plugin.json') for n in names)
         metadata = json.loads(archive.read('provenance.json'))
-        required_go = package.re.search(r'^go (\S+)$', (ROOT/'native/go.mod').read_text(encoding='utf-8'), package.re.M).group(1)
+        required_go = re.search(r'^go (\S+)$', (ROOT/'native/go.mod').read_text(encoding='utf-8'), re.M).group(1)
         assert metadata['go_version'] == 'go' + required_go, 'unapproved build toolchain'
         assert metadata['schema'] == 'kujo.openai.native-artifact/v1'
         assert metadata['submission_ready'] is False and metadata['publisher_signed'] is False
