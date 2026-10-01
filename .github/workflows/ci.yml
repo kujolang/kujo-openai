@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           git clone --filter=blob:none https://github.com/kujolang/patchbrief.git ../patchbrief
-          git -C ../patchbrief checkout a4da5942e9668924cd2f2869859bf05b006edda5
+          git -C ../patchbrief checkout 0e8d6bd6fd226b09b807f8758ade08096c8b70f0
           git clone --filter=blob:none https://github.com/kujolang/changebucket.git ../changebucket
           git -C ../changebucket checkout 030eea63c60449f82c9ba2680227485d318fdb6d
           npm run test:review

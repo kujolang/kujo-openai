@@ -37,7 +37,7 @@ The installed Codex CLI 0.144.4 required the supported `.codex-plugin/plugin.jso
 
 ## Trusted local change review
 
-Use Ability's canonical repository-review pack to expose actual PatchBrief and ChangeBucket tools. Obtain clean source checkouts at PatchBrief `a4da5942e9668924cd2f2869859bf05b006edda5` and ChangeBucket `030eea63c60449f82c9ba2680227485d318fdb6d` (siblings by default; override `KUJO_PATCHBRIEF_SOURCE` / `KUJO_CHANGEBUCKET_SOURCE`). From this adapter checkout:
+Use Ability's canonical repository-review pack to expose actual PatchBrief and ChangeBucket tools. Obtain clean source checkouts at PatchBrief `0e8d6bd6fd226b09b807f8758ade08096c8b70f0` and ChangeBucket `030eea63c60449f82c9ba2680227485d318fdb6d` (siblings by default; override `KUJO_PATCHBRIEF_SOURCE` / `KUJO_CHANGEBUCKET_SOURCE`). From this adapter checkout:
 
 ```sh
 KUJO_BIN=/absolute/path/to/kujo node scripts/configure-review-pack.mjs /absolute/trusted/repository

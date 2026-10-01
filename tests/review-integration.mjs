@@ -29,7 +29,7 @@ try {
    assert.equal(result.structuredContent.checks.find(check=>check.name==='git-repo')?.passed,1,'fixture Git repository must be detected');
    assert.equal(result.structuredContent.checks.find(check=>check.name==='readme')?.passed,0,'fixture deliberately has no README');
   } else assert.equal(result.structuredContent.summary.files_changed,1);
-  const resource=await client.readResource({uri:result._meta['kujo/receiptUri']});const receipt=JSON.parse(resource.contents[0].text);assert.equal(receipt.ability_id,tool._meta['kujo/abilityId']);assert.deepEqual(receipt.result,result.structuredContent);assert.equal(receipt.audit.source_revisions["patchbrief.kujo"],"a4da5942e9668924cd2f2869859bf05b006edda5");checks.push({ability:receipt.ability_id,status:receipt.status,receipt_id:receipt.receipt_id});
+  const resource=await client.readResource({uri:result._meta['kujo/receiptUri']});const receipt=JSON.parse(resource.contents[0].text);assert.equal(receipt.ability_id,tool._meta['kujo/abilityId']);assert.deepEqual(receipt.result,result.structuredContent);assert.equal(receipt.audit.source_revisions["patchbrief.kujo"],"0e8d6bd6fd226b09b807f8758ade08096c8b70f0");checks.push({ability:receipt.ability_id,status:receipt.status,receipt_id:receipt.receipt_id});
   const evidence=await client.callTool({name:'_kujo_receipt_evidence',arguments:{receipt_uri:result._meta['kujo/receiptUri']}});assert.deepEqual(evidence.structuredContent.receipt,receipt);
   const invalid=await client.callTool({name:tool.name,arguments:{path:'../../etc',command:'touch injected',approval:true}});assert.equal(invalid.isError,true);checks.push({ability:receipt.ability_id,case:'forged path/command/approval',passed:true});
  });

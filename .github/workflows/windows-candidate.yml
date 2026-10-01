@@ -36,7 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           git clone https://github.com/kujolang/patchbrief.git .local/patchbrief
-          git -C .local/patchbrief checkout a4da5942e9668924cd2f2869859bf05b006edda5
+          git -C .local/patchbrief checkout 0e8d6bd6fd226b09b807f8758ade08096c8b70f0
           git clone https://github.com/kujolang/changebucket.git .local/changebucket
           git -C .local/changebucket checkout 030eea63c60449f82c9ba2680227485d318fdb6d
           git clone https://github.com/kujolang/shipcheck.git .local/shipcheck
