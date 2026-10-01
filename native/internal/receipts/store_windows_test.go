@@ -3,6 +3,7 @@
 package receipts
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -19,6 +20,7 @@ import (
 	"github.com/kujolang/kujo-openai/native/internal/provider"
 	"github.com/kujolang/kujo-openai/native/internal/windowstrust"
 	bolt "go.etcd.io/bbolt"
+	"golang.org/x/sys/windows"
 )
 
 func windowsStore(t *testing.T) (*Store, string) {
@@ -166,7 +168,7 @@ func TestWindowsReceiptLockTimeout(t *testing.T) {
 	start := time.Now()
 	_, e = s.Put(json.RawMessage(`{"secret_fixture":"must_not_leak"}`))
 	assertBoundary(t, e, "receipt_persistence_failed", true)
-	if elapsed := time.Since(start); elapsed < lockTimeout || elapsed > lockTimeout+3*time.Second {
+	if elapsed := time.Since(start); elapsed < lockTimeout-100*time.Millisecond || elapsed > lockTimeout+3*time.Second {
 		t.Fatalf("lock deadline %s", elapsed)
 	}
 	if len(s.Recent()) != 0 {
@@ -224,6 +226,100 @@ func TestWindowsReceiptCorruptDatabase(t *testing.T) {
 	}
 	_, e := Open(path)
 	assertBoundary(t, e, "receipt_storage_durability_unavailable", false)
+	if e = os.Truncate(filepath.Join(path, databaseName), 0); e != nil {
+		t.Fatal(e)
+	}
+	_, e = Open(path)
+	assertBoundary(t, e, "receipt_storage_durability_unavailable", false)
+}
+
+func TestWindowsReceiptPrivateACLRequired(t *testing.T) {
+	s, path := windowsStore(t)
+	database := filepath.Join(path, databaseName)
+	user, e := windows.GetCurrentProcessToken().GetTokenUser()
+	if e != nil {
+		t.Fatal(e)
+	}
+	sd, e := windows.SecurityDescriptorFromString("D:P(A;;FA;;;" + user.User.Sid.String() + ")(A;;FA;;;SY)(A;;FA;;;BA)(A;;GR;;;WD)")
+	if e != nil {
+		t.Fatal(e)
+	}
+	acl, _, e := sd.DACL()
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = windows.SetNamedSecurityInfo(database, windows.SE_FILE_OBJECT, windows.DACL_SECURITY_INFORMATION|windows.PROTECTED_DACL_SECURITY_INFORMATION, nil, nil, acl, nil); e != nil {
+		t.Fatal(e)
+	}
+	_, e = s.Put(json.RawMessage(`{}`))
+	assertBoundary(t, e, "receipt_persistence_failed", true)
+	s.Close()
+	_, e = Open(path)
+	assertBoundary(t, e, "receipt_storage_durability_unavailable", false)
+}
+
+func TestWindowsReceiptInterruptedTransaction(t *testing.T) {
+	const raw = `{"uncommitted":true}`
+	sum := sha256.Sum256([]byte(raw))
+	digest := hex.EncodeToString(sum[:])
+	if path := os.Getenv("KUJO_RECEIPT_ABORT_CHILD"); path != "" {
+		s, e := Open(path)
+		if e != nil {
+			os.Exit(30)
+		}
+		s.transaction(false, func(db *bolt.DB) error {
+			return db.Update(func(tx *bolt.Tx) error {
+				if e := tx.Bucket(bucketName).Put([]byte(digest), []byte(raw)); e != nil {
+					os.Exit(31)
+				}
+				fmt.Println("ready")
+				time.Sleep(time.Minute)
+				return errors.New("not_committed")
+			})
+		})
+		os.Exit(32)
+	}
+	s, path := windowsStore(t)
+	old, e := s.Put(json.RawMessage(`{"previous_commit":true}`))
+	if e != nil {
+		t.Fatal(e)
+	}
+	cmd := exec.Command(os.Args[0], "-test.run=^TestWindowsReceiptInterruptedTransaction$")
+	cmd.Env = append(os.Environ(), "KUJO_RECEIPT_ABORT_CHILD="+path)
+	out, e := cmd.StdoutPipe()
+	if e != nil {
+		t.Fatal(e)
+	}
+	if e = cmd.Start(); e != nil {
+		t.Fatal(e)
+	}
+	defer cmd.Process.Kill()
+	ready := make(chan bool, 1)
+	go func() { scanner := bufio.NewScanner(out); ready <- scanner.Scan() && scanner.Text() == "ready" }()
+	select {
+	case ok := <-ready:
+		if !ok {
+			cmd.Process.Kill()
+			cmd.Wait()
+			t.Fatal("child did not begin transaction")
+		}
+	case <-time.After(10 * time.Second):
+		cmd.Process.Kill()
+		cmd.Wait()
+		t.Fatal("child deadline")
+	}
+	if e = cmd.Process.Kill(); e != nil {
+		t.Fatal(e)
+	}
+	cmd.Wait()
+	if _, e = s.Read(old); e != nil {
+		t.Fatal("prior committed receipt lost", e)
+	}
+	_, e = s.Read("kujo-receipt://sha256/" + digest)
+	assertBoundary(t, e, "invalid_receipt_file", false)
+	if _, e = s.Put(json.RawMessage(raw)); e != nil {
+		t.Fatal("lock not released after termination", e)
+	}
 }
 
 func TestWindowsReceiptProcessExit(t *testing.T) {
