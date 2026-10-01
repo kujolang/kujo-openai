@@ -351,3 +351,14 @@ This opt-in is test-only. Candidate results do not establish published-package
 acceptance, public ChatGPT installation, or authorization to publish a runtime.
 The rehearsal packages retain version 1.6.0 and must never replace that existing
 registry release. Record workflow results separately after they complete.
+
+On 2026-10-01, the optimized Intel Mac platform artifact passed this isolated
+install test with a neutral runtime package packed locally from the same exact
+source commit: fresh setup, repeat setup, nested project discovery, three real
+canonical MCP executions, and exact receipt lookups. Native/npm binary identity,
+metadata and checksums were also verified for both Linux and both macOS targets.
+Windows and the CI-produced neutral package remained pending at that observation.
+See [the partial artifact evidence](evidence/runtime-artifact-candidate.json).
+The five-platform CI acceptance run is
+[36816195097](https://github.com/kujolang/kujo-openai/actions/runs/36816195097);
+its result must be checked before claiming that milestone.

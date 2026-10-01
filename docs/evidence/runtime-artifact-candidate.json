@@ -1,0 +1,75 @@
+{
+  "schema": "kujo.openai.runtime-artifact-evidence/v1",
+  "observed_at": "2026-10-01",
+  "runtime_source_commit": "9fbad956eecd37448d6dc2f3568105cd1da7b0b0",
+  "runtime_workflow": "https://github.com/kujolang/kujo/actions/runs/36811793883",
+  "completed_artifacts": [
+    {
+      "artifact_id": 11140479054,
+      "metadata": {
+        "runtimeVersion": "1.6.0",
+        "gitCommit": "9fbad956eecd37448d6dc2f3568105cd1da7b0b0",
+        "target": "linux-arm64",
+        "sha256": "e4da76cdf351b411a50dc8475b3b757422e92aa5a30dbf16c1b57c8780385406"
+      },
+      "archive_sha256": "7eebaa2f3454034b18fe95aa39a9706fbe4481b4f44c08cfbd0e58945400d76d",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true
+    },
+    {
+      "artifact_id": 11140723513,
+      "metadata": {
+        "runtimeVersion": "1.6.0",
+        "gitCommit": "9fbad956eecd37448d6dc2f3568105cd1da7b0b0",
+        "target": "linux-x64",
+        "sha256": "ecbfb625b78ed989231dca6b67e38d872046c5ed31e2709cb7e965520ceaa00b"
+      },
+      "archive_sha256": "02a83dff1b5edd10ef3d76ffbaaa12cbe27b42deb5abaafb0da856e58233d102",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true
+    },
+    {
+      "artifact_id": 11140359612,
+      "metadata": {
+        "runtimeVersion": "1.6.0",
+        "gitCommit": "9fbad956eecd37448d6dc2f3568105cd1da7b0b0",
+        "target": "darwin-arm64",
+        "sha256": "d02a3877a950a07b092f42ae251f8c3920fed19eb5816a98a27734e8049bd14c"
+      },
+      "archive_sha256": "b435cd946428abffa4f5cf918defe2e04776c093d73103379116ca3f39694423",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true
+    },
+    {
+      "artifact_id": 11141162945,
+      "metadata": {
+        "runtimeVersion": "1.6.0",
+        "gitCommit": "9fbad956eecd37448d6dc2f3568105cd1da7b0b0",
+        "target": "darwin-x64",
+        "sha256": "53e61ad73ecbc69a2ff22affb5d1d03e6b20ca217e53aed66e18f903176abf8c"
+      },
+      "archive_sha256": "cd01c1e056f8a2a6777d3bf4ae45d686a7f0b5242beb84acf1b81ebf1984ce56",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true
+    }
+  ],
+  "pending_artifacts": [
+    "windows-x64",
+    "neutral npm runtime from CI"
+  ],
+  "local_installed_candidate": {
+    "target": "darwin-x64",
+    "platform_artifact_id": 11141162945,
+    "neutral_runtime": "packed locally from exact runtime source commit",
+    "lifecycle_scripts": "disabled",
+    "canonical_tools_passed": 3,
+    "exact_receipt_lookups": "passed",
+    "repeat_setup_and_nested_discovery": "passed"
+  },
+  "limitations": [
+    "Partial cohort evidence; runtime workflow still in progress at observation.",
+    "Rehearsal version 1.6.0 must not replace the existing published release.",
+    "Candidate npm acceptance workflow 36816195097 is pending; this is not five-platform install acceptance.",
+    "Public ChatGPT local installation and published-package compatibility are not established."
+  ]
+}
