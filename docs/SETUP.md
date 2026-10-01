@@ -52,7 +52,7 @@ The test config points at a disposable repository after testing; rerun provision
 
 ## Release signals in the review pack
 
-To add canonical ShipCheck release metadata scanning, obtain its clean reviewed checkout at `111bfc83c832050877cb9d4fd82908aaf6d14749` (sibling `shipcheck`, or `KUJO_SHIPCHECK_SOURCE`) and provision with:
+To add canonical ShipCheck release metadata scanning, obtain its clean reviewed checkout at `0a9f5795e9498f3698d5da6bb66642544251dd37` (sibling `shipcheck`, or `KUJO_SHIPCHECK_SOURCE`) and provision with:
 
 ```sh
 KUJO_BIN=/absolute/path/to/kujo node scripts/configure-review-pack.mjs /absolute/trusted/repository --release-signals

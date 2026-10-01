@@ -40,7 +40,7 @@ jobs:
           git clone https://github.com/kujolang/changebucket.git .local/changebucket
           git -C .local/changebucket checkout 030eea63c60449f82c9ba2680227485d318fdb6d
           git clone https://github.com/kujolang/shipcheck.git .local/shipcheck
-          git -C .local/shipcheck checkout 111bfc83c832050877cb9d4fd82908aaf6d14749
+          git -C .local/shipcheck checkout 0a9f5795e9498f3698d5da6bb66642544251dd37
       - name: Execute canonical review tools and preserve exact receipts over MCP
         shell: pwsh
         run: |

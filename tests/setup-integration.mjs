@@ -36,7 +36,12 @@ try {
  const {tools}=await client.listTools();assert.equal(tools.length,4);
  for(const tool of tools.filter(t=>t._meta?.['kujo/abilityId'])) {
   const result=await client.callTool({name:tool.name,arguments:{}});assert.equal(result.isError,false,JSON.stringify(result));
-  if(tool._meta['kujo/abilityId']==='kujo.shipcheck.repository.scan')assert.equal(result.structuredContent.summary.gate_passed,0);
+  if(tool._meta['kujo/abilityId']==='kujo.shipcheck.repository.scan') {
+   assert.equal(result.structuredContent.summary.gate_passed,0);
+   assert.equal(result.structuredContent.summary.total_checks,16);
+   assert.equal(result.structuredContent.checks.find(check=>check.name==='git-repo')?.passed,1,'installed tool must recognize the real Git fixture');
+   assert.equal(result.structuredContent.checks.find(check=>check.name==='readme')?.passed,0);
+  }
   else assert.equal(result.structuredContent.summary.files_changed,1);
   const evidence=await client.callTool({name:'_kujo_receipt_evidence',arguments:{receipt_uri:result._meta['kujo/receiptUri']}});
   assert.equal(evidence.isError,false);assert.equal(evidence.structuredContent.receipt.ability_id,tool._meta['kujo/abilityId']);
