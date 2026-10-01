@@ -18,6 +18,11 @@ import (
 var unsafePath = errors.New("unsafe_windows_path")
 var unsafeACL = errors.New("unsafe_windows_acl")
 var unverified = errors.New("windows_security_unverified")
+
+// Windows Modules Installer owns protected OS ancestors. Trust exactly this
+// service SID, not arbitrary NT SERVICE identities or an account-name match.
+const trustedInstallerSID = "S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464"
+
 var drive = regexp.MustCompile(`^[A-Za-z]:$`)
 
 // Check inspects the object and every existing ancestor. Network/device paths,
@@ -78,7 +83,9 @@ func checkDescriptor(sd *windows.SECURITY_DESCRIPTOR, current string, directory,
 		return unverified
 	}
 	defer runtime.KeepAlive(sd)
-	trusted := func(sid string) bool { return sid == current || sid == "S-1-5-18" || sid == "S-1-5-32-544" }
+	trusted := func(sid string) bool {
+		return sid == current || sid == "S-1-5-18" || sid == "S-1-5-32-544" || sid == trustedInstallerSID
+	}
 	owner, _, e := sd.Owner()
 	if e != nil || owner == nil || !trusted(owner.String()) {
 		return unsafeACL

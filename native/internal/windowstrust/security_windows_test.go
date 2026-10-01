@@ -33,6 +33,8 @@ func TestDescriptorPolicy(t *testing.T) {
 		directory, private, allow bool
 	}{
 		{"owner_only", "O:" + current + "D:P(A;;FA;;;" + current + ")", false, true, true},
+		{"trusted_installer", "O:" + trustedInstallerSID + "D:P(A;;FA;;;" + trustedInstallerSID + ")", false, false, true},
+		{"other_service", "O:S-1-5-80-1-2-3-4-5D:P(A;;FA;;;BA)", false, false, false},
 		{"system_and_administrators", "O:SYD:P(A;;FA;;;SY)(A;;FA;;;BA)", false, false, true},
 		{"readable_runtime", "O:" + current + "D:P(A;;FA;;;" + current + ")(A;;GR;;;BU)", false, false, true},
 		{"readable_private_data", "O:" + current + "D:P(A;;FA;;;" + current + ")(A;;GR;;;BU)", false, true, false},
@@ -195,4 +197,11 @@ func TestPrivateCreationAndInheritedFiles(t *testing.T) {
 		t.Fatal("unsafe existing state repaired or accepted")
 	}
 	setDACL(t, directory, private)
+}
+
+func TestTrustedInstallerIdentity(t *testing.T) {
+	sid, _, _, e := windows.LookupSID("", `NT SERVICE\TrustedInstaller`)
+	if e != nil || sid.String() != trustedInstallerSID {
+		t.Fatal("TrustedInstaller identity not verified", e)
+	}
 }
