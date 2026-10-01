@@ -86,3 +86,26 @@ test('review metadata preserves operator cases and rejects incomplete or unsafe 
  for(const kind of ['positive','negative'])invalid.push({...review,test_cases:{...review.test_cases,[kind]:[...review.test_cases[kind],example]}});
  for(const value of invalid)assert.throws(()=>remotePackageManifests(plugin,{...configuration,review:value}),error=>!String(error).includes('secret'));
 });
+
+test('public review boundaries enforce listing URLs and positive case requirements',async()=>{
+ const {remotePackageManifests}=await import('../lib/remote-package.mjs');
+ const plugin=JSON.parse(await readFile('plugin.json'));
+ const configuration={schema:'kujo.openai.remote-package/v1',resource:'https://kujo.example/mcp',websiteURL:'https://kujo.example',supportURL:'https://kujo.example/support',privacyPolicyURL:'https://kujo.example/privacy',termsOfServiceURL:'https://kujo.example/terms'};
+ const urlOfLength=length=>'https://kujo.example/'+ 'a'.repeat(length-'https://kujo.example/'.length);
+ for(const field of ['websiteURL','supportURL','privacyPolicyURL','termsOfServiceURL']) {
+  assert.doesNotThrow(()=>remotePackageManifests(plugin,{...configuration,[field]:urlOfLength(1024)}));
+  assert.throws(()=>remotePackageManifests(plugin,{...configuration,[field]:urlOfLength(1025)}));
+ }
+ const review=reviewFixture();
+ review.test_cases.positive[0].description='a'.repeat(4000);
+ assert.doesNotThrow(()=>remotePackageManifests(plugin,{...configuration,review}));
+ review.test_cases.positive[0].description+='a';
+ assert.throws(()=>remotePackageManifests(plugin,{...configuration,review}));
+ review.test_cases.positive[0].description='Valid case';
+ for(const value of ['', '   ']) {
+  review.test_cases.positive[0].tools_triggered=value;
+  assert.throws(()=>remotePackageManifests(plugin,{...configuration,review}));
+ }
+ review.test_cases.positive[0].tools_triggered='fixture_inspect';
+ assert.doesNotThrow(()=>remotePackageManifests(plugin,{...configuration,review}));
+});
