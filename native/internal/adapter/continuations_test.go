@@ -150,6 +150,7 @@ func TestContinuationPersistBeforeInvokeAndUncertainty(t *testing.T) {
 			if e != nil {
 				t.Fatal(e)
 			}
+			defer refs.Close()
 			executions := 0
 			b := backendFunc(func(_ context.Context, request map[string]any) (json.RawMessage, error) {
 				if request["operation"] == "discover" {
