@@ -99,3 +99,13 @@ with `KUJO_NATIVE_TEST_BIN` set passed one top-level test and five subtests,
 zero failures/skips; `go vet ./internal/adapter` passed. Log:
 `.local/native-legacy-protocol-acceptance.log`. The first attempted test command
 ran before the test file existed and is not counted as verification.
+
+At code checkpoint `5e09b86`, [native Windows run 36918983214](https://github.com/kujolang/kujo-openai/actions/runs/36918983214)
+passed **53 top-level tests and 30 subtests, zero failures/skips**, plus vet and
+extracted-archive acceptance. The log explicitly records every legacy protocol
+case: `.local/windows-protocol-5e09b86.log`.
+[Run 36918983273](https://github.com/kujolang/kujo-openai/actions/runs/36918983273)
+passed the full native race/vet/archive workflow on Linux x64/ARM64 and macOS
+x64/ARM64, including the newly added protocol matrix. Its legacy installation
+and receipt jobs also passed. These five native execution platforms still do
+not constitute public ChatGPT installation, signing, or folder-grant acceptance.
