@@ -24,7 +24,7 @@ The Windows security workflow runs real ACL/reparse and transactional receipt te
 | Platform | Native evidence | Remaining boundary |
 |---|---|---|
 | macOS x64 | Actual canonical stdio calls, receipt retrieval/restart; 50 top-level tests and 16 subtests with race detection | Public plugin installation and host grants |
-| macOS ARM64 | Cross-build; Unix acceptance workflow configured | Consult exact CI evidence before claiming execution |
+| macOS ARM64 | Actual native race/vet and extracted-package execution, run 36918182611 at 1ff7864 | Public plugin installation and host grants |
 | Linux x64 / ARM64 | Actual native race/vet and extracted-package execution, run 36916707929 at c3801c0 | Public plugin installation and host grants |
 | Windows x64 | Go 1.26.8: 52 top-level + 25 subtests, vet, extracted executable/reproducibility/tamper checks | Public plugin installation and host grants |
 | Windows ARM64 | Cross-build | Actual runtime, storage and host execution unverified |
@@ -74,3 +74,28 @@ reproducibility/tamper rejection (jobs `110552386306` and `110552386058`).
 Archive SHA-256: x64 `020530606e2ee0d52d9c61cfd387588e5f54f30051528b65dbe907a6f3762961`;
 ARM64 `87f8d2b1c37171aafd46b4b45990f182276893d00f14aed622188f862fc4316f`.
 An explicit local negative check rejected Go 1.25.3 before creating an artifact.
+
+macOS ARM64 [run 36918182611](https://github.com/kujolang/kujo-openai/actions/runs/36918182611),
+job `110557344591`, passed the native race suite, vet and both extracted executable
+cases. Archive reproducibility and tamper rejection passed; SHA-256
+`34bf7281a9865f944ba1df3d9060ab41f069093b8bae2f16eda6019dcc7c8545`
+matched the independently cross-built macOS x64 archive for the ARM64 target.
+Log: `.local/macos-arm64-go1268-1ff7864.log`. This is real ARM64 execution,
+not only cross-compilation.
+
+## MCP protocol compatibility
+
+`TestCanonicalLegacyProtocolCompatibility` uses a raw JSON-RPC client over the
+bounded native stdio transport, real Kujo 1.7 provider and durable receipt store.
+It checks negotiated versions 2024-11-05, 2025-03-26, 2025-06-18 and 2025-11-25;
+tool discovery and canonical execution; stored versus returned receipt equality;
+and shutdown on EOF. An unsupported 2020-01-01 request is negotiated to
+2025-11-25 by the pinned SDK: this does not mean 2020-01-01 is supported.
+Clients must inspect the returned version. Existing executable acceptance uses
+the SDK client's 2026-07-28 discovery/request path.
+
+Local command `go test -race -count=1 -run TestCanonicalLegacyProtocolCompatibility -v ./internal/adapter`
+with `KUJO_NATIVE_TEST_BIN` set passed one top-level test and five subtests,
+zero failures/skips; `go vet ./internal/adapter` passed. Log:
+`.local/native-legacy-protocol-acceptance.log`. The first attempted test command
+ran before the test file existed and is not counted as verification.

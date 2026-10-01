@@ -43,6 +43,6 @@ Diagnostic mode alone reports `provider_runtime_ready` for a compatible installa
 
 ## Still required before the selected product can ship
 
-final native platform packaging; remaining platform acceptance (Windows ARM64 unverified); actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
+final native platform packaging; public-host platform acceptance (native execution verified on five available runtime platforms; Windows ARM64 unverified); actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
 
 See [native build/run/test instructions](../native/README.md) and [submission checklist](PREINSTALLED-SUBMISSION.md). Earlier bootstrap/hosted designs and the diagnostic-only audit are historical evidence, not the current product plan.

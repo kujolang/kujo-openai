@@ -10,7 +10,7 @@
 | Native local entrypoint | BLOCKED — implementation | Experimental compiled adapter verified locally; default manifest/distribution not migrated |
 | No Node/Git runtime dependencies | BLOCKED — implementation | Experimental native runner needs neither; default package/setup still require them |
 | Missing-runtime diagnosis | FIXED (standalone diagnostic) | Native bounded preflight; not connected to host onboarding |
-| Declared platform local launch | BLOCKED — implementation/acceptance | macOS x64 and Windows x64 real native acceptance recorded; other platform evidence must be verified; Windows ARM64 unverified |
+| Declared platform local launch | BLOCKED — implementation/acceptance | Actual native execution recorded on macOS/Linux x64 and ARM64 and Windows x64; final host launch remains unverified; Windows ARM64 unsupported for verified execution |
 | Selected-folder isolation | BLOCKED — implementation/acceptance | Operator-root setup differs from verified host grants |
 | Ability semantics, approvals, receipts | PASS (tested native contracts) | Real canonical schema/approval/failure/receipt tests plus native continuation/restart; live-host acceptance remains separate |
 | Local execution/privacy disclosures | FIXED | README, INSTALL, SECURITY, PRIVACY, SUPPORT |
