@@ -243,3 +243,23 @@ the product bindings must also pass before Windows support can be claimed.
 The same run passed contracts (45s), macOS installed-package (18s), and Linux
 installed-package (19s). The overall run failed as expected from the Windows
 failure; it is not a passing release gate.
+
+### Browser release starter with unavailable tunnel — 2026-09-30
+
+Opened the installed 1.0.3 plugin's release-readiness starter and sent its natural
+language prompt in ChatGPT Work. Conversation:
+`6abdb643-4388-83ea-86bf-a0afcf8e8db9` (Check ship readiness).
+ChatGPT announced the ship-review Skill and attempted the three expected review
+tools. All failed with `McpServerError: Session terminated`. The final response
+said readiness was undetermined, identified unavailable evidence, and did not
+claim that tests ran or that the project could ship. No receipt was presented.
+The announcement is routing evidence, not proof of a Skill file-read event.
+
+The existing trusted local configuration still returned its canonical catalog.
+Both `/healthz` and `/readyz` on the tunnel client's recorded loopback endpoint
+returned connection refused. This establishes a stopped local connection at the
+time of the test; it does not invalidate earlier successful live invocations.
+Browser completion needs the user to restart their foreground tunnel and enter
+the credential locally. No credential was recovered or copied into this chat.
+Private screenshot: `.local/browser-tunnel-stopped.jpg`. Re-run this exact starter
+after reconnecting before claiming successful browser release composition.
