@@ -65,3 +65,9 @@ The next steps for the plugin are:
 See [the prepared support request](OPENAI-HOST-SUPPORT-REQUEST.md). A hosted
 execution service is a separate architectural choice, not an automatic replacement
 for the requested local installation experience.
+
+## Clean container test
+
+Run `npm run test:sandbox` with Docker running. See
+[SANDBOX-ACCEPTANCE.md](SANDBOX-ACCEPTANCE.md) for the verified local-host
+boundary and remaining public-installation requirements.
