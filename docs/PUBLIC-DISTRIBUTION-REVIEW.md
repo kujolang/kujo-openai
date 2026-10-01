@@ -49,3 +49,11 @@ isolation and operational ownership require review before implementation.
 The existing public catalog service does not execute repository reviews.
 No hosted deployment or change of trust boundary is authorized by this
 fact-check. Publishing an npm package alone would not resolve that decision.
+
+## Subsequent design authorization
+
+On 2026-10-01 the owner authorized designing hosted execution, authentication and
+repository access. [The resulting design](HOSTED-EXECUTION-DESIGN.md) reuses the
+existing Ability Gateway while preserving the public catalog boundary. This
+supersedes the recommendation to wait for a local-route answer before design;
+production provisioning, spending and public onboarding remain separate.
