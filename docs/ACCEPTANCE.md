@@ -223,3 +223,23 @@ verification of all 18 vendored canonical files. Linux and macOS CI now run the
 same installed-distribution check independently. This proves npm installation,
 not OpenAI marketplace dependency resolution, automatic repository selection, or
 Windows containment; those remain separate acceptance requirements.
+
+### Windows installation probe — 2026-09-30
+
+Branch `codex/windows-install-acceptance` adds Windows to the installed-package
+matrix and canonicalizes Git-reported roots before comparison. Windows run
+36799379949 exposed Git rejecting Node's null-device path as a configuration
+file. Setup now creates an empty config file and hooks directory inside its
+owned lock instead. Run 36799778867 then passed initial and repeated provisioning
+with the official `kujo-win32-x64` runtime, but native discovery failed with
+`[KUJOVM001] [vm] Runtime Error: absolute executable required`.
+
+The pinned canonical `bindings/json_process.kujo` requires both executable and
+working directory to begin with `/`. This rejects Windows drive-qualified paths.
+The repair belongs in canonical Ability with host-neutral path validation and
+negative tests; the adapter must not patch its vendored semantics independently.
+Windows remains uncertified. Receipt durability, process-tree cancellation and
+the product bindings must also pass before Windows support can be claimed.
+The same run passed contracts (45s), macOS installed-package (18s), and Linux
+installed-package (19s). The overall run failed as expected from the Windows
+failure; it is not a passing release gate.
