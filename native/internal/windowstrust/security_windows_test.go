@@ -121,6 +121,24 @@ func TestUnknownACEFailsClosed(t *testing.T) {
 	}
 }
 
+// Diagnostics are limited to synthetic CI fixture ancestry and ACL descriptors.
+func explainAncestry(t *testing.T, path string) {
+	t.Helper()
+	for cursor := path; ; cursor = filepath.Dir(cursor) {
+		if err := checkObject(cursor, currentSID(t), false); err != nil {
+			sd, e := windows.GetNamedSecurityInfo(cursor, windows.SE_FILE_OBJECT, windows.OWNER_SECURITY_INFORMATION|windows.DACL_SECURITY_INFORMATION)
+			if e == nil {
+				t.Logf("rejected ancestor %s: %v; %s", filepath.Base(cursor), err, sd.String())
+			} else {
+				t.Logf("descriptor unavailable: %v", e)
+			}
+		}
+		if filepath.Dir(cursor) == cursor {
+			break
+		}
+	}
+}
+
 func TestFullPathChecksAncestors(t *testing.T) {
 	current := currentSID(t)
 	directory := t.TempDir()
@@ -138,6 +156,7 @@ func TestFullPathChecksAncestors(t *testing.T) {
 	// This also verifies the real runner's drive/profile ancestry. Unsupported
 	// ownership is reported as a failure, never skipped or treated as permission.
 	if e := Check(path, false); e != nil {
+		explainAncestry(t, path)
 		t.Fatal("trusted path rejected", e)
 	}
 	setDACL(t, parent, private+"(A;;0x40;;;WD)")
@@ -150,6 +169,7 @@ func TestFullPathChecksAncestors(t *testing.T) {
 func TestPrivateCreationAndInheritedFiles(t *testing.T) {
 	directory := filepath.Join(t.TempDir(), "private", "nested")
 	if e := MkdirPrivate(directory); e != nil {
+		explainAncestry(t, filepath.Dir(filepath.Dir(directory)))
 		t.Fatal(e)
 	}
 	if e := MkdirPrivate(directory); e != nil {
