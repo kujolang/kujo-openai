@@ -263,3 +263,20 @@ Browser completion needs the user to restart their foreground tunnel and enter
 the credential locally. No credential was recovered or copied into this chat.
 Private screenshot: `.local/browser-tunnel-stopped.jpg`. Re-run this exact starter
 after reconnecting before claiming successful browser release composition.
+
+### Canonical path repair consumed without changing released-runtime behavior
+
+Ability PR #2 passed release verification and application-assurance CI
+(run 36800657436: verify 22s, application-assurance 33s), then merged as
+`bcbecb49b147023877e83d5f2ea647dfede030b5`. The adapter now vendors that exact
+commit. Its JSON process binding uses the pure native absolute-path predicate
+when available and retains the original POSIX behavior on released Kujo 1.6.0.
+No definitions, schemas, effects or receipts changed.
+
+With this pin, local `npm run check` passed **36/36** tests and all 18 vendor
+integrity checks. `npm run test:install` passed isolated npm distribution setup,
+three canonical MCP calls and exact receipt lookups on macOS with released
+runtime 1.6.0. The new standalone receipt-storage test also checks reopening,
+content identity and tampering independently of Kujo execution; its OS matrix is
+pending. Kujo PR #14 adds the native predicate, but its cross-platform CI and
+release are still pending. This is not a Windows support claim.
