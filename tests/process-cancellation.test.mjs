@@ -6,7 +6,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {fixture} from './helpers.mjs';
 import {ProcessBackend} from '../lib/backend.mjs';
 
-test('POSIX cancellation lets native Kujo terminate its isolated subprocess group',{skip:process.platform==='win32'?'Windows needs its own native process-tree boundary':false},async()=>{
+test('cancellation lets native Kujo terminate its subprocess tree',async()=>{
  const f=await fixture();let pid;
  try {
   const marker=join(f.directory,'child.pid'),entry=join(f.directory,'process.kujo');

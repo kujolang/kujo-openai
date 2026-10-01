@@ -38,3 +38,17 @@ This ledger preserves the requested end state. A green local milestone does not 
 | Commit/push/clean state and durable memory | Git remote refs, CI runs and Strata handoffs | Recheck at each milestone |
 
 Do not claim remote readiness from local filesystem permissions, a simulated approval, a fixture identity, a green MCP client test, or the existing gateway's fixture-only execution path. Complete each outstanding proof against the intended host and distribution before closing the goal. Preserve the owner's local-first requirement: testing an optional hosted profile does not establish automatic installation or local repository access for public plugin users.
+
+### Windows candidate adapter gate
+
+The adapter now always requests the runtime's `--kill-children-on-exit`
+job boundary when launching a provider on Windows. There is no fallback to
+uncontained execution: older runtimes reject that option before running the
+provider. This option does not grant capabilities or prove rollback.
+
+`.github/workflows/windows-candidate.yml` builds immutable runtime candidate
+`8c561cacdcb132faa310df2b81f56c27ff4537df`, then tests adapter cancellation and
+three real canonical review tools, negative inputs, and exact receipts over
+MCP. Candidate validation is separate from the installed-package matrix.
+The dependency remains published runtime 1.6.0; Windows installation support
+must not be claimed until a verified release is pinned and that matrix passes.

@@ -1,0 +1,51 @@
+name: Windows candidate runtime contracts
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  candidate-review:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: kujolang/kujo
+          ref: 8c561cacdcb132faa310df2b81f56c27ff4537df
+          path: .local/runtime-source
+      - name: Build pinned candidate (not a published runtime acceptance)
+        shell: pwsh
+        run: |
+          if (-not $env:VCPKG_INSTALLATION_ROOT) { $env:VCPKG_INSTALLATION_ROOT = "C:\vcpkg" }
+          vcpkg install openssl:x64-windows-static-md
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:VCPKG_ROOT = $env:VCPKG_INSTALLATION_ROOT
+          $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-static-md"
+          $env:OPENSSL_DIR = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows-static-md"
+          cargo build --locked --manifest-path .local/runtime-source/Cargo.toml --bin kujo
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "KUJO_BIN=$pwd\.local\runtime-source\target\debug\kujo.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
+      - run: npm ci --ignore-scripts
+      - name: Adapter cancellation through the native Windows job
+        run: node --test tests/process-cancellation.test.mjs
+      - name: Fetch pinned canonical products
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/kujolang/patchbrief.git .local/patchbrief
+          git -C .local/patchbrief checkout a4da5942e9668924cd2f2869859bf05b006edda5
+          git clone https://github.com/kujolang/changebucket.git .local/changebucket
+          git -C .local/changebucket checkout 030eea63c60449f82c9ba2680227485d318fdb6d
+          git clone https://github.com/kujolang/shipcheck.git .local/shipcheck
+          git -C .local/shipcheck checkout 111bfc83c832050877cb9d4fd82908aaf6d14749
+      - name: Execute canonical review tools and preserve exact receipts over MCP
+        shell: pwsh
+        run: |
+          $env:KUJO_PATCHBRIEF_SOURCE = "$pwd\.local\patchbrief"
+          $env:KUJO_CHANGEBUCKET_SOURCE = "$pwd\.local\changebucket"
+          $env:KUJO_SHIPCHECK_SOURCE = "$pwd\.local\shipcheck"
+          $env:KUJO_REVIEW_RELEASE = "1"
+          npm run test:review
