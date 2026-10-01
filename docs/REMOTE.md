@@ -1,5 +1,9 @@
 # Remote architecture and authentication plan
 
+**Inactive alternative:** the owner selected automatic local installation on
+2026-10-01. Existing remote code is retained; hosted provisioning and GitHub
+onboarding are not release prerequisites for the selected local product.
+
 See [the hosted execution design](HOSTED-EXECUTION-DESIGN.md) for the researched
 reuse decision, repository access flow and staged implementation boundaries.
 

@@ -1,6 +1,8 @@
 # Hosted Kujo execution design
 
-Status: proposed deployment architecture; design authorized on 2026-10-01.
+Status: archived alternative, not the active release path. On 2026-10-01 the
+owner selected automatic local installation after reviewing this design.
+Retained for reference; do not provision or implement it without a new decision.
 No production configuration, onboarding policy, secrets, or infrastructure changed.
 
 ## Decision

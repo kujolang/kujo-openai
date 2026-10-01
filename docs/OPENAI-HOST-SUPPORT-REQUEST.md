@@ -1,14 +1,16 @@
 # Draft: Kujo local MCP distribution support
 
 Status: prepared for the publisher to send; not sent to OpenAI.
-Sources checked: 2026-09-30.
+Sources checked: 2026-10-01.
 
 **Subject:** Confirm public local-MCP installation support for Kujo
 
 We are building [Kujo OpenAI](https://github.com/kujolang/kujo-openai), a generic
 MCP adapter for Kujo Ability. Our intended experience is: install Kujo in ChatGPT,
 select a local repository with explicit host authorization, and immediately use
-registered Kujo tools. Users should not need a developer tunnel, API key, terminal
+registered Kujo tools. No GitHub account or GitHub repository ownership is a
+prerequisite; local files are selected through the host. Users should not need
+a developer tunnel, API key, terminal
 commands, or a separately configured Kujo runtime.
 
 The adapter projects canonical Ability definitions, enforces Kujo authority, and

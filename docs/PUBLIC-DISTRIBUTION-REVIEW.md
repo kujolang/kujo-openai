@@ -57,3 +57,23 @@ repository access. [The resulting design](HOSTED-EXECUTION-DESIGN.md) reuses the
 existing Ability Gateway while preserving the public catalog boundary. This
 supersedes the recommendation to wait for a local-route answer before design;
 production provisioning, spending and public onboarding remain separate.
+
+## Current owner decision: automatic local installation
+
+After reviewing the hosted alternative, the owner selected automatic local
+installation on 2026-10-01. Target: install the plugin, have the host provision
+the correct Kujo runtime, select local files through explicit host consent, and
+use Kujo. No GitHub account, user-managed hosting, API key or terminal setup is
+a product prerequisite. Hosted execution is archived as an alternative.
+
+This is a product requirement, not a verified public host capability. The
+official packaging guide was rechecked on 2026-10-01 and still directs public
+local-MCP publishers to an OpenAI contact. The existing support draft asks for
+the concrete installation, prerequisite and filesystem-authorization contracts.
+It has not been sent. Do not substitute hosted execution, trusted installer
+hooks, or a custom companion installer without a new owner decision.
+
+Next gate: obtain an authoritative supported local distribution route, then
+implement/test that exact host flow on a clean machine without Node, npm, Git
+or Kujo preinstalled. Existing five-platform/runtime and local cache tests
+remain useful but do not satisfy this gate.
