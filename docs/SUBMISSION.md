@@ -95,8 +95,8 @@ with cases appropriate to the actual deployed catalog and a reviewer-accessible
 walkthrough. This is metadata transport, not evidence that the cases passed.
 Omitting `review` keeps the existing development-package behavior.
 
-`review.test_cases.positive` requires at least five cases and `negative` at least
-three. Each case contains `description`, `prompt`, `tools_triggered` (an empty
+`review.test_cases.positive` requires exactly five cases and `negative` exactly
+three for this single-MCP submission profile. Each case contains `description`, `prompt`, `tools_triggered` (an empty
 string is valid when no tool should run), and `expected_behavior`. Optional
 `file_attachment_urls` and `expected_output_url` must be credential-free HTTPS
 URLs. `review.demo_recording_url` is required when supplying review metadata.

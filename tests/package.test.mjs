@@ -69,6 +69,7 @@ test('review metadata preserves operator cases and rejects incomplete or unsafe 
  assert.equal(plugin.extensions['com.openai'].review,undefined);
  result.plugin.extensions['com.openai'].review.test_cases.positive[0].prompt='Changed';
  assert.equal(review.test_cases.positive[0].prompt,example.prompt);
- const invalid=[null,[],{...review,test_cases:{...review.test_cases,positive:review.test_cases.positive.slice(1)}},{...review,test_cases:{...review.test_cases,negative:[]}}, {...review,demo_recording_url:'https://user:secret@kujo.example/demo'}, {...review,credentials:'secret'}, {...review,commerce:'false'}, {...review,test_cases:{...review.test_cases,negative:[...review.test_cases.negative,{...example,file_attachment_urls:['https://kujo.example/file?token=secret']}]}}];
+ const invalid=[null,[],{...review,test_cases:{...review.test_cases,positive:review.test_cases.positive.slice(1)}},{...review,test_cases:{...review.test_cases,negative:[]}}, {...review,demo_recording_url:'https://user:secret@kujo.example/demo'}, {...review,credentials:'secret'}, {...review,commerce:'false'}, {...review,test_cases:{...review.test_cases,negative:[...review.test_cases.negative.slice(1),{...example,file_attachment_urls:['https://kujo.example/file?token=secret']}]}}];
+ for(const kind of ['positive','negative'])invalid.push({...review,test_cases:{...review.test_cases,[kind]:[...review.test_cases[kind],example]}});
  for(const value of invalid)assert.throws(()=>remotePackageManifests(plugin,{...configuration,review:value}),error=>!String(error).includes('secret'));
 });
