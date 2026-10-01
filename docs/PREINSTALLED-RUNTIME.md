@@ -1,40 +1,48 @@
 # Preinstalled runtime contract
 
-Decision: user attachment accepted 2026-10-01. Automatic provisioning is deferred. This document supersedes hosted/bootstrap plans for the near-term product.
+The user installs Kujo independently. The plugin must not bootstrap it. An experimental compiled adapter now implements the native MCP path using the **existing `kujo run` provider protocol**. It does not invent `kujo mcp serve` or require a new Kujo subcommand.
 
-## Verified implementation, not assumptions
+```text
+Supported local MCP host
+        ↓ bounded stdio
+Compiled kujo-openai-native adapter
+        ↓ fixed argv + bounded JSON stdin
+Preinstalled Kujo → canonical Ability provider
+        ↓ canonical result and receipt
+Durable local evidence → MCP tool/resource result
+```
 
-| Component | Current contract | Native-only gap |
+## Current contracts
+
+| Component | Verified behavior | Remaining boundary |
 |---|---|---|
-| Kujo 1.7.0 | `kujo run ENTRY --untrusted` executes a bounded canonical provider; `kujo mcp --help` lists `make` | No native stdio Ability MCP server |
-| Current MCP entrypoint | `node ${PLUGIN_ROOT}/bin/kujo-openai.mjs serve` | Requires Node; cannot relabel as native |
-| Review setup | npm runtime resolver, fixed Git source acquisition, operator-selected Git worktree | Requires Git; not ordinary folder onboarding |
-| Ability | Vendored canonical discovery/execution/policy/receipts | Preserve unchanged through any native transport implementation |
-| Preflight | Native `kujo-preflight [--kujo ABSOLUTE] [--project ABSOLUTE]` | Diagnosis only; not wired into a pretend MCP server |
-| Folder authority | Trusted local operator config today | Host-selected root confinement/restart authorization not certified |
+| Kujo runtime | Stable 1.7 provider family; actual 1.7.0 exercised | Other releases require acceptance; `mcp make` is still only a generator |
+| Experimental native entrypoint | `kujo-openai-native --serve-config ABSOLUTE --project ABSOLUTE` | Requires an already configured trusted provider; not automatic end-user onboarding |
+| Default plugin entrypoint | Existing Node development profile | Must migrate packaging only after native platform/onboarding acceptance |
+| Discovery | Known user install directory, absolute PATH, or explicit operator path; project shadows rejected | Windows ACL verification fails closed; POSIX ACL coverage remains limited |
+| Canonical execution | Identity/schema/effect projection, policy, approvals and receipts remain in Ability | No host-supplied authority; continuation-enabled catalogs currently rejected explicitly |
+| Receipt storage | Private root, file+directory sync, atomic publication, integrity-checked retrieval | Unsupported filesystem durability fails before calls; Windows equivalent still pending |
+| Folder selection | Explicit launch configuration excludes project code from trusted code/state | Not an OS sandbox or proof of a provider's scope; real host grants remain unverified |
 
-No launch command for the requested product has been verified. `mcp make` generates a server; it is not a long-running stdio server. A minimum native-MCP Kujo version cannot truthfully be published yet. The diagnostic recognizes stable `>=1.7.0 <1.8.0` only as the tested **provider** runtime family; patches still require release acceptance. This is not a promise of native MCP compatibility.
+The version check accepts `>=1.7.0 <1.8.0` for provider compatibility, not as a claim that every patch/platform combination was tested. Build-time Go and the pinned official Go MCP SDK are compiled into the host; they are not end-user runtime prerequisites. No Node, Git, npm or API credential is used by the verified native execution path.
 
-## Discovery boundary
+## Failure behavior
 
-The native locator is isolated in `native/preflight`: operator absolute override, then `~/.local/bin/kujo`, then absolute PATH entries. It ignores empty/relative entries, canonicalizes symlinks, excludes current/explicit project trees, checks executable/ancestor ownership and write bits on macOS/Linux, and rejects unsafe candidates. It never reads repository configuration, changes PATH, invokes a shell, installs or provisions software. Default install path is from the official installer; custom paths require operator configuration. Windows `.exe` selection compiles, but ACL/reparse validation is unimplemented and reports `runtime_permissions_unverified`; it does not rely on POSIX mode bits there.
+- Missing executable: `runtime_missing` with official installation guidance; no install/retry.
+- Old/future/unrecognized version: `runtime_version_unsupported` or `runtime_version_invalid`.
+- Unsafe project binary, writable executable ancestry or filesystem alias: `unsafe_runtime`.
+- Platform permission validation unavailable: `runtime_permissions_unverified`.
+- Missing/ambiguous project: `explicit_project_required` or `project_unavailable`.
+- Project-controlled provider/import/config/state: rejected before provider invocation, including resolved symlink paths.
+- Timeout/cancellation after an invocation starts: completion uncertain, no automatic retry.
+- Canonical denial/approval requirement/domain failure: canonical receipt and explicit status preserved; never reported as success.
+- Missing durable evidence after execution: `receipt_persistence_failed`, completion uncertain.
+- Resume-capable provider: `native_continuation_unsupported`; no silent loss of recovery semantics.
 
-The version probe has a 3s deadline, 4 KiB stdout limit, suppressed stderr and a minimal environment. No executable paths, user names, credentials or project contents appear in reports. Every current result exits 1 because native MCP readiness is not established. Reports do not constitute receipts or authorization.
+Diagnostic mode alone reports `provider_runtime_ready` for a compatible installation, with `nativeMcpVerified: false`. It did not start a server and cannot certify public readiness.
 
-| Status | User action |
-|---|---|
-| `runtime_missing` | Install Kujo independently using the linked official guide; reconnect after resolving prerequisites |
-| `unsafe_runtime` | Use a trusted installation outside project/writable directories |
-| `runtime_permission_denied` | Repair installation permissions without privilege escalation |
-| `runtime_permissions_unverified` | Wait for verified native platform permission handling |
-| `runtime_version_unsupported` | Use a reviewed compatible provider version; do not blindly downgrade or claim MCP support |
-| `runtime_version_invalid`, `runtime_probe_failed` | Verify the official installation; raw errors stay private |
-| `runtime_probe_timeout` | Investigate the installation; no automatic restart/retry |
-| `invalid_project`, `project_unavailable` | Select an accessible absolute project through the host; no authority is granted by this flag |
-| `native_mcp_unavailable` | Native stdio adapter work remains; a tunnel/Node workaround is not the selected product |
+## Still required before the selected product can ship
 
-## Work still required in code
+Git-independent capability onboarding for ordinary selected projects; final native platform packaging; Windows trusted executable/ACL and durable storage support; continuation parity where applicable; actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
 
-Implement a native bounded stdio transport using the existing canonical Ability projection, with receipt storage, cancellation, process cleanup and schema validation equivalent to the reference Node adapter. Either the Kujo runtime must gain this reviewed capability or a separately distributed native adapter must be accepted; neither exists in this commit. Keep authority in Ability, not a transport-specific tool registry. Do not copy product-specific wrappers. A change outside this repository must explicitly justify the missing runtime capability.
-
-Resolve Git-dependent review handlers and package acquisition without promising a Git-free change review they cannot perform. Start with genuinely Git-independent canonical capabilities, explicitly reporting unsupported ones. Verify selected-root enforcement and Windows ACL/process behavior. Then replace the development manifest with an actually tested platform launch contract, repeat the complete MCP/receipt tests without Node/Git available, and obtain local public-distribution confirmation. No speculative native command, installer hook or remote fallback is provided here.
+See [native build/run/test instructions](../native/README.md) and [submission checklist](PREINSTALLED-SUBMISSION.md). Earlier bootstrap/hosted designs and the diagnostic-only audit are historical evidence, not the current product plan.

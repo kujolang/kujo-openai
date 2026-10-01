@@ -1,4 +1,5 @@
-// kujo-preflight diagnoses a preinstalled runtime. It never installs or serves MCP.
+// Native Kujo host: standalone diagnostic and explicit operator-configured MCP.
+// It never installs the runtime or loads repository-owned launch configuration.
 package main
 
 import (
@@ -11,11 +12,13 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -35,7 +38,23 @@ type locator struct{ home, path, explicit, project, cwd string }
 
 func inside(root, path string) bool {
 	rel, err := filepath.Rel(root, path)
-	return err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator))
+	if err == nil && rel != ".." && !strings.HasPrefix(rel, ".."+string(os.PathSeparator)) {
+		return true
+	}
+	// Filesystem identity also catches case aliases on case-insensitive volumes.
+	rootInfo, err := os.Stat(root)
+	if err != nil {
+		return false
+	}
+	for p := filepath.Clean(path); ; p = filepath.Dir(p) {
+		if info, e := os.Stat(p); e == nil && os.SameFile(rootInfo, info) {
+			return true
+		}
+		if filepath.Dir(p) == p {
+			break
+		}
+	}
+	return false
 }
 
 // Inspect both the lexical path and resolved target: a trusted target behind a
@@ -183,8 +202,12 @@ func check(ctx context.Context, l locator) report {
 	if err != nil {
 		r.Status = err.Error()
 	} else {
-		r.Status = "native_mcp_unavailable"
+		r.Status = "provider_runtime_ready"
 	}
+	r.Message = diagnosticMessage(r.Status)
+	return r
+}
+func diagnosticMessage(status string) string {
 	messages := map[string]string{
 		"runtime_missing":                "Kujo was not found in trusted install locations. Install Kujo using the official guide, then retry. Nothing was installed.",
 		"unsafe_runtime":                 "Refusing a repository-local or writable runtime path. Use an independently trusted installation outside the project.",
@@ -196,24 +219,41 @@ func check(ctx context.Context, l locator) report {
 		"runtime_version_unsupported":    "This runtime version is outside the tested provider range. Use a reviewed compatible version; newer versions require compatibility tests.",
 		"invalid_project":                "Supply an absolute project directory. Relative project paths are not accepted.",
 		"project_unavailable":            "Project directory is unavailable. Select an accessible project in the host; this check does not grant access.",
-		"native_mcp_unavailable":         "Kujo 1.7 has mcp make, not a native stdio Ability server. This runtime can run providers, but the current adapter still requires Node. The preinstalled-only plugin is blocked; do not substitute an invented MCP command.",
+		"provider_runtime_ready":         "Installed Kujo is compatible with the experimental native provider runner. MCP startup additionally requires reviewed operator configuration and private receipt storage. This check does not certify host authorization or public distribution.",
 	}
-	r.Message = messages[r.Status]
-	return r
+	if message, ok := messages[status]; ok {
+		return message
+	}
+	return "Native MCP startup failed. Check the trusted operator configuration and private state directory. No software was installed."
 }
 func main() {
 	binary := flag.String("kujo", "", "absolute trusted preinstalled binary (operator only)")
 	project := flag.String("project", "", "absolute project directory to exclude from runtime discovery; does not authorize access")
+	serveConfig := flag.String("serve-config", "", "absolute private operator config for native MCP (experimental)")
 	flag.Parse()
 	if flag.NArg() != 0 {
-		fmt.Fprintln(os.Stderr, "usage: kujo-preflight [--kujo /absolute/path] [--project /absolute/path]")
+		fmt.Fprintln(os.Stderr, "usage: kujo-openai-native [--kujo /absolute/path] [--project /absolute/path] OR --serve-config /absolute/operator.json --project /absolute/project")
 		os.Exit(2)
+	}
+	if *serveConfig != "" {
+		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+		defer stop()
+		if err := serve(ctx, *serveConfig, *project); err != nil {
+			_ = json.NewEncoder(os.Stderr).Encode(map[string]any{"ok": false, "code": err.Error(), "message": diagnosticMessage(err.Error()), "installURL": installURL})
+			os.Exit(1)
+		}
+		return
 	}
 	home, _ := os.UserHomeDir()
 	cwd, _ := os.Getwd()
+	if *project != "" {
+		cwd = *project
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	r := check(ctx, locator{home: home, path: os.Getenv("PATH"), explicit: *binary, project: *project, cwd: cwd})
 	_ = json.NewEncoder(os.Stdout).Encode(r)
-	os.Exit(1) // No native stdio contract has been verified. Never claim readiness.
+	if r.Status != "provider_runtime_ready" {
+		os.Exit(1)
+	} // Runtime check only; not submission readiness.
 }

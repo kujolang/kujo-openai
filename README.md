@@ -6,12 +6,12 @@ Kujo Ability remains the source of truth for identities, schemas, effects, autho
 
 The selected product flow is: install Kujo yourself → install the plugin on a supported local client → select a project → run authorized Kujo tools. The plugin must not install software or require Node, npm, Git, GitHub, credentials, tunnels or hosting. Web/mobile local filesystem access is not claimed.
 
-That flow is **not implemented end to end yet**. Kujo 1.7.0 exposes `kujo mcp make`, a generator, not a native stdio Ability server. The existing MCP transport runs through Node; review setup acquires Git-based product sources. Those are technical gaps, separate from public local-MCP approval. We have not substituted a nonexistent `kujo mcp serve` command.
+That flow is **not implemented end to end yet**. An [experimental compiled native host](native/README.md) now runs canonical Kujo providers over bounded stdio without Node/Git and preserves durable receipts. Kujo itself still exposes `mcp make`, not a stdio server: the compiled adapter invokes the real `kujo run` provider contract. The default plugin manifest remains the legacy Node profile. Automatic project/provider onboarding, native distribution, Windows boundaries and public local-MCP approval remain separate gaps.
 
 ## What works today
 
 - Existing development adapter: generic Ability projection, canonical policy, bounded MCP transport and durable receipts. Its Node/Git requirements remain explicit in [developer instructions](docs/LEGACY-DEVELOPMENT.md).
-- Native preflight: checks a preinstalled executable without npm, installation, network requests or repository scanning. Build-time Go is needed to compile this diagnostic; end users would run the resulting native binary. It is **not an MCP launcher**.
+- Native host: explicit trusted provider configuration, canonical calls/receipts and bounded stdio. Its runtime diagnostic also handles missing/outdated installations. Build-time Go is not an end-user prerequisite. See the [native setup and limitations](native/README.md).
 - Submission guard: `npm run check:submission` and `npm run package:submission` fail closed while native acceptance and public host support remain unverified. Ordinary `npm run package` still produces a legacy development archive, not a submission.
 
 ## Read next

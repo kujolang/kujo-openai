@@ -4,7 +4,7 @@
 
 The user preinstalls Kujo. A plugin on a supported local-capable client would invoke a native Kujo Ability MCP server over stdio. The plugin would download no runtime and require no Node, npm, Git, GitHub account, API key, developer mode, tunnel or user hosting.
 
-**Implementation caveat:** this is the requested architecture, not today's working package. Kujo 1.7.0 has `mcp make` only; the current stdio adapter uses Node and review setup uses Git. Native transport, Git-independent capability onboarding and host folder confinement are technical prerequisites, not matters OpenAI approval can fix.
+**Implementation caveat:** this is the requested architecture, not today's working package. Kujo 1.7.0 has `mcp make` only; the current stdio adapter uses Node and review setup uses Git. An experimental compiled native adapter now runs the real `kujo run` provider contract without Node/Git and with durable receipts. Its final distribution, Git-independent capability onboarding, Windows support and host folder confinement remain technical prerequisites, not matters OpenAI approval can fix.
 
 ## Requested capability
 

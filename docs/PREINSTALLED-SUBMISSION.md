@@ -7,8 +7,8 @@
 | Portable and Codex manifests | PASS (development profile) | Versioned schema/parity tests; actual entrypoint still Node |
 | Prerequisite and honest listing | FIXED | Both manifests disclose preinstalled goal and current dependency gap |
 | Brand | PASS (packaged asset) | Existing Kujo K PNG/SVG and manifest references; actual host rendering must be accepted again |
-| Native local entrypoint | BLOCKED — implementation | Kujo 1.7.0 has no native stdio server |
-| No Node/Git runtime dependencies | BLOCKED — implementation | Current transport/setup require them; native preflight alone is not the adapter |
+| Native local entrypoint | BLOCKED — implementation | Experimental compiled adapter verified locally; default manifest/distribution not migrated |
+| No Node/Git runtime dependencies | BLOCKED — implementation | Experimental native runner needs neither; default package/setup still require them |
 | Missing-runtime diagnosis | FIXED (standalone diagnostic) | Native bounded preflight; not connected to host onboarding |
 | Six-platform local launch | BLOCKED — implementation/acceptance | Cross-compilation is not execution; Windows ACL boundary fails closed |
 | Selected-folder isolation | BLOCKED — implementation/acceptance | Operator-root setup differs from verified host grants |

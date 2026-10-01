@@ -45,4 +45,6 @@ cd ..
 ./dist/kujo-preflight --project /absolute/project
 ```
 
-An optional `--kujo /absolute/trusted/kujo` is operator configuration, never model input. Known install paths are checked before absolute PATH entries to handle GUI PATH differences. No shell profile is sourced. The diagnostic exits nonzero until a native MCP contract is verified. See [runtime contract](docs/PREINSTALLED-RUNTIME.md) for all errors. It does not restart itself or install anything.
+An optional `--kujo /absolute/trusted/kujo` is operator configuration, never model input. Known install paths are checked before absolute PATH entries to handle GUI PATH differences. No shell profile is sourced. The diagnostic exits zero only for `provider_runtime_ready`; that does not certify MCP or submission readiness. See [runtime contract](docs/PREINSTALLED-RUNTIME.md) for all errors. It does not restart itself or install anything.
+
+An experimental native server is now available for maintainers with an existing trusted provider. See [native setup](native/README.md). It does not yet replace the default manifest or provide ordinary end-user onboarding.

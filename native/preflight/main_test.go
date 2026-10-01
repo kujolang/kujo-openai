@@ -46,7 +46,7 @@ func TestKnownPathWithoutPATH(t *testing.T) {
 	_, l := fixture(t)
 	binary(t, filepath.Join(l.home, ".local/bin/kujo"), "echo 'kujo 1.7.0'")
 	r := check(context.Background(), l)
-	if r.Version != "1.7.0" || r.Status != "native_mcp_unavailable" || r.NativeMCP {
+	if r.Version != "1.7.0" || r.Status != "provider_runtime_ready" || r.NativeMCP {
 		t.Fatal(r)
 	}
 }
@@ -159,7 +159,7 @@ func TestEnvironmentAndArgv(t *testing.T) {
 	_, l := fixture(t)
 	t.Setenv("KUJO_TEST_SECRET", "do-not-inherit")
 	binary(t, filepath.Join(l.home, ".local/bin/kujo"), "[ -z \"$KUJO_TEST_SECRET\" ] && [ \"$#\" = 1 ] && [ \"$1\" = --version ] || exit 22\necho 'kujo 1.7.0'")
-	if r := check(context.Background(), l); r.Status != "native_mcp_unavailable" {
+	if r := check(context.Background(), l); r.Status != "provider_runtime_ready" {
 		t.Fatal(r)
 	}
 }
@@ -207,5 +207,24 @@ func TestProjectExcludedOutsideCWD(t *testing.T) {
 	binary(t, l.explicit, "exit 99")
 	if r := check(context.Background(), l); r.Status != "unsafe_runtime" {
 		t.Fatal(r)
+	}
+}
+
+func TestProjectFilesystemIdentity(t *testing.T) {
+	root, l := fixture(t)
+	project := filepath.Join(root, "Selected")
+	if e := os.Mkdir(project, 0700); e != nil {
+		t.Fatal(e)
+	}
+	target := filepath.Join(project, "kujo")
+	binary(t, target, "exit 99")
+	alias := filepath.Join(root, "SELECTED", "kujo")
+	if _, e := os.Stat(alias); e != nil {
+		alias = target
+	} // Case-sensitive filesystem: same physical directory path.
+	l.project = project
+	l.explicit = alias
+	if _, e := l.find(); e == nil || e.Error() != "unsafe_runtime" {
+		t.Fatal("filesystem alias bypassed project exclusion", e)
 	}
 }

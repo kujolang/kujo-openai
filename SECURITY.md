@@ -61,3 +61,11 @@ Only fixed `--version` is executed, without a shell, from the installation direc
 The local user and administrator remain trusted: this is not protection against same-user replacement between inspection and execution. POSIX ACL grants are not fully audited; require independently trusted installation directories. A malicious user-installed executable is arbitrary code: version probing is not a sandbox. Windows ACL support is an explicit native-product blocker.
 
 A host-selected folder is not automatically an OS sandbox. MCP roots and model-provided paths are not authorization evidence. Before the native product can ship, demonstrate host filesystem enforcement and bind the canonical provider to the selected root across restarts. The current developer adapter's operator configuration does not establish public ChatGPT folder isolation.
+
+## Experimental compiled MCP host
+
+The native executable now also accepts explicit `--serve-config` and `--project` flags. The configuration must be private, absolute and schema-valid; resolved config, code/import/CWD and receipt paths must be outside the selected project. This does not certify that the provider implements a project-scoped filesystem policy. It prevents repository content from becoming launcher code, not all filesystem access by a trusted provider.
+
+The provider runner strips ambient PATH and environment, sends only fixed capabilities and JSON data, and preserves uncertain completion on interruption. Stdio has a 1 MiB input frame, 4 MiB output frame and 32-pending-request bound; notifications cannot be used to make untracked tool calls. The SDK handles protocol dispatch. Receipt files are atomically published only after file sync, then directory sync; `os.Root` confines file operations. Integrity and inode checks reject tampering and link replacement. Runtime discovery additionally compares filesystem identities to catch case aliases on case-insensitive volumes.
+
+The native host does not expose an approval issuer or shell tool. Resume-capable catalogs fail explicitly pending native recovery support. Windows remains blocked at the executable trust boundary; cross-compilation is not certification. The default packaged manifest is still the reference Node profile and must not be presented as this native implementation.

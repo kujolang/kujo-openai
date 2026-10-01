@@ -1,3 +1,5 @@
+> Native implementation update: see [native tests and acceptance](native/README.md). A compiled experimental host now passes actual stdio calls, durable receipt retrieval and restart tests without Node/Git. The default public product remains blocked. Earlier diagnostic-only limitations below are historical unless still listed in the native guide.
+
 # Verification boundaries
 
 The native-only product is blocked; no end-to-end native MCP success is claimed.

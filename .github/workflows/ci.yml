@@ -86,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-15-intel, macos-15]
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-15-intel, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -94,9 +94,35 @@ jobs:
         with:
           go-version: '1.25.3'
           cache: false
-      - name: Native diagnostic security boundaries (not MCP acceptance)
+      - name: Prepare checksum-pinned native runtime for acceptance
+        shell: bash
+        run: |
+          case "$RUNNER_OS/$RUNNER_ARCH" in
+            Linux/X64) kujo_asset=linux-x64; kujo_sha=526729faff88d19f985cd471ab8602a87070a539ceff7984e12352e30a229c4a ;;
+            Linux/ARM64) kujo_asset=linux-arm64; kujo_sha=cbc063076f32d426df9ddf1fb40e078c7094d11f10fafe1d2b01bbe70bd8edfa ;;
+            macOS/X64) kujo_asset=macos-x64; kujo_sha=9ddf267ebb1fa043713410c15c60edbf1fbfe128068aac1aeb5c6c0562a88ddc ;;
+            macOS/ARM64) kujo_asset=macos-arm64; kujo_sha=81c4d5431bcaba51bd991bbe3e0747c5d8579bec16d3aef5b27d01bc8fc91c9c ;;
+            *) exit 1 ;;
+          esac
+          kujo_archive="$RUNNER_TEMP/kujo-native.tar.gz"
+          curl --fail --location --silent --show-error "https://github.com/kujolang/kujo/releases/download/v1.7.0/kujo-v1.7.0-$kujo_asset.tar.gz" -o "$kujo_archive"
+          echo "$kujo_sha  $kujo_archive" | shasum -a 256 --check
+          mkdir -p "$RUNNER_TEMP/kujo-native"
+          tar -xzf "$kujo_archive" -C "$RUNNER_TEMP/kujo-native"
+          kujo_native_path=$(find "$RUNNER_TEMP/kujo-native" -type f -name kujo -perm -100 | head -1)
+          test -n "$kujo_native_path"
+          echo "KUJO_NATIVE_TEST_BIN=$kujo_native_path" >> "$GITHUB_ENV"
+      - name: Build native adapter (no runtime download by the adapter)
         working-directory: native
-        run: go test -race -count=1 ./...
+        run: |
+          mkdir -p ../dist
+          go build -trimpath -o ../dist/kujo-openai-native ./preflight
+      - name: Native protocol and canonical acceptance with Node/Git absent from child PATH
+        shell: bash
+        run: |
+          export KUJO_NATIVE_HOST_BIN="$PWD/dist/kujo-openai-native"
+          cd native
+          go test -race -count=1 ./...
       - name: Vet native diagnostic
         working-directory: native
         run: go vet ./...
