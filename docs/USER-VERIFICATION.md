@@ -1,3 +1,5 @@
+> Historical development evidence/design. Superseded for the product plan by [preinstalled runtime](PREINSTALLED-RUNTIME.md) and [current submission checklist](PREINSTALLED-SUBMISSION.md). Do not use bootstrap, tunnel or hosted instructions as the selected install flow.
+
 # Test your local Kujo connection
 
 The adapter now uses published Kujo 1.7.0. Linux x64/arm64, macOS x64/arm64,

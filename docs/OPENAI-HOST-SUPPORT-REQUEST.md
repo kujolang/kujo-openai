@@ -1,3 +1,5 @@
+> Historical development evidence/design. Superseded for the product plan by [preinstalled runtime](PREINSTALLED-RUNTIME.md) and [current submission checklist](PREINSTALLED-SUBMISSION.md). Do not use bootstrap, tunnel or hosted instructions as the selected install flow.
+
 # Draft: Kujo local MCP distribution support
 
 Status: prepared for the publisher to send; not sent to OpenAI.

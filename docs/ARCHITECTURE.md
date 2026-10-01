@@ -1,3 +1,5 @@
+> Current product decision: [preinstalled runtime contract](PREINSTALLED-RUNTIME.md). This document describes the existing development adapter; its Node transport is not the requested native-only implementation.
+
 # Architecture and projection contract
 
 ## Ownership

@@ -27,7 +27,7 @@ This release is a **single-operator local adapter**, not a sandbox or multi-user
 
 Stdio inherits the local operator's authority to start the configured process. It is not OAuth. The application supplies a fixed principal or independently authenticated context. Do not run the local provider behind a public HTTP proxy and call it multi-tenant.
 
-MCP annotations describe effects; they neither authorize execution nor replace canonical schema checks. Ability v1 lacks precise open-world and destructive/execute metadata; conservative annotations avoid claiming safety without evidence. Public submission remains gated on accurate reviewed semantics.
+MCP annotations describe effects; they neither authorize execution nor replace canonical schema checks. The vendored Ability definitions support explicit semantic metadata; the projection uses it when available and remains conservative when absent. No inference from names or descriptions grants authority.
 
 ## Secrets, audit and receipts
 
@@ -51,3 +51,13 @@ never downloads software or interprets repository files as installation authorit
 The package installation does not grant canonical execution approval. Protect the
 user data directory, package installation and source cache as trusted executable
 state. This is not protection against another process with the same user's rights.
+
+## Preinstalled-runtime preflight
+
+The native diagnostic is not an MCP server or sandbox. It locates an existing binary in the official user install directory, then absolute PATH entries, or an operator-supplied absolute path. It rejects the current/selected project and symlink targets inside those directories. On macOS/Linux it checks every lexical and resolved ancestor for owner and group/world write permissions; it does not accept a writable sticky directory. Windows ACL verification is not implemented and fails closed.
+
+Only fixed `--version` is executed, without a shell, from the installation directory. Environment is empty on POSIX, version stdout is capped at 4 KiB, stderr is discarded, and the probe has a three-second deadline. Reports omit executable/project paths and raw child errors. No download, scan, package manager, retry, telemetry or provider execution occurs.
+
+The local user and administrator remain trusted: this is not protection against same-user replacement between inspection and execution. POSIX ACL grants are not fully audited; require independently trusted installation directories. A malicious user-installed executable is arbitrary code: version probing is not a sandbox. Windows ACL support is an explicit native-product blocker.
+
+A host-selected folder is not automatically an OS sandbox. MCP roots and model-provided paths are not authorization evidence. Before the native product can ship, demonstrate host filesystem enforcement and bind the canonical provider to the selected root across restarts. The current developer adapter's operator configuration does not establish public ChatGPT folder isolation.

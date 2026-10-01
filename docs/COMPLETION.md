@@ -1,3 +1,5 @@
+> Historical development evidence/design. Superseded for the product plan by [preinstalled runtime](PREINSTALLED-RUNTIME.md) and [current submission checklist](PREINSTALLED-SUBMISSION.md). Do not use bootstrap, tunnel or hosted instructions as the selected install flow.
+
 # Full-mission completion ledger
 
 This ledger preserves the requested end state. A green local milestone does not complete the mission. Status is evidence-based as of 2026-09-30; live deployment and host behavior require fresh verification.

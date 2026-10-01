@@ -2,7 +2,7 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "kujo-openai",
   "version": "0.1.0",
-  "description": "Use registered Kujo Abilities with canonical authority and evidence.",
+  "description": "Requires Kujo installed locally. Ability tools and evidence; native-only distribution is not yet available.",
   "author": {
     "name": "Kujolang",
     "url": "https://kujolang.ai"
@@ -20,8 +20,8 @@
     "com.openai": {
       "interface": {
         "displayName": "Kujo",
-        "shortDescription": "Kujo tools with evidence",
-        "longDescription": "Discover and invoke application-registered Kujo Abilities. Configure the trusted local review pack for PatchBrief summaries and ChangeBucket footprint evidence, or the MCP core pack for repository profiling and manifest validation. Available workflows depend on the registered catalog.",
+        "shortDescription": "Local Kujo tools and evidence",
+        "longDescription": "Requires Kujo installed locally for the planned native-only plugin. Discover registered Kujo Abilities, run authorized checks, and inspect execution receipts on supported local clients. This development package still uses Node and its review setup uses Git; it does not yet implement the preinstalled-only product. Available workflows depend on the configured Ability catalog. Local filesystem access requires an explicitly selected project and a verified host execution boundary. ChatGPT web/mobile local access and public local-MCP distribution are not claimed.",
         "developerName": "Kujolang",
         "websiteURL": "https://github.com/kujolang/kujo-openai",
         "supportURL": "https://github.com/kujolang/kujo-openai/issues",

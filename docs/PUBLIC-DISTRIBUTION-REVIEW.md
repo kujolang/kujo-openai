@@ -1,3 +1,5 @@
+> Historical development evidence/design. Superseded for the product plan by [preinstalled runtime](PREINSTALLED-RUNTIME.md) and [current submission checklist](PREINSTALLED-SUBMISSION.md). Do not use bootstrap, tunnel or hosted instructions as the selected install flow.
+
 # Public local installation fact-check
 
 Verified against official OpenAI documentation on **2026-10-01**.
