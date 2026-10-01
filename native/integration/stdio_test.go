@@ -206,7 +206,8 @@ func TestBundledProjectWithoutSourceCheckout(t *testing.T) {
 	}
 	result, e := session.CallTool(ctx, &mcp.CallToolParams{Name: name, Arguments: map[string]any{}})
 	if e != nil || result.IsError {
-		t.Fatal("real selected project", result, e)
+		diagnostic, _ := json.Marshal(result)
+		t.Fatal("real selected project", string(diagnostic), e)
 	}
 	output := result.StructuredContent.(map[string]any)
 	if output["repo_name"] != "plain-project" {

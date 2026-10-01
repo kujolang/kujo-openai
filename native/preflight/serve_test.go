@@ -64,3 +64,21 @@ func TestProjectCannotSupplyTrustedCodeOrState(t *testing.T) {
 		t.Fatal(e)
 	}
 }
+
+func TestProjectCannotAliasTrustedImports(t *testing.T) {
+	project := t.TempDir()
+	trusted := t.TempDir()
+	entry := filepath.Join(trusted, "provider.kujo")
+	if e := os.WriteFile(entry, []byte("unused"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	module := filepath.Join(project, "imports")
+	if e := os.Symlink(trusted, module); e != nil {
+		t.Fatal(e)
+	}
+	path := writeConfig(t, map[string]any{"schema": "kujo.openai.local/v1", "entry": entry, "cwd": trusted, "stateDirectory": trusted, "modulePaths": []string{module}})
+	e := serve(context.Background(), path, project)
+	if e == nil || e.Error() != "trusted_code_must_be_outside_project" {
+		t.Fatal("project-owned import alias accepted", e)
+	}
+}

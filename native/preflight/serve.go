@@ -93,8 +93,22 @@ func serveOperator(ctx context.Context, config operatorConfig, path, project str
 	}
 	for _, module := range config.ModulePaths {
 		real, e := filepath.EvalSymlinks(module)
-		if e != nil || inside(selected, real) {
+		if e != nil || inside(selected, module) || inside(selected, real) {
 			return errors.New("trusted_code_must_be_outside_project")
+		}
+	}
+	for _, code := range append([]string{config.Entry, config.CWD}, config.ModulePaths...) {
+		if !filepath.IsAbs(code) {
+			return errors.New("absolute_operator_paths_required")
+		}
+		for cursor := code; ; cursor = filepath.Dir(cursor) {
+			info, err := os.Stat(cursor)
+			if err != nil || trustedPermissions(cursor, info) != nil {
+				return errors.New("unsafe_operator_code")
+			}
+			if filepath.Dir(cursor) == cursor {
+				break
+			}
 		}
 	}
 	home, _ := os.UserHomeDir()
