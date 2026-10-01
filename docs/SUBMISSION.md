@@ -6,9 +6,15 @@
 
 Run `npm run package` after `npm ci`. It builds a ZIP with locked production Node dependencies, source/skills/docs, checksum, dependency inventory and unsigned provenance. The locked npm dependencies include the platform-selected Kujo runtime. npm installation uses no lifecycle scripts. The local ZIP includes the build platform runtime and is not a universal cross-platform binary bundle. The operator must provide a trusted application configuration. The package is local authoring/testing material and does not install into a live user profile.
 
-## Public submission blockers
+## Public distribution decision
 
-This release deliberately cannot claim public readiness:
+The documented public submission path requires a hosted HTTPS MCP endpoint. Local
+marketplace installation is separate from public directory distribution. A public
+local MCP route requires confirmation from OpenAI; it is not established by our
+container tests. See [the dated fact-check](PUBLIC-DISTRIBUTION-REVIEW.md).
+
+The following are requirements remaining **if the optional hosted path is chosen**,
+not authorization to build a hosted execution service:
 
 - No deployed stable HTTPS Streamable HTTP endpoint, domain challenge or OAuth integration.
 - No certified multi-user isolation or remote execution profile.
@@ -76,7 +82,7 @@ After choosing the real deployment, create an operator-owned JSON file with thes
 }
 ```
 
-These are placeholders to replace, not deployed URLs. Include no credentials. All URLs require HTTPS, without user information, query or fragment; unknown configuration fields fail closed. The actual policies must describe the hosted service accurately.
+These are placeholders to replace, not deployed URLs. Include no credentials. The four listing URLs are limited to 1024 characters each. All URLs require HTTPS, without user information, query or fragment; unknown configuration fields fail closed. The actual policies must describe the hosted service accurately.
 
 ```sh
 node scripts/package.mjs --remote /absolute/operator/remote-package.json
@@ -97,9 +103,10 @@ Omitting `review` keeps the existing development-package behavior.
 
 `review.test_cases.positive` requires exactly five cases and `negative` exactly
 three for this single-MCP submission profile. Each case contains `description`, `prompt`, `tools_triggered` (an empty
-string is valid when no tool should run), and `expected_behavior`. Optional
+string is valid for a negative case when no tool should run), and `expected_behavior`. Optional
 `file_attachment_urls` and `expected_output_url` must be credential-free HTTPS
-URLs. `review.demo_recording_url` is required when supplying review metadata.
+URLs. Positive descriptions are limited to 4000 characters and positive cases
+require nonempty tool names. `review.demo_recording_url` is required when supplying review metadata.
 Optional `commerce` is boolean; `commerce_description` is text. Unknown fields,
 incomplete case groups, unsafe URLs and oversized metadata fail validation with
 generic diagnostics. Reviewer passwords/tokens belong in the submission portal,
