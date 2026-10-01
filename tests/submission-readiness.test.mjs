@@ -5,12 +5,19 @@ import {preinstalledReadiness} from '../lib/submission-readiness.mjs';
 test('current Node archive cannot qualify as preinstalled-only submission',async()=>{
  const result=preinstalledReadiness({mcp:JSON.parse(await readFile('mcp.json'))});
  assert.equal(result.ready,false);
- assert.deepEqual(result.blockers,['preinstalled_native_entrypoint_unverified','native_stdio_acceptance_missing','openai_local_distribution_unconfirmed']);
+ assert.deepEqual(result.blockers,['preinstalled_native_entrypoint_unverified','native_plugin_host_acceptance_missing','openai_local_distribution_unconfirmed']);
 });
 test('invented native command alone cannot remove runtime or host acceptance gates',()=>{
  const result=preinstalledReadiness({mcp:{mcpServers:{kujo:{type:'stdio',command:'kujo',args:['mcp','serve']}}}});
  assert.equal(result.ready,false);
- assert.deepEqual(result.blockers,['native_stdio_acceptance_missing','openai_local_distribution_unconfirmed']);
+ assert.deepEqual(result.blockers,['preinstalled_native_entrypoint_unverified','native_plugin_host_acceptance_missing','openai_local_distribution_unconfirmed']);
+});
+test('caller booleans cannot certify a public native plugin',()=>{
+ const result=preinstalledReadiness({mcp:{mcpServers:{kujo:{type:'stdio',command:'kujo',args:['mcp','serve']}}},nativeAcceptance:true,hostApproval:true});
+ assert.equal(result.ready,false);
+ assert.ok(result.blockers.includes('preinstalled_native_entrypoint_unverified'));
+ assert.ok(result.blockers.includes('native_plugin_host_acceptance_missing'));
+ assert.ok(result.blockers.includes('openai_local_distribution_unconfirmed'));
 });
 test('remote and absent configurations cannot satisfy local distribution',()=>{
  for(const mcp of [null,{mcpServers:{kujo:{type:'streamable-http',url:'https://example.invalid/mcp'}}}])assert.ok(preinstalledReadiness({mcp}).blockers.includes('local_stdio_required'));

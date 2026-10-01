@@ -36,7 +36,7 @@ These prompts describe existing development-pack capabilities, not native-only a
 
 ## Diagnose a preinstalled runtime (maintainers)
 
-From this repository, with Go 1.25 installed for building:
+From this repository, with the pinned Go 1.26.8 installed for building:
 
 ```sh
 cd native

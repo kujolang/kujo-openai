@@ -24,6 +24,6 @@
 | Automatic installation/hooks | NOT APPLICABLE | Not implemented or required |
 | Release publication | NOT APPLICABLE now | Explicitly prohibited by task |
 
-`npm run package:submission` intentionally exits 1 before creating a ZIP. Its limited gate prevents current native/host gaps from being overlooked; it does not validate legal terms, publisher identity or all review requirements. `npm run package` remains a legacy developer build and must not be submitted as this product.
+`npm run package:submission` intentionally exits 1 before creating a ZIP. The development guard always reports not ready until a final native plugin profile is implemented and independently reviewed; it accepts neither invented commands nor caller-supplied approval booleans as evidence. It does not validate legal terms, publisher identity or all review requirements. `npm run package` remains a legacy developer build and must not be submitted as this product.
 
 Reviewer plan once final native packaging and host authorization are resolved: positive discovery, repository read-only result, structured output, canonical receipt retrieval, restart/reconnect; negative missing runtime, unauthorized project, denied effect. Expand with actual workflow prompts and exact projected tool identities after catalog selection. Do not insert these unexecuted plans as passed review metadata.
