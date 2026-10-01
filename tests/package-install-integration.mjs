@@ -2,7 +2,7 @@
 // runtime dependencies must fail before a release reaches a fresh machine.
 import assert from 'node:assert/strict';
 import {artifactFixture,verifyInstalledArtifact} from './runtime-artifact-fixture.mjs';
-import {mkdtemp,mkdir,readFile,rm,realpath} from 'node:fs/promises';
+import {mkdtemp,mkdir,readFile,writeFile,rm,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -16,11 +16,17 @@ try {
  const packed=JSON.parse(runNpm(['pack','--json','--ignore-scripts','--pack-destination',temporary],root));
  assert.equal(packed.length,1);
  const consumer=join(temporary,'consumer');await mkdir(consumer);
+ // Root-only override: exercise an unpublished runtime without changing the
+ // adapter tarball's declared registry dependency or accepting nested fallback.
+ if(candidate)await writeFile(join(consumer,'package.json'),JSON.stringify({
+  private:true,overrides:{'@kujolang/kujo-runtime':'$@kujolang/kujo-runtime'}
+ }));
  runNpm(['install','--ignore-scripts','--no-audit','--no-fund','--package-lock=false',...(candidate?[candidate.runtime,candidate.platform]:[]),join(temporary,packed[0].filename)],consumer);
  const installed=join(consumer,'node_modules','@kujolang','kujo-openai');
  assert.equal(await realpath(installed),installed,'Install must be independent of the source checkout');
  const manifest=JSON.parse(await readFile(join(installed,'package.json'),'utf8'));
  assert.equal(manifest.name,'@kujolang/kujo-openai');
+ assert.deepEqual(manifest.dependencies,JSON.parse(await readFile(join(root,'package.json'),'utf8')).dependencies,'Candidate testing must not rewrite the adapter dependency declaration');
  if(candidate)console.log('Verified candidate runtime provenance:',JSON.stringify(await verifyInstalledArtifact(installed,candidate)));
  const env={...process.env,KUJO_TEST_INSTALLED_ENTRY:join(installed,'bin','kujo-openai.mjs')};
  delete env.KUJO_BIN;delete env.KUJO_OPENAI_CONFIG;

@@ -22,7 +22,7 @@ export async function verifyInstalledArtifact(installed,fixture) {
  const manifest=JSON.parse(await readFile(join(platformRoot,'package.json'),'utf8'));
  assert.equal(metadata.gitCommit,fixture.commit,'Installed binary must come from the reviewed candidate commit');
  assert.equal(metadata.target,`${process.platform}-${process.arch}`);
- assert.equal(metadata.runtimeVersion,require('@kujolang/kujo-runtime/package.json').version);
+ assert.equal(metadata.runtimeVersion,require('@kujolang/kujo-runtime/package.json').version,'Candidate resolver and binary versions must match');
  assert.equal(manifest.version,metadata.runtimeVersion);
  assert.equal(metadata.sha256,createHash('sha256').update(await readFile(binary)).digest('hex'));
  for(const name of ['preinstall','install','postinstall'])assert.equal(manifest.scripts?.[name],undefined);

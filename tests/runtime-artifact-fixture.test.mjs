@@ -27,6 +27,8 @@ test('installed candidate verification rejects forged provenance and binary dige
   const path=join(platform,'metadata.json');const metadata=JSON.parse(await readFile(path,'utf8'));
   assert.deepEqual(await verifyInstalledArtifact(temporary,{commit:metadata.gitCommit}),metadata);
   await assert.rejects(verifyInstalledArtifact(temporary,{commit:'0'.repeat(40)}),/reviewed candidate commit/);
+  await writeFile(path,JSON.stringify({...metadata,runtimeVersion:'0.0.0'}));
+  await assert.rejects(verifyInstalledArtifact(temporary,{commit:metadata.gitCommit}),/resolver and binary versions must match/);
   await writeFile(path,JSON.stringify({...metadata,sha256:'0'.repeat(64)}));
   await assert.rejects(verifyInstalledArtifact(temporary,{commit:metadata.gitCommit}));
  }finally{await rm(temporary,{recursive:true,force:true});}

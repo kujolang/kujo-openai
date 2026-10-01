@@ -373,3 +373,13 @@ npm package; the CI neutral tarball matched the exact-source local pack's file
 contents. The local Intel Mac install also passed using both CI-produced packages.
 The evidence JSON records every artifact, job ID and binary digest. This closes
 candidate distribution acceptance, not registry publication or host installation.
+
+Candidate mode uses a root-only npm override to bind the adapter's runtime to the
+explicit candidate tarball, including a version newer than the production pin.
+The test asserts the packed adapter dependency declarations remain unchanged and
+rejects mixed resolver/binary versions before execution. This follows npm's
+[documented root overrides and direct-dependency references](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#overrides)
+(accessed 2026-10-01). The override exists only in the disposable test consumer;
+default registry acceptance uses no override. A negative local integration with
+the real 1.7.0 resolver package and 1.6.0 native artifact correctly failed the
+version check before setup or tool execution.
