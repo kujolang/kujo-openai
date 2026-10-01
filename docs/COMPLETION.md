@@ -130,3 +130,25 @@ The private ChatGPT connection still has three enabled Skills, but its tunnel
 health endpoint is unavailable. Live workflow and brand acceptance cannot be
 completed until the local tunnel is restarted. Public local npm installation
 support remains unconfirmed; the prepared support request has not been sent.
+
+### Public repository and resumed CI (2026-10-01)
+
+The publisher explicitly authorized making kujolang/kujo-openai public to remove
+the private-repository Actions billing gate. GitHub confirms visibility=public.
+A bounded known-token/private-key scan of all 340 reachable history blobs found
+no matching credentials; ignored .local tunnel state was not published. This is
+not a claim of exhaustive secret detection.
+
+Both retry attempts completed successfully at 3d64605:
+- Ability host contracts 36874370702, attempt 2: all five installed-package
+  platforms, three receipt-storage platforms and contracts passed.
+- Windows published runtime contracts 36874370567, attempt 2: passed.
+
+This supersedes the adapter billing blocker above. Public GitHub visibility
+does not establish public ChatGPT directory support.
+
+Pages deployment 36874066982 completed successfully. The live installer at
+https://kujolang.ai/install.sh exactly matches the merged, locally tested script:
+SHA256 9764501717e7f7494c81be62c7f17a3c2a927ff2593eb1ebb91a2e0bca23efbd.
+The identical script completed a disposable core installation reporting Kujo
+1.7.0. No Cargo publication was performed.
