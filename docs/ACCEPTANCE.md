@@ -313,3 +313,18 @@ mode. This resolves the reproduced storage mechanism gap, not the separate
 released-runtime and process-containment gaps. Full Windows installation must
 still pass before claiming platform support. Earlier Windows fsync failures above
 remain historical evidence, not the current storage-selection behavior.
+
+### Native subprocess cancellation — 2026-09-30
+
+A real Kujo `spawn_process` fixture reproduced a POSIX orphan: the adapter's
+immediate SIGKILL bypassed Kujo's existing cancellation handler, while the native
+subprocess lived in a separate session. The pre-fix test failed because that
+subprocess was still alive after the host returned cancellation.
+
+The adapter now sends SIGTERM first, allowing canonical native cleanup, then
+forces the provider group down after 500 ms and closes retained pipes. Native
+subprocess death is asserted before cancellation resolves. A second real-runtime
+fixture installs the native handler and enters a busy loop; the forced-stop
+fallback must bound the host response. Neither path reports successful execution
+or retries. This is verified POSIX cleanup, not a sandbox or a Windows job-object
+claim. Deliberately detached descendants remain outside the local guarantee.

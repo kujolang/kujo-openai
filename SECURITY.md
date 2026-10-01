@@ -21,7 +21,7 @@ This release is a **single-operator local adapter**, not a sandbox or multi-user
 | Destruction / external effects | Conservative annotations and canonical policy; no unrestricted shell surface | An `allow` policy is application authority; verify it before exposing consequential abilities |
 | Malicious MCP client | Official SDK dispatch, strict framing, lifecycle checks, unknown tool denial | Local process launch credentials remain the host boundary |
 | Dependency compromise | Exact npm lock, vendor commit/checksums, minimal transport dependencies, integrity gate | Checksums do not replace trusted release provenance and review |
-| Cancellation / timeout | Kill local process group, return uncertainty, no retry | Detached children and already committed effects survive; use Workcell isolation for such workloads |
+| Cancellation / timeout | POSIX native cleanup signal then bounded group kill; uncertainty, no retry | Detached children and already committed effects can survive; Windows process-tree containment is uncertified; externally isolate such workloads |
 
 ## Authentication
 

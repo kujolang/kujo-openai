@@ -21,7 +21,7 @@ flowchart LR
 
 The application is trusted installed code. Repository content cannot choose its entrypoint, module paths, runtime, principal or services. `lib/backend.mjs` launches one bounded process per operation using an operator configuration. No shell interpolation; arguments travel over bounded stdin. The application owns durable state because each call has a fresh process. In-memory approvals or idempotency maps are unsuitable here.
 
-Node's official MCP SDK handles protocol negotiation and dispatch. The bounded transport adds input framing, lifecycle and concurrency guards. The process backend handles quotas, timeout and cancellation. Cancellation kills the process group on macOS/Linux; it cannot undo effects or kill a deliberately detached descendant. Such execution requires external isolation.
+Node's official MCP SDK handles protocol negotiation and dispatch. The bounded transport adds input framing, lifecycle and concurrency guards. The process backend handles quotas, timeout and cancellation. On macOS/Linux cancellation first sends SIGTERM so Kujo can terminate its isolated native subprocess groups, then escalates after 500 ms to SIGKILL of the provider group. The host closes retained pipes and reports uncertain completion at that bound. Cancellation cannot undo effects or guarantee termination of a deliberately detached descendant. Windows currently kills only the provider; process-tree containment remains uncertified. Such execution requires external isolation.
 
 ## Projection
 
