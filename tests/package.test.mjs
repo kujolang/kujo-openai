@@ -15,10 +15,23 @@ test('portable plugin and MCP manifests validate against official versioned sche
  assert.equal((await readdir('skills')).length,3);
  for(const name of await readdir('skills')) {const text=await readFile(`skills/${name}/SKILL.md`,'utf8');assert.ok(text.startsWith(`---\nname: ${name}\n`));assert.ok(text.includes('description:'));assert.ok(text.length<12000);assert.equal(text.includes('/Users/'),false);}
  assert.equal(JSON.stringify(plugin).includes('ai-plugin'),false);
+ // OpenAI extension fields are not constrained by the portable JSON schema.
+ // Public submission limits: developers.openai.com/plugins/deploy/submission.
+ const listing=plugin.extensions['com.openai'].interface;
+ for(const [field,limit] of [['displayName',30],['shortDescription',30],['longDescription',4000],['developerName',80]]) {
+  assert.equal(typeof listing[field],'string');assert.ok(listing[field].trim());assert.ok(listing[field].length<=limit,field);
+ }
+ assert.equal(listing.category,'Developer Tools');
+ assert.ok(Array.isArray(listing.capabilities));assert.ok(listing.capabilities.length<=20);
+ for(const label of listing.capabilities)assert.ok(typeof label==='string'&&label.trim()&&label.length<=120);
+ assert.ok(plugin.author.name&&plugin.author.name.length<=120);
+ assert.ok(listing.defaultPrompt.length<=3);assert.equal(new Set(listing.defaultPrompt).size,listing.defaultPrompt.length);
+ for(const prompt of listing.defaultPrompt)assert.ok(prompt.length<=128&&!prompt.includes('@'));
+
 });
 test('Codex compatibility metadata matches portable package',async()=>{
  const portable=JSON.parse(await readFile('plugin.json')),compat=JSON.parse(await readFile('.codex-plugin/plugin.json'));
- assert.equal(compat.name,portable.name);assert.equal(compat.version,portable.version);assert.deepEqual(compat.interface,portable.extensions['com.openai'].interface);
+ assert.deepEqual(compat.author,portable.author);assert.equal(compat.name,portable.name);assert.equal(compat.version,portable.version);assert.deepEqual(compat.interface,portable.extensions['com.openai'].interface);
  const mcp=JSON.parse(await readFile('mcp.json')),legacy=JSON.parse(await readFile('.mcp.json'));
  assert.deepEqual(legacy.mcpServers.kujo.args,mcp.mcpServers.kujo.args);assert.equal(legacy.mcpServers.kujo.command,mcp.mcpServers.kujo.command);
 });

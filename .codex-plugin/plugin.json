@@ -6,7 +6,7 @@
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "Kujo",
-    "shortDescription": "Registered abilities, reviewable evidence",
+    "shortDescription": "Kujo tools with evidence",
     "longDescription": "Discover and invoke application-registered Kujo Abilities. Configure the trusted local review pack for PatchBrief summaries and ChangeBucket footprint evidence, or the MCP core pack for repository profiling and manifest validation. Available workflows depend on the registered catalog.",
     "developerName": "Kujolang",
     "websiteURL": "https://github.com/kujolang/kujo-openai",
@@ -19,6 +19,16 @@
     "logo": "./assets/kujo-icon.png",
     "composerIcon": "./assets/kujo-icon.png",
     "logoDark": "./assets/kujo-icon.png",
-    "composerIconDark": "./assets/kujo-icon.png"
+    "composerIconDark": "./assets/kujo-icon.png",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Discover registered abilities",
+      "Run authorized abilities",
+      "Inspect execution receipts"
+    ]
+  },
+  "author": {
+    "name": "Kujolang",
+    "url": "https://kujolang.ai"
   }
 }

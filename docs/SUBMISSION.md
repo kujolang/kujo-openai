@@ -110,3 +110,13 @@ These fields follow the official [submission guide](https://developers.openai.co
 (accessed 2026-09-30). Tests verify deep-copy preservation, source-manifest
 immutability, rejection cases, and exact metadata in the reproducible remote ZIP.
 The fixture cases used by tests are not shipped as production review claims.
+
+### Listing validation boundary
+
+The portable schema permits OpenAI extension fields without enforcing their
+submission limits. Packaging tests therefore separately check the shipped name,
+subtitle, description, publisher, category, capability labels and starter prompts
+against the official field reference (accessed 2026-09-30). The Codex fallback
+also carries the same publisher object. These checks establish local metadata
+conformance; they do not verify publisher identity, approve a directory listing,
+or resolve the installed ChatGPT placeholder icon.
