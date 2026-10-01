@@ -280,3 +280,19 @@ runtime 1.6.0. The new standalone receipt-storage test also checks reopening,
 content identity and tampering independently of Kujo execution; its OS matrix is
 pending. Kujo PR #14 adds the native predicate, but its cross-platform CI and
 release are still pending. This is not a Windows support claim.
+
+### Windows receipt storage rejects before execution — 2026-09-30
+
+Independent receipt-storage CI run 36801477359, Windows job 110176552000,
+failed at the parent-directory fsync with `EPERM`. Linux and macOS storage
+jobs passed. This is separate from the canonical native-path compatibility gap.
+The local store now probes directory durability during initialization, before
+MCP admission or provider discovery. Unsupported filesystems return the explicit
+`receipt_storage_durability_unavailable` startup error. Post-execution flush
+failures remain `receipt_persistence_failed` with uncertain completion.
+
+The Windows storage test now asserts this explicit pre-execution rejection;
+it does not skip storage checks or certify Windows support. The full Windows
+installed-package gate remains required and is expected to fail until native
+storage durability, runtime compatibility and containment are implemented.
+No directory flush was removed and no weaker storage guarantee was substituted.
