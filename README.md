@@ -16,7 +16,7 @@ Application-owned Ability registry + policy + stores
 
 ## Install and verify
 
-Requires Node 22+ and Git. npm installs the pinned Kujo 1.6.0 platform runtime automatically; no separate Kujo installation is needed. macOS/Linux execution is tested. Windows hard process-tree cancellation is not certified. No API key is needed for offline verification.
+Requires Node 22.13+ and Git. npm installs the pinned Kujo 1.6.0 platform runtime automatically; no separate Kujo installation is needed. macOS/Linux execution is tested. Windows hard process-tree cancellation is not certified. No API key is needed for offline verification.
 
 ```sh
 npm ci

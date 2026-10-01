@@ -2,7 +2,7 @@
 
 ## Trusted local application
 
-1. Install Node 22+ and Git. npm installs the pinned Kujo 1.6.0 native runtime.
+1. Install Node 22.13+ and Git. npm installs the pinned Kujo 1.6.0 native runtime.
 2. Clone this repository and run `npm ci && npm run check`.
 3. Configure an application using `examples/operator-config.json`. All executable, source, working-directory and state paths must be absolute. Keep this file and its application code outside untrusted repositories.
 4. Implement the application provider contract in [EXTENDING](EXTENDING.md). Supply only necessary runtime capabilities. Kujo capability flags are not path-specific sandboxing.

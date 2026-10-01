@@ -47,7 +47,7 @@ Unsupported scalar schemas or missing bindings appear in the operator catalog's 
 
 Successful `structuredContent` is exactly `receipt.result`, validated against the advertised output schema. Text contains a small status/identity/reference summary plus result text for clients lacking structured-result support. Failed calls have `isError: true`, preserve the canonical status/error, and do not masquerade as successful domain output.
 
-The adapter verifies response identity against discovery and invocation, then durably stores the complete canonical receipt without rewriting it. Content-addressed `kujo-receipt://sha256/<digest>` references can be read with MCP `resources/read`; the resource API does not enumerate receipts. Private files use exclusive creation, no-follow opens, fsync and content verification. The store probes directory fsync at initialization and rejects unsupported filesystems before execution. Windows Node directory fsync currently fails this preflight; Windows execution is unsupported until an equivalent durable storage implementation is verified. Existing records survive server restarts. The local store is single-operator, not a multi-tenant authorization design. Operators own retention, backups, disk quotas and deletion.
+The adapter verifies response identity against discovery and invocation, then durably stores the complete canonical receipt without rewriting it. Content-addressed `kujo-receipt://sha256/<digest>` references can be read with MCP `resources/read`; the resource API does not enumerate receipts. Private files use exclusive creation, no-follow opens, fsync and content verification. The store probes directory fsync at initialization and rejects unsupported filesystems before execution. Windows uses the SQLite store below because Node directory fsync fails this preflight. Existing records survive server restarts. The local store is single-operator, not a multi-tenant authorization design. Operators own retention, backups, disk quotas and deletion.
 
 Canonical receipts contain execution identity, handler/version, status, result/error, policy, approval reference, idempotency, timing, principal and audit/provenance metadata. They do not necessarily include input bytes or an input hash. Application audit must preserve safe input references when required. The adapter must not silently modify a canonical receipt to claim evidence that was never emitted. Hashes detect modification; they are not third-party signatures.
 
@@ -69,10 +69,10 @@ Local access follows the existing single-operator receipt boundary. Remote acces
 
 The leading underscore reserves the helper outside generated canonical Ability tool names. Missing, corrupt, unauthorized and symlink receipts return a generic failure without filesystem or principal diagnostics. This helper has protocol/isolation coverage; live ChatGPT visibility must be verified separately after the host refreshes its tool catalog.
 
-### Native SQLite receipt store (platform acceptance in progress)
+### Native SQLite receipt store
 
-`SqliteReceiptStore` is a separate candidate local backend, not yet selected by
-startup. It keeps identical JSON bytes and SHA-256 references, uses parameterized
+`SqliteReceiptStore` is selected automatically on Windows; other systems retain
+the existing file store. It keeps identical JSON bytes and SHA-256 references, uses parameterized
 SQL, checks database/journal paths, and closes each connection after the operation.
 It uses Node's bundled SQLite (Node >=22.13), with extension loading disabled,
 `trusted_schema=OFF`, DELETE journaling, `synchronous=EXTRA`, and fullfsync enabled.
@@ -86,7 +86,8 @@ multi-tenant authorization are unsupported. As with the file store, durability
 depends on honest OS/device flush semantics; no software test proves arbitrary
 hardware power-loss behavior. Concurrent subprocess writers, writer termination
 after commit, reopening, tampering and linked-file rejection are tested on the
-three-OS CI matrix before enabling this implementation for Windows.
+three-OS CI matrix (run 36802667616 passed all storage jobs). This proves the
+storage contract; it does not establish runtime or process containment support.
 
 Sources accessed 2026-09-30:
 - https://sqlite.org/atomiccommit.html (native commit and flush semantics)

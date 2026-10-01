@@ -296,3 +296,20 @@ it does not skip storage checks or certify Windows support. The full Windows
 installed-package gate remains required and is expected to fail until native
 storage durability, runtime compatibility and containment are implemented.
 No directory flush was removed and no weaker storage guarantee was substituted.
+
+### SQLite native storage acceptance — 2026-09-30
+
+Commit cc51886 adds an equivalent receipt interface using Node bundled SQLite,
+without installation scripts or a native-addon dependency. CI 36802667616 passed
+storage on Linux, macOS and Windows (Windows job 110180229517), covering concurrent
+independent writers, immediate writer termination after commit, reopen, exact
+canonical JSON/hash identity, duplicate verification, tampering and symlink
+rejection. Node >=22.13 is now required for the bundled API without feature flags.
+
+Windows now selects SQLite automatically; POSIX keeps existing receipt files.
+The file-store preflight remains intact and its Windows rejection stays tested.
+The SQLite backend uses native transactional flush/locking with EXTRA synchronous
+mode. This resolves the reproduced storage mechanism gap, not the separate
+released-runtime and process-containment gaps. Full Windows installation must
+still pass before claiming platform support. Earlier Windows fsync failures above
+remain historical evidence, not the current storage-selection behavior.
