@@ -20,3 +20,9 @@ Tests include descriptor policies, real file DACL changes, reparse rejection, co
 - [FlushFileBuffers](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-flushfilebuffers): Windows file durability requires appropriate writable handles; the POSIX directory-sync implementation is not assumed portable.
 
 Windows CI identified the drive-root owner as TrustedInstaller. The policy recognizes that exact service SID and verifies it against Windows account lookup in a test; it does not accept arbitrary service accounts. See [Windows Resource Protection](https://learn.microsoft.com/en-us/windows/win32/wfp/about-windows-file-protection) (accessed 2026-10-01) for the service's operating-system authority. This resolves an overly restrictive owner check without accepting ordinary foreign writers.
+
+## Verified evidence
+
+Windows x64 GitHub run [36908125981](https://github.com/kujolang/kujo-openai/actions/runs/36908125981), job `110524006026`, commit `96aaf6a`: **8 top-level tests and 16 subtests passed, zero failures/skips**, plus Windows `go vet`. This includes full real ancestor traversal, exact TrustedInstaller identity lookup, protected directory creation and inherited private file ACLs. Earlier failing runs exposed the missing TrustedInstaller owner allowance and a test-only ACL restoration issue; both were corrected and rerun. This does not certify launcher integration, storage durability or Windows ARM64 execution.
+
+Cross-compilation of the security test executable for Windows x64 and ARM64 passed. The unchanged macOS native regression suite passed 50 top-level tests and 16 subtests with race detection; `go vet ./...` passed. Local log references: `.local/windows-security-96aaf6a.log`, `.local/native-windows-foundation-regression.json`.
