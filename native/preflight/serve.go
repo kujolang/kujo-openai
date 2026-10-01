@@ -118,7 +118,12 @@ func serve(ctx context.Context, path, project string) error {
 		return e
 	}
 	defer store.Close()
-	a, e := adapter.New(backend, store)
+	references, e := receipts.Open(filepath.Join(config.StateDirectory, "continuations"))
+	if e != nil {
+		return e
+	}
+	defer references.Close()
+	a, e := adapter.NewWithContinuations(backend, store, references)
 	if e != nil {
 		return e
 	}

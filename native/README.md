@@ -2,7 +2,7 @@
 
 This implementation uses a **preinstalled Kujo 1.7 runtime**. Go is needed to build it, not to run the resulting executable. The host never downloads Kujo, invokes npm/Git, or installs packages. Tool contracts and handlers remain in the canonical Kujo provider; the Go layer uses the official MCP SDK for transport.
 
-It is not yet the default plugin package or the finished onboarding experience. Windows runtime ACL checks and durable storage remain blocked; continuation-capable catalogs are explicitly unsupported. Public local-MCP distribution is unconfirmed. No installer, hosted fallback or new `kujo mcp` subcommand is introduced.
+It is not yet the default plugin package or the finished onboarding experience. Windows runtime ACL checks and durable storage remain blocked; continuation-capable providers use private durable references and canonical resume. Public local-MCP distribution is unconfirmed. No installer, hosted fallback or new `kujo mcp` subcommand is introduced.
 
 ## Build and run with a reviewed provider
 
@@ -32,7 +32,7 @@ Without `--serve-config`, the executable checks runtime discovery/version only. 
 - Discovery is rechecked before each call. Identity/digest and output schemas are validated. Canonical approval/denial/failure receipts stay distinct from success and transport uncertainty.
 - Receipts are content-addressed, fsynced and atomically linked into an `os.Root`-confined private directory. Read checks reject links, traversal, oversized files and hash mismatch. Unsupported directory durability fails before admitting calls. A 32-entry store-instance index resets on restart; stored receipts remain readable by reference.
 - `_kujo_receipt_evidence` and `kujo-receipt://sha256/{digest}` expose evidence without rerunning an Ability. The index is not chat-specific.
-- Resume-capable catalogs fail with `native_continuation_unsupported`; this implementation does not silently discard their recovery contract.
+- Providers declaring `resume: invocation-v1` expose `_kujo_resume_invocation`. The launcher stores private references in `stateDirectory/continuations` before invocation. References contain identity and definition digest, never original inputs or approval grants. Resume rechecks the catalog and sends only the saved invocation ID; Ability/application policy retains authority. No automatic retry or resume occurs. Unsupported recovery versions fail closed.
 
 ## Verify
 

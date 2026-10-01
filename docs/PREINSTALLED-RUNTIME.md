@@ -20,7 +20,7 @@ Durable local evidence → MCP tool/resource result
 | Experimental native entrypoint | `kujo-openai-native --serve-config ABSOLUTE --project ABSOLUTE` | Requires an already configured trusted provider; not automatic end-user onboarding |
 | Default plugin entrypoint | Existing Node development profile | Must migrate packaging only after native platform/onboarding acceptance |
 | Discovery | Known user install directory, absolute PATH, or explicit operator path; project shadows rejected | Windows ACL verification fails closed; POSIX ACL coverage remains limited |
-| Canonical execution | Identity/schema/effect projection, policy, approvals and receipts remain in Ability | No host-supplied authority; continuation-enabled catalogs currently rejected explicitly |
+| Canonical execution | Identity/schema/effect projection, policy, approvals and receipts remain in Ability | No host-supplied authority; invocation-v1 continuation references preserve canonical resume |
 | Receipt storage | Private root, file+directory sync, atomic publication, integrity-checked retrieval | Unsupported filesystem durability fails before calls; Windows equivalent still pending |
 | Folder selection | Explicit launch configuration excludes project code from trusted code/state | Not an OS sandbox or proof of a provider's scope; real host grants remain unverified |
 
@@ -37,12 +37,12 @@ The version check accepts `>=1.7.0 <1.8.0` for provider compatibility, not as a 
 - Timeout/cancellation after an invocation starts: completion uncertain, no automatic retry.
 - Canonical denial/approval requirement/domain failure: canonical receipt and explicit status preserved; never reported as success.
 - Missing durable evidence after execution: `receipt_persistence_failed`, completion uncertain.
-- Resume-capable provider: `native_continuation_unsupported`; no silent loss of recovery semantics.
+- Resume-capable provider: private durable reference saved before invocation; explicit resume preserves original invocation ID and checks the current definition digest. Unknown recovery versions fail with `native_continuation_unsupported`.
 
 Diagnostic mode alone reports `provider_runtime_ready` for a compatible installation, with `nativeMcpVerified: false`. It did not start a server and cannot certify public readiness.
 
 ## Still required before the selected product can ship
 
-Git-independent capability onboarding for ordinary selected projects; final native platform packaging; Windows trusted executable/ACL and durable storage support; continuation parity where applicable; actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
+Git-independent capability onboarding for ordinary selected projects; final native platform packaging; Windows trusted executable/ACL and durable storage support; actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
 
 See [native build/run/test instructions](../native/README.md) and [submission checklist](PREINSTALLED-SUBMISSION.md). Earlier bootstrap/hosted designs and the diagnostic-only audit are historical evidence, not the current product plan.

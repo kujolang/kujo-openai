@@ -27,8 +27,9 @@ type Receipts interface {
 	Recent() []string
 }
 type Adapter struct {
-	backend  Backend
-	receipts Receipts
+	backend       Backend
+	receipts      Receipts
+	continuations Receipts
 }
 type selected struct {
 	tool   *mcp.Tool
@@ -39,7 +40,7 @@ func New(backend Backend, receipts Receipts) (*Adapter, error) {
 	if backend == nil || receipts == nil {
 		return nil, fail("adapter_dependencies_required", false)
 	}
-	return &Adapter{backend, receipts}, nil
+	return &Adapter{backend: backend, receipts: receipts}, nil
 }
 func fail(code string, uncertain bool) error {
 	return &provider.BoundaryError{Code: code, Uncertain: uncertain}
@@ -71,10 +72,10 @@ func compile(value any) (*jsonschema.Resolved, error) {
 	}
 	return schema.Resolve(nil) // No remote loader: schema references cannot fetch URLs.
 }
-func (a *Adapter) discover(ctx context.Context) (map[string]selected, []*mcp.Tool, error) {
+func (a *Adapter) discover(ctx context.Context) (map[string]selected, []*mcp.Tool, bool, error) {
 	raw, err := a.backend.Request(ctx, map[string]any{"operation": "discover"})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, false, err
 	}
 	var catalog struct {
 		OK           bool              `json:"ok"`
@@ -84,38 +85,39 @@ func (a *Adapter) discover(ctx context.Context) (map[string]selected, []*mcp.Too
 		Capabilities map[string]any    `json:"capabilities"`
 	}
 	if json.Unmarshal(raw, &catalog) != nil || !catalog.OK || catalog.Schema != "kujo.openai.catalog/v1" || catalog.Tools == nil || catalog.Unsupported == nil || len(catalog.Tools) > 256 {
-		return nil, nil, fail("invalid_catalog", false)
+		return nil, nil, false, fail("invalid_catalog", false)
 	}
-	if catalog.Capabilities["resume"] != nil {
-		return nil, nil, fail("native_continuation_unsupported", false)
+	resume := catalog.Capabilities["resume"] == "invocation-v1" && a.continuations != nil
+	if catalog.Capabilities["resume"] != nil && !resume {
+		return nil, nil, false, fail("native_continuation_unsupported", false)
 	}
 	next := map[string]selected{}
 	for _, tool := range catalog.Tools {
 		if tool == nil {
-			return nil, nil, fail("invalid_catalog_identity", false)
+			return nil, nil, false, fail("invalid_catalog_identity", false)
 		}
 		id, _ := tool.Meta["kujo/abilityId"].(string)
 		v, _ := tool.Meta["kujo/abilityVersion"].(string)
 		d, _ := tool.Meta["kujo/definitionDigest"].(string)
 		if !identity.MatchString(id) || !version.MatchString(v) || !digest.MatchString(d) || tool.Name != Name(id, v) {
-			return nil, nil, fail("invalid_catalog_identity", false)
+			return nil, nil, false, fail("invalid_catalog_identity", false)
 		}
 		if _, exists := next[tool.Name]; exists {
-			return nil, nil, fail("invalid_catalog_identity", false)
+			return nil, nil, false, fail("invalid_catalog_identity", false)
 		}
 		if _, err = compile(tool.InputSchema); err != nil {
-			return nil, nil, fail("unsupported_host_schema", false)
+			return nil, nil, false, fail("unsupported_host_schema", false)
 		}
 		output, err := compile(tool.OutputSchema)
 		if err != nil {
-			return nil, nil, fail("unsupported_host_schema", false)
+			return nil, nil, false, fail("unsupported_host_schema", false)
 		}
 		next[tool.Name] = selected{tool, output}
 	}
-	return next, catalog.Tools, nil
+	return next, catalog.Tools, resume, nil
 }
 func (a *Adapter) Discover(ctx context.Context) ([]*mcp.Tool, error) {
-	_, tools, e := a.discover(ctx)
+	_, tools, _, e := a.discover(ctx)
 	return tools, e
 }
 func invocationID() string {
@@ -131,7 +133,7 @@ func (a *Adapter) Call(ctx context.Context, name string, input map[string]any) (
 	if input == nil {
 		return nil, fail("invalid_arguments", false)
 	}
-	catalog, _, err := a.discover(ctx)
+	catalog, _, resume, err := a.discover(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -140,10 +142,29 @@ func (a *Adapter) Call(ctx context.Context, name string, input map[string]any) (
 		return nil, fail("ability_tool_not_available", false)
 	}
 	id := invocationID()
-	raw, err := a.backend.Request(ctx, map[string]any{"operation": "invoke", "name": name, "input": input, "invocation_id": id})
+	reference := ""
+	if resume {
+		saved, _ := json.Marshal(continuation{Schema: "kujo.openai.continuation/v1", Name: name, InvocationID: id, Meta: mcp.Meta{"kujo/abilityId": tool.tool.Meta["kujo/abilityId"], "kujo/abilityVersion": tool.tool.Meta["kujo/abilityVersion"], "kujo/definitionDigest": tool.tool.Meta["kujo/definitionDigest"]}})
+		uri, e := a.continuations.Put(saved)
+		if e != nil {
+			return nil, fail("continuation_persistence_failed", false)
+		}
+		reference = strings.Replace(uri, "kujo-receipt:", "kujo-continuation:", 1)
+	}
+	return a.execute(ctx, tool, map[string]any{"operation": "invoke", "name": name, "input": input, "invocation_id": id}, reference)
+}
+func (a *Adapter) execute(ctx context.Context, tool selected, request map[string]any, reference string) (result *mcp.CallToolResult, err error) {
+	defer func() {
+		if err != nil && reference != "" {
+			err = &continuationError{err, reference}
+		}
+	}()
+	id := request["invocation_id"]
+	raw, err := a.backend.Request(ctx, request)
 	if err != nil {
 		return nil, err
 	}
+
 	var response struct {
 		OK      *bool           `json:"ok"`
 		Receipt json.RawMessage `json:"receipt"`
@@ -186,11 +207,17 @@ func (a *Adapter) Call(ctx context.Context, name string, input map[string]any) (
 		summary["error"] = receipt.Error
 	}
 	text, _ := json.Marshal(summary)
-	result := &mcp.CallToolResult{IsError: !success, Content: []mcp.Content{&mcp.TextContent{Text: string(text)}}, Meta: mcp.Meta{"kujo/receiptUri": uri, "kujo/invocationId": id}}
+	result = &mcp.CallToolResult{IsError: !success, Content: []mcp.Content{&mcp.TextContent{Text: string(text)}}, Meta: mcp.Meta{"kujo/receiptUri": uri, "kujo/invocationId": id}}
 	if success {
 		result.StructuredContent = receipt.Result
 		body, _ := json.Marshal(receipt.Result)
 		result.Content = append(result.Content, &mcp.TextContent{Text: string(body)})
+	}
+	if reference != "" {
+		result.Meta["kujo/continuationUri"] = reference
+		summary["continuation_uri"] = reference
+		text, _ = json.Marshal(summary)
+		result.Content[0] = &mcp.TextContent{Text: string(text)}
 	}
 	return result, nil
 }
@@ -203,15 +230,22 @@ func Failure(err error) *mcp.CallToolResult {
 			status = "not_executed"
 		}
 	}
-	body, _ := json.Marshal(map[string]any{"ok": false, "status": status, "code": code})
-	return &mcp.CallToolResult{IsError: true, Content: []mcp.Content{&mcp.TextContent{Text: string(body)}}}
+	summary := map[string]any{"ok": false, "status": status, "code": code}
+	meta := mcp.Meta{}
+	var continuation *continuationError
+	if errors.As(err, &continuation) {
+		summary["continuation_uri"] = continuation.reference
+		meta["kujo/continuationUri"] = continuation.reference
+	}
+	body, _ := json.Marshal(summary)
+	return &mcp.CallToolResult{IsError: true, Content: []mcp.Content{&mcp.TextContent{Text: string(body)}}, Meta: meta}
 
 }
 
 // Register snapshots discovery for the SDK's tool list; every call rechecks the
 // canonical catalog so a stale host list cannot bypass revocation.
 func (a *Adapter) Register(ctx context.Context, server *mcp.Server) error {
-	tools, err := a.Discover(ctx)
+	_, tools, resume, err := a.discover(ctx)
 	if err != nil {
 		return err
 	}
@@ -228,6 +262,9 @@ func (a *Adapter) Register(ctx context.Context, server *mcp.Server) error {
 			}
 			return result, nil
 		})
+	}
+	if resume {
+		a.registerResume(server)
 	}
 	a.registerEvidence(server)
 	return nil
