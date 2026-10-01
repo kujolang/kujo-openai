@@ -10,9 +10,9 @@
 | Native local entrypoint | BLOCKED — implementation | Experimental compiled adapter verified locally; default manifest/distribution not migrated |
 | No Node/Git runtime dependencies | BLOCKED — implementation | Experimental native runner needs neither; default package/setup still require them |
 | Missing-runtime diagnosis | FIXED (standalone diagnostic) | Native bounded preflight; not connected to host onboarding |
-| Six-platform local launch | BLOCKED — implementation/acceptance | Cross-compilation is not execution; Windows ACL boundary fails closed |
+| Declared platform local launch | BLOCKED — implementation/acceptance | macOS x64 and Windows x64 real native acceptance recorded; other platform evidence must be verified; Windows ARM64 unverified |
 | Selected-folder isolation | BLOCKED — implementation/acceptance | Operator-root setup differs from verified host grants |
-| Ability semantics, approvals, receipts | PASS (development adapter) | Canonical tests remain applicable; native parity remains untested |
+| Ability semantics, approvals, receipts | PASS (tested native contracts) | Real canonical schema/approval/failure/receipt tests plus native continuation/restart; live-host acceptance remains separate |
 | Local execution/privacy disclosures | FIXED | README, INSTALL, SECURITY, PRIVACY, SUPPORT |
 | Public website/support URLs | PASS (existing repo links) | Publisher identity verification is separate |
 | Public privacy and terms URLs | BLOCKED — publisher | Local privacy notice supplied; publisher-approved terms and public listing metadata still needed |
@@ -26,4 +26,4 @@
 
 `npm run package:submission` intentionally exits 1 before creating a ZIP. Its limited gate prevents current native/host gaps from being overlooked; it does not validate legal terms, publisher identity or all review requirements. `npm run package` remains a legacy developer build and must not be submitted as this product.
 
-Reviewer plan once the actual native implementation exists: positive discovery, repository read-only result, structured output, canonical receipt retrieval, restart/reconnect; negative missing runtime, unauthorized project, denied effect. Expand with actual workflow prompts and exact projected tool identities after catalog selection. Do not insert these unexecuted plans as passed review metadata.
+Reviewer plan once final native packaging and host authorization are resolved: positive discovery, repository read-only result, structured output, canonical receipt retrieval, restart/reconnect; negative missing runtime, unauthorized project, denied effect. Expand with actual workflow prompts and exact projected tool identities after catalog selection. Do not insert these unexecuted plans as passed review metadata.

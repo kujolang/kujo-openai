@@ -44,7 +44,7 @@ def main():
     if not runtime or not pathlib.Path(runtime).is_absolute():
         raise SystemExit('KUJO_NATIVE_TEST_BIN must name a compatible installed runtime; acceptance was not run')
     target = subprocess.check_output(['go', 'env', 'GOOS', 'GOARCH'], text=True).strip().replace('\n', '/')
-    subprocess.run(['python3', str(ROOT/'scripts/native-assets.py'), '--verify'], check=True)
+    subprocess.run([sys.executable, str(ROOT/'scripts/native-assets.py'), '--verify'], check=True)
     with tempfile.TemporaryDirectory(prefix='kujo-native-package-test-') as temporary:
         directory = pathlib.Path(temporary)
         first = package.build(target, directory/'first')

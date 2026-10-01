@@ -1,6 +1,6 @@
 # Windows native boundary implementation
 
-Status: staged security component; native launcher remains fail-closed. Cross-compilation is not Windows execution evidence. ACL and transactional receipt components have Windows x64 execution evidence. Launcher integration and full native acceptance must pass before enabling Windows.
+Status: Windows x64 native launcher acceptance passed. ACL checks and transactional receipts are integrated with discovery, private operator configuration and bundled project execution. Windows ARM64 and public host installation remain unverified. Historical component-only evidence below is superseded by the launcher evidence at the end.
 
 `native/internal/windowstrust` reads object security through a handle opened with `READ_CONTROL`, `FILE_READ_ATTRIBUTES`, `FILE_FLAG_OPEN_REPARSE_POINT` and directory-compatible flags. It rejects network/device paths, alternate streams and reparse points, then checks owner and DACL. The current user, SYSTEM, built-in Administrators and the exact Windows TrustedInstaller service SID are trusted; other owners fail closed. Unknown ACE layouts fail closed. NULL DACLs fail closed. Foreign write/change-owner/change-ACL/delete grants are rejected even if a deny ACE could cancel them. Directory ancestor delete-child grants are rejected; merely creating a sibling does not imply control of an already existing child. Private objects also reject foreign data-read and child-creation grants.
 
@@ -8,7 +8,7 @@ Status: staged security component; native launcher remains fail-closed. Cross-co
 
 Threat boundary: same-user administrators, SYSTEM and a compromised OS remain trusted. This is not a general sandbox or an effective-access evaluator for arbitrary enterprise ACLs. Conditional/object ACEs, network storage and reparse installations are unsupported, with explicit rejection. ACLs can change after inspection; callers must protect live object identity and apply project exclusion independently. Do not infer a filesystem grant from MCP roots or model content.
 
-Tests include descriptor policies, real file DACL changes, reparse rejection, complete ancestor checks and private inheritance. The dedicated `Native Windows security boundaries` workflow runs on Windows; exact run results must be recorded before claiming validation. The library is deliberately not wired into the native launcher yet.
+Tests include descriptor policies, real file DACL changes, reparse rejection, complete ancestor checks and private inheritance. The dedicated `Native Windows security boundaries` workflow runs on Windows; exact run results must be recorded before claiming validation. The library is now wired into native discovery and private state; see the launcher evidence below.
 
 ## Primary references (accessed 2026-10-01)
 
@@ -40,3 +40,12 @@ The lock test permits the dependency's 50 ms polling interval around its deadlin
 The macOS regression passed **50 top-level tests and 16 subtests** with race detection and no test skips/failures. Both real executable acceptance tests passed again after rebuilding the host; `go vet ./...` passed. Windows x64/ARM64 test executables cross-compiled; only x64 was executed. A Windows preview archive built successfully with bbolt's license included, and remains explicitly `submission_ready: false`. Logs: `.local/windows-receipts-c784a35.log`, `.local/native-windows-store-regression.json`, `.local/native-windows-store-integration.json`.
 
 Dependency references, accessed 2026-10-01: [bbolt 1.5.0 release](https://github.com/etcd-io/bbolt/releases/tag/v1.5.0), [pinned Windows sync and lock implementation](https://github.com/etcd-io/bbolt/blob/v1.5.0/bolt_windows.go). This build-time library is linked into the executable; users do not install a database service or Go.
+
+
+## Integrated Windows x64 launcher evidence
+
+Run [36912436042](https://github.com/kujolang/kujo-openai/actions/runs/36912436042), job `110538672342`, adapter commit `f945d22`: **38 top-level tests and 23 subtests passed, zero failures/skips**, plus vet. This includes two real Kujo 1.7.0 MCP executable tests (canonical fixture and bundled repository profile), canonical receipt tool/resource retrieval after restart, empty child PATH, seven launcher permission/discovery/version tests, and real native child-process termination for cancellation and timeout. The runtime ZIP was independently downloaded by CI and checked against pinned SHA-256 `ed0094f5add39c282bcafe82505ede0ae3059f9c1056dd44112fab47abb03cf3`; the adapter never downloads it.
+
+Two failures were corrected without weakening trust boundaries. CI checkout ACLs were not suitable trusted provider code, so the test copies canonical sources into private operator state. Canonical MCP repository profiling concatenated `/` onto Windows verbatim paths; upstream MCP commit `e02905d` now uses native path joins and maintains slash-separated relative display names. Its full regression suite passed on macOS. The adapter vendors that immutable source, not a separate Windows handler. Upstream draft [PR 11](https://github.com/kujolang/mcp/pull/11) remains unmerged. Model/project-owned import aliases are rejected even when their target is outside the project.
+
+The launcher does not turn `--project` into an OS permission grant. Host-controlled folder authorization, final plugin platform selection, publisher signing and actual ChatGPT installation remain separate unresolved work. Local Windows x64 acceptance must not be represented as public directory approval. Evidence logs: `.local/windows-launcher-f945d22.log`, `.local/mcp-windows-path-regression.log`, `.local/native-windows-profile-integration.json`.

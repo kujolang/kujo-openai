@@ -7,6 +7,7 @@ import os
 import pathlib
 import re
 import subprocess
+import sys
 import tempfile
 import zipfile
 
@@ -90,7 +91,7 @@ def build(target, output):
         binary = pathlib.Path(temporary)/('kujo-openai-native.exe' if system == 'windows' else 'kujo-openai-native')
         run(['go', 'build', '-mod=readonly', '-trimpath', '-buildvcs=false', '-ldflags=-buildid=', '-o', str(binary), './preflight'], env)
         files[binary.name] = (binary.read_bytes(), 0o755)
-    status = 'blocked_windows_launcher_acceptance' if system == 'windows' else 'requires_host_acceptance'
+    status = 'unverified_runtime_platform' if target == 'windows/arm64' else 'requires_host_acceptance'
     files['README.md'] = (('''# Kujo native adapter — local preview
 
 Requires a separately installed Kujo 1.7.x runtime. Nothing in this archive
@@ -110,7 +111,7 @@ Source and support: https://github.com/kujolang/kujo-openai
 This is a native adapter archive, NOT a Plugin Directory submission package.
 Public local-MCP distribution, actual host folder permissions and live ChatGPT
 acceptance remain unconfirmed. No publisher signature or notarization is supplied.
-Windows builds currently reject launch: trust/storage support is incomplete.
+Windows x64 native execution is verified; Windows ARM64 execution is unverified.
 
 Toolchain and dependencies, source digests and executable hash are recorded in
 provenance.json. Checksums detect changed bytes; they do not authenticate a publisher.
@@ -145,7 +146,7 @@ def main():
     parser.add_argument('--target', action='append', choices=TARGETS, required=True)
     parser.add_argument('--output', type=pathlib.Path, default=ROOT/'dist/native')
     args = parser.parse_args()
-    subprocess.run(['python3', str(ROOT/'scripts/native-assets.py'), '--verify'], check=True)
+    subprocess.run([sys.executable, str(ROOT/'scripts/native-assets.py'), '--verify'], check=True)
     run(['go', 'mod', 'verify'])
     for target in dict.fromkeys(args.target):
         print(json.dumps(build(target, args.output.resolve())))

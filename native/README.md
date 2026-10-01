@@ -2,7 +2,7 @@
 
 This implementation uses a **preinstalled Kujo 1.7 runtime**. Go is needed to build it, not to run the resulting executable. The host never downloads Kujo, invokes npm/Git, or installs packages. Tool contracts and handlers remain in the canonical Kujo provider; the Go layer uses the official MCP SDK for transport.
 
-It is not yet the default plugin package or the finished onboarding experience. Windows ACL and receipt components are implemented separately; Windows launcher integration remains blocked; continuation-capable providers use private durable references and canonical resume. Public local-MCP distribution is unconfirmed. No installer, hosted fallback or new `kujo mcp` subcommand is introduced.
+It is not yet the default plugin package or the finished onboarding experience. Windows x64 discovery, private state, native MCP execution and child-process cancellation have acceptance evidence; Windows ARM64 execution remains unverified; continuation-capable providers use private durable references and canonical resume. Public local-MCP distribution is unconfirmed. No installer, hosted fallback or new `kujo mcp` subcommand is introduced.
 
 ## Build and run
 
@@ -39,7 +39,7 @@ Without `--serve` or `--serve-config`, the executable checks runtime discovery/v
 - 1 MiB input frames/provider IO budget, 4 MiB MCP output frames, 32 pending RPCs, 1–16 provider processes and at most 120 seconds per process. No automatic retries.
 - Kujo gets SIGTERM for native child cleanup on POSIX, followed by process-group escalation. Real Kujo child cancellation/timeout tests verify cleanup; no claim that committed effects can be undone.
 - Discovery is rechecked before each call. Identity/digest and output schemas are validated. Canonical approval/denial/failure receipts stay distinct from success and transport uncertainty.
-- Receipts preserve canonical bytes and content-addressed references. On Unix they are fsynced and atomically linked into an `os.Root`-confined private directory. The staged Windows backend uses private ACLs and synced bbolt transactions, with a two-second lock deadline and 256 MiB database cap; it does not enable Windows launch by itself. Read checks reject links, traversal, oversized files and hash mismatch. Unsupported directory durability fails before admitting calls. A 32-entry store-instance index resets on restart; stored receipts remain readable by reference.
+- Receipts preserve canonical bytes and content-addressed references. On Unix they are fsynced and atomically linked into an `os.Root`-confined private directory. The Windows backend uses private ACLs and synced bbolt transactions, with a two-second lock deadline and 256 MiB database cap. Read checks reject links, traversal, oversized files and hash mismatch. Unsupported directory durability fails before admitting calls. A 32-entry store-instance index resets on restart; stored receipts remain readable by reference.
 - `_kujo_receipt_evidence` and `kujo-receipt://sha256/{digest}` expose evidence without rerunning an Ability. The index is not chat-specific.
 - Providers declaring `resume: invocation-v1` expose `_kujo_resume_invocation`. The launcher stores private references in `stateDirectory/continuations` before invocation. References contain identity and definition digest, never original inputs or approval grants. Resume rechecks the catalog and sends only the saved invocation ID; Ability/application policy retains authority. No automatic retry or resume occurs. Unsupported recovery versions fail closed.
 

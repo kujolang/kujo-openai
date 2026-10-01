@@ -17,7 +17,7 @@ Without both environment variables, actual runtime/host cases explicitly skip. T
 
 Native tests cover runtime discovery and version rejection, repository shadowing, unsafe paths, environment/argument isolation, canonical schemas/effects/approvals, continuation recovery, bounded stdio, malformed traffic, cancellation, timeouts, crash uncertainty, receipt integrity and restart. Executable acceptance runs the compiled host with an empty PATH against a separately installed real Kujo runtime and a plain selected project. Fixtures support isolated boundary tests; canonical integration cases use the actual Ability implementation.
 
-The Windows security workflow runs real ACL/reparse and transactional receipt tests. These prove components, not Windows launcher acceptance. See [Windows boundaries and exact CI evidence](docs/WINDOWS-NATIVE-BOUNDARIES.md).
+The Windows security workflow runs real ACL/reparse and transactional receipt tests. It also verifies trusted runtime discovery, private operator configuration, real canonical MCP calls/restart and native child-process cancellation on Windows x64. See [Windows boundaries and exact CI evidence](docs/WINDOWS-NATIVE-BOUNDARIES.md).
 
 ## Platform interpretation
 
@@ -26,7 +26,7 @@ The Windows security workflow runs real ACL/reparse and transactional receipt te
 | macOS x64 | Actual canonical stdio calls, receipt retrieval/restart; 50 top-level tests and 16 subtests with race detection | Public plugin installation and host grants |
 | macOS ARM64 | Cross-build; Unix acceptance workflow configured | Consult exact CI evidence before claiming execution |
 | Linux x64 / ARM64 | Cross-build; Unix acceptance workflow configured | Consult exact CI evidence before claiming execution |
-| Windows x64 | Actual ACL/reparse and receipt component tests | Launcher integration and full native MCP acceptance |
+| Windows x64 | Actual ACL/reparse, receipt, launcher and canonical MCP/restart tests | Public plugin installation and host grants |
 | Windows ARM64 | Cross-build | Actual runtime, storage and host execution unverified |
 
 Cross-building does not prove execution, signing or host integration. Process termination tests do not simulate power loss or certify every storage device. Legacy five-platform Node installation tests do not establish native-only plugin compatibility.
