@@ -69,7 +69,8 @@ The unpublished 1.7.0 preparation is tracked in
 `f68750b368e6ebaf4dcaf588b4984651bb4d9670` passed the full release gate:
 2,891 Rust tests passed, none failed, 17 ignored; both fixture runs passed
 150 tests with 11 skipped. The candidate identity contract also passed.
-Optional cargo-audit/cargo-deny were absent and skipped. Five optimized artifact
-builds remain in progress at this observation; publication and registry-based
-acceptance are still outstanding. See
+Optional cargo-audit/cargo-deny were absent and skipped. All 25 PR checks passed. Optimized artifacts for both Linux targets and macOS
+ARM have verified source/version/digests and native/npm binary identity. Windows
+and Intel Mac builds remain in progress at this observation; publication and
+registry-based acceptance are still outstanding. See
 [versioned candidate evidence](evidence/runtime-1.7-candidate.json).

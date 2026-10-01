@@ -38,9 +38,59 @@
     "macos-arm64": 110229780479
   },
   "remaining": [
-    "Native artifact builds are in progress; do not infer their success from the release gate.",
+    "Windows and Intel Mac native artifact builds remain in progress; neutral npm packaging follows all native builds.",
     "Validate exact versioned packages with the candidate install harness on all five platforms.",
     "Publication requires explicit release authorization, then published-package verification and adapter dependency update.",
     "Public ChatGPT local installation support remains a separate host requirement."
+  ],
+  "pull_request_checks": {
+    "passed": 25,
+    "failed": 0,
+    "pending": 0,
+    "log_sha256": "ce15d91f5b17897098bf5caeac995745588a746ddad11eb4aecb8788fc3b8096"
+  },
+  "completed_artifacts": [
+    {
+      "artifact_id": 11143175967,
+      "job_id": 110229780371,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "linux-arm64",
+        "sha256": "b6904478f5abba3afacac2d6ab19819e51808c79ff79f0b2a94afce567814363"
+      },
+      "archive_sha256": "ac0cc908348e7f8f5621e1afb0c37bc171d9cabd409bc4f4ebdf0ba7df02464b",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11142699629,
+      "job_id": 110229780420,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "linux-x64",
+        "sha256": "fda5d00274aafc1a76d5e02faa792836e99babfac1c407c1b66e568f0a9ed2b0"
+      },
+      "archive_sha256": "1b053d0d4f216e0344518520d2c8f0e960651ae6ff605993f4d49f89d5866751",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11143226291,
+      "job_id": 110229780479,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "darwin-arm64",
+        "sha256": "77582d08d638f8ed346b8787126d75ee9b9cce07efe572d73333e6a8361fc48f"
+      },
+      "archive_sha256": "eaafc24d19f148bae1a78ad6ed71aca072faf8610c10661c84e9ab0ae734ada5",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    }
   ]
 }
