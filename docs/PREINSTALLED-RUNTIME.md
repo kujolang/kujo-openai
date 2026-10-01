@@ -17,7 +17,7 @@ Durable local evidence → MCP tool/resource result
 | Component | Verified behavior | Remaining boundary |
 |---|---|---|
 | Kujo runtime | Stable 1.7 provider family; actual 1.7.0 exercised | Other releases require acceptance; `mcp make` is still only a generator |
-| Experimental native entrypoint | `kujo-openai-native --serve-config ABSOLUTE --project ABSOLUTE` | Requires an already configured trusted provider; not automatic end-user onboarding |
+| Experimental native entrypoint | `kujo-openai-native --serve --project ABSOLUTE`; optional trusted `--serve-config` | Bundled canonical read-only project profile; public host installation remains unverified |
 | Default plugin entrypoint | Existing Node development profile | Must migrate packaging only after native platform/onboarding acceptance |
 | Discovery | Known user install directory, absolute PATH, or explicit operator path; project shadows rejected | Windows ACL verification fails closed; POSIX ACL coverage remains limited |
 | Canonical execution | Identity/schema/effect projection, policy, approvals and receipts remain in Ability | No host-supplied authority; invocation-v1 continuation references preserve canonical resume |
@@ -43,6 +43,6 @@ Diagnostic mode alone reports `provider_runtime_ready` for a compatible installa
 
 ## Still required before the selected product can ship
 
-Git-independent capability onboarding for ordinary selected projects; final native platform packaging; Windows trusted executable/ACL and durable storage support; actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
+final native platform packaging; Windows trusted executable/ACL and durable storage support; actual host folder permission enforcement; clean-machine and live ChatGPT acceptance; publisher policies/reviewer materials; public local-MCP confirmation. The ordinary development ZIP remains gated from submission.
 
 See [native build/run/test instructions](../native/README.md) and [submission checklist](PREINSTALLED-SUBMISSION.md). Earlier bootstrap/hosted designs and the diagnostic-only audit are historical evidence, not the current product plan.

@@ -4,15 +4,24 @@ This implementation uses a **preinstalled Kujo 1.7 runtime**. Go is needed to bu
 
 It is not yet the default plugin package or the finished onboarding experience. Windows runtime ACL checks and durable storage remain blocked; continuation-capable providers use private durable references and canonical resume. Public local-MCP distribution is unconfirmed. No installer, hosted fallback or new `kujo mcp` subcommand is introduced.
 
-## Build and run with a reviewed provider
+## Build and run
 
-These commands require the source checkout (or source archive). The legacy npm/plugin package includes this guide for reference; it does not ship the native build sources or a native executable.
-
-From this directory:
+Build from this source checkout:
 
 ```sh
+cd native
 go build -trimpath -o ../dist/kujo-openai-native ./preflight
+cd ..
+./dist/kujo-openai-native --serve --project /absolute/project
 ```
+
+`--serve` ships two canonical read-only MCP pack Abilities: bounded repository profiling and contained MCP manifest validation. It needs only the compiled host and a compatible preinstalled Kujo. It does not require a Git repository. Source code is embedded at build time, extracted into a private launch directory, and removed on normal shutdown. No source/runtime download occurs. Canonical definitions are loaded from that trusted bundle, never from the selected project. The host writes audit/evidence under `~/.local/share/kujo/openai-native/<project-path-hash>`; `--state-directory` can select another trusted directory outside the project. Neither option grants OS permissions.
+
+The reviewed source revision and file hashes are in `mcp-source.json`. Maintainers run `python3 scripts/native-assets.py --verify` from the repository root to verify embedded bytes against pinned canonical sources. Python is build/test tooling only. The generic provider path remains available for additional registered Abilities; new products do not get bespoke Go wrappers.
+
+## Run with another reviewed provider
+
+These commands require the source checkout (or source archive). The legacy npm/plugin package includes this guide for reference; it does not ship the native build sources or a native executable.
 
 Use `examples/operator-config.json` from the repository as the configuration shape. Supply absolute paths to an independently installed Kujo executable and a **working trusted canonical provider**, its import/CWD roots, a precreated private receipt directory and only the capabilities that provider needs. The example entrypoint is a template, not a runnable registry. Keep the config file mode 0600 and state directory mode 0700. Code, configuration, imports and state must be outside the explicitly selected project. Never place secret values in JSON; `secretEnvironment` names only explicitly allowed process environment entries.
 
@@ -20,9 +29,9 @@ Use `examples/operator-config.json` from the repository as the configuration sha
 ./dist/kujo-openai-native --serve-config /absolute/private/operator.json --project /absolute/project
 ```
 
-Run the command above from the repository root. Its stdio is MCP-only; startup errors go to stderr as bounded diagnostic codes and guidance. A selected project excludes repository code from launcher trust; it is **not** an OS filesystem sandbox or a provider's authorization policy. The provider must bind its own project scope and Ability policy, and the host must enforce its grants. There is no automatic provider installation or registration yet.
+Run the command above from the repository root. Its stdio is MCP-only; startup errors go to stderr as bounded diagnostic codes and guidance. A selected project excludes repository code from launcher trust; it is **not** an OS filesystem sandbox or a provider's authorization policy. The provider must bind its own project scope and Ability policy, and the host must enforce its grants. The bundled read-only profile handles ordinary project selection; custom providers remain explicit operator configuration.
 
-Without `--serve-config`, the executable checks runtime discovery/version only. `provider_runtime_ready` means a compatible executable was found; `nativeMcpVerified: false` correctly means that diagnostic did not start MCP. It must not be used as a submission-readiness result.
+Without `--serve` or `--serve-config`, the executable checks runtime discovery/version only. `provider_runtime_ready` means a compatible executable was found; `nativeMcpVerified: false` correctly means that diagnostic did not start MCP. It must not be used as a submission-readiness result.
 
 ## Boundaries
 
@@ -43,7 +52,7 @@ go test -race -count=1 -v ./...
 go vet ./...
 ```
 
-Tests without those variables explicitly skip real-runtime/executable cases. The acceptance test copies the verified runtime into a private temporary trusted install, launches the host with **empty PATH and `/` as CWD**, negotiates MCP, discovers tools, invokes a canonical Ability, reads its receipt by tool/resource and retrieves it after restarting the executable. It supplies a controlled canonical test registry, not a claim that end-user repository onboarding is complete. Real subprocess-tree tests use native Go fixtures, not Node.
+Tests without those variables explicitly skip real-runtime/executable cases. The acceptance test copies the verified runtime into a private temporary trusted install, launches the host with **empty PATH and `/` as CWD**, negotiates MCP, discovers tools, invokes a canonical Ability, reads its receipt by tool/resource and retrieves it after restarting the executable. A second executable acceptance case runs the bundled canonical MCP pack against a plain project, rejects project-local replacement source and unsafe paths/state, and retrieves evidence after restart. Public plugin installation and host folder authorization remain unverified. Real subprocess-tree tests use native Go fixtures, not Node.
 
 The current CI matrix prepares checksum-pinned official runtime archives as a **test prerequisite**, then runs these checks on macOS x64/ARM64 and Linux x64/ARM64. CI installation is not behavior performed by the plugin. Check actual job results before claiming platform verification.
 

@@ -219,7 +219,7 @@ func diagnosticMessage(status string) string {
 		"runtime_version_unsupported":    "This runtime version is outside the tested provider range. Use a reviewed compatible version; newer versions require compatibility tests.",
 		"invalid_project":                "Supply an absolute project directory. Relative project paths are not accepted.",
 		"project_unavailable":            "Project directory is unavailable. Select an accessible project in the host; this check does not grant access.",
-		"provider_runtime_ready":         "Installed Kujo is compatible with the experimental native provider runner. MCP startup additionally requires reviewed operator configuration and private receipt storage. This check does not certify host authorization or public distribution.",
+		"provider_runtime_ready":         "Installed Kujo is compatible with the experimental native provider runner. Use --serve with an explicitly selected project, or --serve-config with a reviewed provider; private receipt storage is required. This check does not certify host authorization or public distribution.",
 	}
 	if message, ok := messages[status]; ok {
 		return message
@@ -228,17 +228,29 @@ func diagnosticMessage(status string) string {
 }
 func main() {
 	binary := flag.String("kujo", "", "absolute trusted preinstalled binary (operator only)")
-	project := flag.String("project", "", "absolute project directory to exclude from runtime discovery; does not authorize access")
+	project := flag.String("project", "", "absolute selected project; excluded from trusted code discovery; does not grant OS access")
 	serveConfig := flag.String("serve-config", "", "absolute private operator config for native MCP (experimental)")
+	serveProject := flag.Bool("serve", false, "serve bundled read-only Abilities for an explicitly selected project")
+	state := flag.String("state-directory", "", "private state outside the selected project; defaults to user data directory")
 	flag.Parse()
 	if flag.NArg() != 0 {
-		fmt.Fprintln(os.Stderr, "usage: kujo-openai-native [--kujo /absolute/path] [--project /absolute/path] OR --serve-config /absolute/operator.json --project /absolute/project")
+		fmt.Fprintln(os.Stderr, "usage: kujo-openai-native [--kujo /absolute/path] --project /absolute/project [--serve [--state-directory /private/state] | --serve-config /private/operator.json]")
 		os.Exit(2)
 	}
-	if *serveConfig != "" {
+	if *serveProject && *serveConfig != "" {
+		fmt.Fprintln(os.Stderr, "choose --serve or --serve-config")
+		os.Exit(2)
+	}
+	if *serveProject || *serveConfig != "" {
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		defer stop()
-		if err := serve(ctx, *serveConfig, *project); err != nil {
+		var err error
+		if *serveProject {
+			err = serveProjectBundle(ctx, *binary, *project, *state)
+		} else {
+			err = serve(ctx, *serveConfig, *project)
+		}
+		if err != nil {
 			_ = json.NewEncoder(os.Stderr).Encode(map[string]any{"ok": false, "code": err.Error(), "message": diagnosticMessage(err.Error()), "installURL": installURL})
 			os.Exit(1)
 		}

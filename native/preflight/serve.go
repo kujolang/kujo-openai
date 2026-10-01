@@ -64,6 +64,9 @@ func serve(ctx context.Context, path, project string) error {
 	if e != nil {
 		return e
 	}
+	return serveOperator(ctx, config, path, project)
+}
+func serveOperator(ctx context.Context, config operatorConfig, path, project string) error {
 	// Selection is operator/host launch configuration, never an MCP tool argument.
 	if !filepath.IsAbs(project) {
 		return errors.New("explicit_project_required")

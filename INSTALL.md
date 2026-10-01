@@ -48,3 +48,13 @@ cd ..
 An optional `--kujo /absolute/trusted/kujo` is operator configuration, never model input. Known install paths are checked before absolute PATH entries to handle GUI PATH differences. No shell profile is sourced. The diagnostic exits zero only for `provider_runtime_ready`; that does not certify MCP or submission readiness. See [runtime contract](docs/PREINSTALLED-RUNTIME.md) for all errors. It does not restart itself or install anything.
 
 An experimental native server is now available for maintainers with an existing trusted provider. See [native setup](native/README.md). It does not yet replace the default manifest or provide ordinary end-user onboarding.
+
+## Native source-build preview
+
+With a preinstalled compatible Kujo 1.7 runtime and a locally built adapter, run:
+
+```sh
+./dist/kujo-openai-native --serve --project /absolute/project
+```
+
+This is an MCP stdio command for a supported local client, not a terminal chat interface. It bundles canonical read-only repository profiling and MCP manifest validation; no Git checkout or package installation is required. See [native instructions](native/README.md) for the build, trusted runtime discovery, private evidence location and limitations. Public Plugin Directory installation is still unconfirmed.

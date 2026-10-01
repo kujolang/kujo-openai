@@ -1,0 +1,28 @@
+// Host-owned composition of the canonical read-only MCP pack. No product
+// schemas, handlers, or model-supplied project selection are defined here.
+from packs.mcp_core.runtime import create_mcp_core_ability_registry_for_project, mcp_core_policy
+from vendor.ability.ability import list_ability_definitions, register_ability_exposure
+from src.projection import discover, invoke
+func visible(entry, context) { return true }
+func audit(phase, invocation, payload) {
+ name := invocation["invocation_id"] + "-" + phase + ".json"
+ write_file_atomic_beneath(__AUDIT_LITERAL__, name, to_json(payload), false)
+ return {"ok":true,"event_id":name}
+}
+created := create_mcp_core_ability_registry_for_project(__SOURCE_LITERAL__,__PROJECT_LITERAL__)
+assert(created["ok"],"registry unavailable")
+registry := created["registry"]
+for entry in list_ability_definitions(registry,"sdk") {
+ exposure := entry["exposure"]
+ exposure["surface"] := "mcp"
+ step := register_ability_exposure(registry,exposure)
+ assert(step["ok"],"exposure rejected")
+ registry = step["registry"]
+}
+request := parse_json(read_stdin(1048576))
+context := {"principal":{"type":"workload","id":"local-project-operator","tenant_id":"local","claims":{}},"invocation_id":"discovery"}
+if request["operation"] == "discover" { print(to_json(discover(registry,context,visible))) } else {
+ assert(request["operation"] == "invoke","unsupported operation")
+ context["invocation_id"] := request["invocation_id"]
+ print(to_json(invoke(registry,request["name"],request["input"],context,{"policy":mcp_core_policy,"audit":audit},visible)))
+}

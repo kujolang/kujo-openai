@@ -1,0 +1,719 @@
+from src.make.common import dict_has_key, resolve_absolute_existing, push_unique
+from src.make.safety import classify_script, detect_sensitive_path
+
+IGNORED_DIRS := {
+    ".git": true,
+    ".mcp": true,
+    "node_modules": true,
+    "vendor": true,
+    "build": true,
+    "dist": true,
+    "target": true,
+    "coverage": true,
+    ".venv": true,
+    "venv": true,
+    "__pycache__": true,
+    ".next": true,
+    ".nuxt": true,
+    ".cache": true,
+    "kennel_packages": true
+}
+
+KNOWN_CONFIG_FILES := {
+    "package.json": true,
+    "pnpm-lock.yaml": true,
+    "package-lock.json": true,
+    "yarn.lock": true,
+    "pyproject.toml": true,
+    "requirements.txt": true,
+    "Pipfile": true,
+    "Cargo.toml": true,
+    "go.mod": true,
+    "composer.json": true,
+    "kujo.toml": true,
+    "kennel.toml": true,
+    "mcp-server.json": true,
+    "docker-compose.yml": true,
+    "docker-compose.yaml": true,
+    "Dockerfile": true,
+    "tsconfig.json": true,
+    "vite.config.ts": true,
+    "vite.config.js": true,
+    "next.config.js": true,
+    "next.config.mjs": true
+}
+
+ENTRYPOINT_NAMES := {
+    "main.kujo": true,
+    "server.kujo": true,
+    "main.py": true,
+    "app.py": true,
+    "main.go": true,
+    "main.rs": true,
+    "index.js": true,
+    "index.ts": true,
+    "src/main.rs": true,
+    "cmd/main.go": true
+}
+
+DOMAIN_KEYWORDS := [
+    "api",
+    "auth",
+    "server",
+    "client",
+    "model",
+    "schema",
+    "mcp",
+    "agent",
+    "runtime",
+    "prompt",
+    "resource",
+    "tool",
+    "security",
+    "test",
+    "build",
+    "docs",
+    "release",
+    "config"
+]
+
+func get_file_extension(file_name) {
+    clean := trim(to_string(file_name))
+    if clean == "" {
+        return ""
+    }
+
+    idx := len(clean) - 1
+    while idx >= 0 {
+        ch := substring(clean, idx, idx + 1)
+        if ch == "." {
+            if idx + 1 < len(clean) {
+                return to_lower(substring(clean, idx + 1, len(clean)))
+            }
+            return ""
+        }
+
+        if ch == "/" || ch == "\\" {
+            return ""
+        }
+
+        idx := idx - 1
+    }
+
+    return ""
+}
+
+func language_from_file(file_name) {
+    ext := get_file_extension(file_name)
+    if ext == "" {
+        return ""
+    }
+
+    if ext == "kujo" {
+        return "Kujo"
+    }
+    if ext == "js" || ext == "mjs" || ext == "cjs" {
+        return "JavaScript"
+    }
+    if ext == "ts" || ext == "tsx" {
+        return "TypeScript"
+    }
+    if ext == "py" {
+        return "Python"
+    }
+    if ext == "rs" {
+        return "Rust"
+    }
+    if ext == "go" {
+        return "Go"
+    }
+    if ext == "php" {
+        return "PHP"
+    }
+    if ext == "java" {
+        return "Java"
+    }
+    if ext == "rb" {
+        return "Ruby"
+    }
+    if ext == "md" {
+        return "Markdown"
+    }
+    if ext == "json" {
+        return "JSON"
+    }
+    if ext == "yml" || ext == "yaml" {
+        return "YAML"
+    }
+    if ext == "toml" {
+        return "TOML"
+    }
+    if ext == "sh" {
+        return "Shell"
+    }
+
+    return "Other"
+}
+
+func add_language_count(counts, language_name) {
+    if language_name == "" {
+        return counts
+    }
+
+    if dict_has_key(counts, language_name) {
+        counts[language_name] := counts[language_name] + 1
+    } else {
+        counts[language_name] := 1
+    }
+
+    return counts
+}
+
+func is_ignored_dir(dir_name) {
+    clean := trim(to_string(dir_name))
+    if clean == "" {
+        return true
+    }
+
+    if starts_with(clean, ".") {
+        if clean == ".github" {
+            return false
+        }
+        if clean == ".git" || clean == ".mcp" || clean == ".venv" || clean == ".next" || clean == ".nuxt" || clean == ".cache" {
+            return true
+        }
+    }
+
+    return dict_has_key(IGNORED_DIRS, clean)
+}
+
+func detect_frameworks(target_abs, package_json) {
+    frameworks := []
+
+    if file_exists(target_abs + "/next.config.js") || file_exists(target_abs + "/next.config.mjs") {
+        frameworks := push_unique(frameworks, "Next.js")
+    }
+
+    if file_exists(target_abs + "/vite.config.js") || file_exists(target_abs + "/vite.config.ts") {
+        frameworks := push_unique(frameworks, "Vite")
+    }
+
+    if file_exists(target_abs + "/artisan") {
+        frameworks := push_unique(frameworks, "Laravel")
+    }
+
+    if file_exists(target_abs + "/wp-config.php") {
+        frameworks := push_unique(frameworks, "WordPress")
+    }
+
+    if type(package_json) == "dict" {
+        dep_groups := ["dependencies", "devDependencies"]
+        group_idx := 0
+        while group_idx < len(dep_groups) {
+            group_name := dep_groups[group_idx]
+            group_idx := group_idx + 1
+
+            if dict_has_key(package_json, group_name) {
+                dep_map := package_json[group_name]
+                if type(dep_map) == "dict" {
+                    if dict_has_key(dep_map, "react") {
+                        frameworks := push_unique(frameworks, "React")
+                    }
+                    if dict_has_key(dep_map, "express") {
+                        frameworks := push_unique(frameworks, "Express")
+                    }
+                    if dict_has_key(dep_map, "vue") {
+                        frameworks := push_unique(frameworks, "Vue")
+                    }
+                    if dict_has_key(dep_map, "@sveltejs/kit") || dict_has_key(dep_map, "svelte") {
+                        frameworks := push_unique(frameworks, "Svelte")
+                    }
+                }
+            }
+        }
+    }
+
+    return frameworks
+}
+
+func read_small_json(file_path, max_bytes) {
+    if !file_exists(file_path) {
+        return {"ok": false, "data": {}, "error": "File not found"}
+    }
+
+    if path_is_symlink(file_path) {
+        return {"ok": false, "data": {}, "error": "Symbolic links are not read during repository analysis"}
+    }
+
+    if file_size(file_path) > max_bytes {
+        return {"ok": false, "data": {}, "error": "File exceeds read budget"}
+    }
+
+    try {
+        parsed := parse_json(read_file(file_path))
+        if type(parsed) == "dict" {
+            return {"ok": true, "data": parsed, "error": ""}
+        }
+        return {"ok": false, "data": {}, "error": "JSON root must be an object"}
+    } except err {
+        return {"ok": false, "data": {}, "error": "Could not parse JSON"}
+    }
+}
+
+func detect_package_manager(target_abs) {
+    if file_exists(target_abs + "/pnpm-lock.yaml") {
+        return {"name": "pnpm", "install": "pnpm install", "runner": "pnpm"}
+    }
+    if file_exists(target_abs + "/yarn.lock") {
+        return {"name": "yarn", "install": "yarn install --frozen-lockfile", "runner": "yarn"}
+    }
+    if file_exists(target_abs + "/package-lock.json") {
+        return {"name": "npm", "install": "npm ci", "runner": "npm"}
+    }
+    if file_exists(target_abs + "/package.json") {
+        return {"name": "npm", "install": "npm install", "runner": "npm"}
+    }
+    if file_exists(target_abs + "/Cargo.toml") {
+        return {"name": "cargo", "install": "cargo fetch", "runner": "cargo"}
+    }
+    if file_exists(target_abs + "/pyproject.toml") || file_exists(target_abs + "/requirements.txt") {
+        return {"name": "python", "install": "pip install -r requirements.txt", "runner": "python"}
+    }
+    if file_exists(target_abs + "/go.mod") {
+        return {"name": "go", "install": "go mod download", "runner": "go"}
+    }
+    return {"name": "unknown", "install": "", "runner": ""}
+}
+
+func infer_node_script_command(scripts_map, names, runner) {
+    idx := 0
+    while idx < len(names) {
+        script_name := names[idx]
+        idx := idx + 1
+        if dict_has_key(scripts_map, script_name) {
+            if runner == "yarn" {
+                return "yarn " + script_name
+            }
+            if runner == "pnpm" {
+                return "pnpm " + script_name
+            }
+            return "npm run " + script_name
+        }
+    }
+    return ""
+}
+
+export func analyze_repository(target_repo_path, no_ai) {
+    target_result := resolve_absolute_existing(target_repo_path)
+    if !target_result["ok"] {
+        return {"ok": false, "error": target_result["error"], "profile": {}}
+    }
+
+    target_abs := target_result["path"]
+    if !path_is_dir(target_abs) {
+        return {"ok": false, "error": "Target path must be a directory", "profile": {}}
+    }
+
+    cwd_abs := path_absolute(".")
+    relative_path := target_abs
+    if starts_with(target_abs, cwd_abs + "/") {
+        relative_path := substring(target_abs, len(cwd_abs) + 1, len(target_abs))
+    }
+
+    repo_name := basename(target_abs)
+
+    language_counts := {}
+    frameworks := []
+    top_level_dirs := []
+    important_configs := []
+    source_dirs := []
+    test_dirs := []
+    docs_files := []
+    entrypoints := []
+    sample_files := []
+    domain_concepts := []
+    sensitive_paths := []
+    sensitive_reasons := []
+
+    max_depth := 8
+    max_files := 4000
+    max_entries := 8000
+    file_count := 0
+    entry_count := 0
+
+    queue := [{"path": target_abs, "depth": 0}]
+    queue_idx := 0
+
+    while queue_idx < len(queue) {
+        current := queue[queue_idx]
+        queue_idx := queue_idx + 1
+
+        current_path := current["path"]
+        current_depth := current["depth"]
+
+        entries := []
+        try {
+            entries := list_dir(current_path)
+        } except err {
+            entries := []
+        }
+
+        entry_idx := 0
+        while entry_idx < len(entries) {
+            name := entries[entry_idx]
+            entry_idx := entry_idx + 1
+            entry_count := entry_count + 1
+
+            full := current_path + "/" + name
+            rel := name
+            if starts_with(full, target_abs + "/") {
+                rel := substring(full, len(target_abs) + 1, len(full))
+            }
+
+            is_link := path_is_symlink(full)
+            is_directory := false
+            if !is_link {
+                try {
+                    list_dir(full)
+                    is_directory = true
+                } except err {
+                    is_directory = false
+                }
+            }
+
+            if is_directory {
+                if current_depth == 0 {
+                    top_level_dirs := push_unique(top_level_dirs, name)
+                }
+
+                lower_name := to_lower(name)
+                if lower_name == "src" || lower_name == "lib" || lower_name == "app" || lower_name == "server" || lower_name == "client" {
+                    source_dirs := push_unique(source_dirs, rel)
+                }
+                if lower_name == "test" || lower_name == "tests" || lower_name == "__tests__" || lower_name == "spec" {
+                    test_dirs := push_unique(test_dirs, rel)
+                }
+
+                if !is_ignored_dir(name) && current_depth < max_depth {
+                    queue := push(queue, {"path": full, "depth": current_depth + 1})
+                }
+            } else if !is_link {
+                file_count := file_count + 1
+                if file_count <= 300 {
+                    sample_files := push(sample_files, rel)
+                }
+
+                language_name := language_from_file(name)
+                language_counts := add_language_count(language_counts, language_name)
+
+                if dict_has_key(KNOWN_CONFIG_FILES, name) {
+                    important_configs := push_unique(important_configs, rel)
+                }
+
+                lower_name := to_lower(name)
+                if lower_name == "readme" || lower_name == "readme.md" || ends_with(lower_name, ".md") {
+                    if starts_with(to_lower(rel), "docs/") || current_depth == 0 {
+                        docs_files := push_unique(docs_files, rel)
+                    }
+                }
+
+                if dict_has_key(ENTRYPOINT_NAMES, name) || dict_has_key(ENTRYPOINT_NAMES, rel) {
+                    entrypoints := push_unique(entrypoints, rel)
+                }
+
+                sensitive := detect_sensitive_path(rel)
+                if sensitive["sensitive"] {
+                    sensitive_paths := push_unique(sensitive_paths, rel)
+                    sensitive_reasons := push_unique(sensitive_reasons, rel + " => " + sensitive["reason"])
+                }
+
+                keyword_idx := 0
+                rel_lower := to_lower(rel)
+                while keyword_idx < len(DOMAIN_KEYWORDS) {
+                    kw := DOMAIN_KEYWORDS[keyword_idx]
+                    keyword_idx := keyword_idx + 1
+                    if index_of(rel_lower, kw) >= 0 {
+                        domain_concepts := push_unique(domain_concepts, kw)
+                    }
+                }
+
+                if file_count >= max_files || entry_count >= max_entries {
+                    break
+                }
+            }
+
+            if entry_count >= max_entries {
+                break
+            }
+        }
+
+        if file_count >= max_files || entry_count >= max_entries {
+            break
+        }
+    }
+
+    package_manager := detect_package_manager(target_abs)
+    package_json := {}
+    package_json_result := read_small_json(target_abs + "/package.json", 1048576)
+    if package_json_result["ok"] {
+        package_json := package_json_result["data"]
+    }
+
+    frameworks := detect_frameworks(target_abs, package_json)
+
+    scripts := []
+    likely_install := package_manager["install"]
+    likely_build := ""
+    likely_test := ""
+    likely_lint := ""
+    likely_typecheck := ""
+
+    if type(package_json) == "dict" && dict_has_key(package_json, "scripts") {
+        scripts_map := package_json["scripts"]
+        if type(scripts_map) == "dict" {
+            script_names := keys(scripts_map)
+            idx := 0
+            while idx < len(script_names) {
+                script_name := to_string(script_names[idx])
+                idx := idx + 1
+                script_command := to_string(scripts_map[script_name])
+                classification := classify_script(script_name, script_command)
+                scripts := push(scripts, {
+                    "name": script_name,
+                    "command": script_command,
+                    "safety_tier": classification["tier"],
+                    "safety_reason": classification["reason"],
+                    "source": "package.json"
+                })
+            }
+
+            likely_build := infer_node_script_command(scripts_map, ["build", "compile"], package_manager["runner"])
+            likely_test := infer_node_script_command(scripts_map, ["test", "test:ci", "ci:test"], package_manager["runner"])
+            likely_lint := infer_node_script_command(scripts_map, ["lint", "check"], package_manager["runner"])
+            likely_typecheck := infer_node_script_command(scripts_map, ["typecheck", "types", "tsc"], package_manager["runner"])
+        }
+    }
+
+    if likely_test == "" {
+        if file_exists(target_abs + "/Cargo.toml") {
+            likely_test := "cargo test"
+        } else {
+            if file_exists(target_abs + "/pytest.ini") || file_exists(target_abs + "/pyproject.toml") || len(test_dirs) > 0 {
+                likely_test := "pytest"
+            } else {
+                if file_exists(target_abs + "/go.mod") {
+                    likely_test := "go test ./..."
+                }
+            }
+        }
+    }
+
+    if likely_lint == "" {
+        if file_exists(target_abs + "/Cargo.toml") {
+            likely_lint := "cargo clippy"
+        } else {
+            if file_exists(target_abs + "/pyproject.toml") {
+                likely_lint := "kujo check ."
+            } else {
+                if file_exists(target_abs + "/go.mod") {
+                    likely_lint := "go vet ./..."
+                }
+            }
+        }
+    }
+
+    if likely_build == "" {
+        if file_exists(target_abs + "/Cargo.toml") {
+            likely_build := "cargo build"
+        } else {
+            if file_exists(target_abs + "/go.mod") {
+                likely_build := "go build ./..."
+            }
+        }
+    }
+
+    if likely_typecheck == "" {
+        if file_exists(target_abs + "/pyproject.toml") {
+            likely_typecheck := "kujo check ."
+        }
+    }
+
+    inferred_commands := []
+    if likely_test != "" {
+        classify_test := classify_script("test", likely_test)
+        inferred_commands := push(inferred_commands, {
+            "name": "test",
+            "command": likely_test,
+            "safety_tier": classify_test["tier"],
+            "safety_reason": classify_test["reason"],
+            "source": "inferred"
+        })
+    }
+    if likely_lint != "" {
+        classify_lint := classify_script("lint", likely_lint)
+        inferred_commands := push(inferred_commands, {
+            "name": "lint",
+            "command": likely_lint,
+            "safety_tier": classify_lint["tier"],
+            "safety_reason": classify_lint["reason"],
+            "source": "inferred"
+        })
+    }
+    if likely_build != "" {
+        classify_build := classify_script("build", likely_build)
+        inferred_commands := push(inferred_commands, {
+            "name": "build",
+            "command": likely_build,
+            "safety_tier": classify_build["tier"],
+            "safety_reason": classify_build["reason"],
+            "source": "inferred"
+        })
+    }
+
+    inf_idx := 0
+    while inf_idx < len(inferred_commands) {
+        inferred_entry := inferred_commands[inf_idx]
+        inf_idx := inf_idx + 1
+
+        name := inferred_entry["name"]
+        exists := false
+        scan_idx := 0
+        while scan_idx < len(scripts) {
+            if scripts[scan_idx]["name"] == name {
+                exists := true
+                break
+            }
+            scan_idx := scan_idx + 1
+        }
+
+        if !exists {
+            scripts := push(scripts, inferred_entry)
+        }
+    }
+
+    safe_operations := []
+    risky_operations := []
+    script_idx := 0
+    while script_idx < len(scripts) {
+        script_entry := scripts[script_idx]
+        script_idx := script_idx + 1
+
+        tier := to_string(script_entry["safety_tier"])
+        if tier == "safe_command" {
+            safe_operations := push(safe_operations, {
+                "name": script_entry["name"],
+                "command": script_entry["command"],
+                "reason": script_entry["safety_reason"]
+            })
+        } else {
+            risky_operations := push(risky_operations, {
+                "name": script_entry["name"],
+                "command": script_entry["command"],
+                "tier": tier,
+                "reason": script_entry["safety_reason"]
+            })
+        }
+    }
+
+    useful_resources := [
+        "repo-profile.json",
+        "repo-map.md",
+        "mcp-surface-plan.md",
+        "validation-report.md"
+    ]
+
+    if len(docs_files) > 0 {
+        useful_resources := push_unique(useful_resources, docs_files[0])
+    }
+
+    useful_prompts := [
+        "prepare implementation plan",
+        "review patch",
+        "write tests",
+        "explain module",
+        "create release checklist",
+        "investigate failing test",
+        "produce agent handoff"
+    ]
+
+    missing_docs := []
+    if file_exists(target_abs + "/README.md") == false && file_exists(target_abs + "/readme.md") == false {
+        missing_docs := push(missing_docs, "Repository README file is missing")
+    }
+
+    missing_tests := []
+    if len(test_dirs) == 0 {
+        missing_tests := push(missing_tests, "No dedicated test directory detected")
+    }
+
+    stale_setup_steps := []
+    if package_manager["name"] == "unknown" {
+        stale_setup_steps := push(stale_setup_steps, "No recognized package manager or build system detected")
+    }
+
+    dependency_assumptions := []
+    if package_manager["name"] == "npm" || package_manager["name"] == "yarn" || package_manager["name"] == "pnpm" {
+        if file_exists(target_abs + "/package-lock.json") == false && file_exists(target_abs + "/pnpm-lock.yaml") == false && file_exists(target_abs + "/yarn.lock") == false {
+            dependency_assumptions := push(dependency_assumptions, "Node dependency lockfile not detected; install command assumptions may be wrong")
+        }
+    }
+
+    confidence_notes := []
+    confidence_notes := push(confidence_notes, "Repository analysis uses deterministic file-system inspection and bounded file reads")
+    confidence_notes := push(confidence_notes, "Script safety tiers are inferred from command names and blocked-term policy")
+
+    unresolved_assumptions := []
+    unresolved_assumptions := push(unresolved_assumptions, "Deterministic repository analysis did not execute discovered repository commands")
+
+    profile := {
+        "repo_name": repo_name,
+        "repo_path_absolute": target_abs,
+        "repo_path_relative": relative_path,
+        "detected_languages": keys(language_counts),
+        "language_file_counts": language_counts,
+        "detected_frameworks": frameworks,
+        "package_manager": package_manager["name"],
+        "build_system": package_manager["runner"],
+        "available_scripts": scripts,
+        "likely_install_command": likely_install,
+        "likely_build_command": likely_build,
+        "likely_test_command": likely_test,
+        "likely_lint_command": likely_lint,
+        "likely_typecheck_command": likely_typecheck,
+        "important_config_files": important_configs,
+        "top_level_directories": top_level_dirs,
+        "likely_source_directories": source_dirs,
+        "likely_test_directories": test_dirs,
+        "docs_and_readmes": docs_files,
+        "entrypoints": entrypoints,
+        "sample_files": sample_files,
+        "mcp_relevant_domain_concepts": domain_concepts,
+        "safe_operations": safe_operations,
+        "risky_operations": risky_operations,
+        "useful_resources": useful_resources,
+        "useful_prompts": useful_prompts,
+        "missing_or_stale_docs": missing_docs,
+        "missing_tests": missing_tests,
+        "risky_scripts": risky_operations,
+        "broken_or_unverified_setup_steps": stale_setup_steps,
+        "dependency_assumptions_that_may_be_wrong": dependency_assumptions,
+        "sensitive_paths_detected": sensitive_paths,
+        "sensitive_path_notes": sensitive_reasons,
+        "confidence_notes": confidence_notes,
+        "unresolved_assumptions": unresolved_assumptions,
+        "analysis_limits": {
+            "max_depth": max_depth,
+            "max_files": max_files,
+            "max_entries": max_entries,
+            "files_scanned": file_count,
+            "entries_scanned": entry_count
+        },
+        "inference": {
+            "ai_enrichment_requested": no_ai == false,
+            "ai_enrichment_applied": false,
+            "ai_enrichment_reason": "Enrichment outcome is resolved after deterministic analysis"
+        }
+    }
+
+    return {"ok": true, "error": "", "profile": profile}
+}
