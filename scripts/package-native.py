@@ -86,7 +86,7 @@ def build(target, output):
         files['assets/'+name] = (path.read_bytes(), 0o644)
     source_files = [p for p in (ROOT/'native').rglob('*') if p.is_file() and p.suffix in ('.go', '.mod', '.sum', '.json', '.kujo', '.md')]
     source_files += [ROOT/'scripts/package-native.py', ROOT/'scripts/native-assets.py', ROOT/'package.json', ROOT/'LICENSE']
-    sources = {str(p.relative_to(ROOT)): sha(p.read_bytes()) for p in sorted(source_files)}
+    sources = {p.relative_to(ROOT).as_posix(): sha(p.read_bytes()) for p in sorted(source_files)}
     with tempfile.TemporaryDirectory(prefix='kujo-native-build-') as temporary:
         binary = pathlib.Path(temporary)/('kujo-openai-native.exe' if system == 'windows' else 'kujo-openai-native')
         run(['go', 'build', '-mod=readonly', '-trimpath', '-buildvcs=false', '-ldflags=-buildid=', '-o', str(binary), './preflight'], env)

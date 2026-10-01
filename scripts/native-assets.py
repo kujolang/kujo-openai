@@ -31,7 +31,7 @@ files['src/projection.kujo'] = (root/'src/projection.kujo').read_bytes()
 files['provider.kujo'] = (root/'native/internal/bundle/provider.kujo').read_bytes()
 files['provenance.json'] = (json.dumps({'ability':ability,'mcp':mcp_lock},sort_keys=True,indent=2)+'\n').encode()
 if '--verify' in sys.argv:
-    actual = {str(p.relative_to(out)):p.read_bytes() for p in out.rglob('*') if p.is_file()}
+    actual = {p.relative_to(out).as_posix():p.read_bytes() for p in out.rglob('*') if p.is_file()}
     if files != actual: raise SystemExit('native assets drift; run python3 scripts/native-assets.py')
 else:
     for path,body in files.items():
