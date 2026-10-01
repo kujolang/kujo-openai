@@ -127,3 +127,52 @@ func checkDescriptor(sd *windows.SECURITY_DESCRIPTOR, current string, directory,
 	}
 	return nil
 }
+
+// MkdirPrivate creates a new directory with a protected inheritable DACL. It
+// never repairs or broadens an existing object's permissions. Callers must keep
+// these paths outside any model-controlled project before invoking this helper.
+func MkdirPrivate(path string) error {
+	if !filepath.IsAbs(path) || !drive.MatchString(filepath.VolumeName(path)) || strings.Contains(strings.TrimPrefix(path, filepath.VolumeName(path)), ":") {
+		return unsafePath
+	}
+	path = filepath.Clean(path)
+	name, e := windows.UTF16PtrFromString(path)
+	if e != nil {
+		return unsafePath
+	}
+	if attributes, e := windows.GetFileAttributes(name); e == nil {
+		if attributes&windows.FILE_ATTRIBUTE_DIRECTORY == 0 {
+			return unsafePath
+		}
+		return Check(path, true)
+	} else if e != windows.ERROR_FILE_NOT_FOUND && e != windows.ERROR_PATH_NOT_FOUND {
+		return unverified
+	}
+	parent := filepath.Dir(path)
+	if parent == path {
+		return unsafePath
+	}
+	if _, e := windows.GetFileAttributes(windows.StringToUTF16Ptr(parent)); e != nil {
+		if e = MkdirPrivate(parent); e != nil {
+			return e
+		}
+	}
+	if e := Check(parent, false); e != nil {
+		return e
+	}
+	user, e := windows.GetCurrentProcessToken().GetTokenUser()
+	if e != nil {
+		return unverified
+	}
+	sd, e := windows.SecurityDescriptorFromString("D:P(A;OICI;FA;;;" + user.User.Sid.String() + ")(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)")
+	if e != nil {
+		return unverified
+	}
+	defer runtime.KeepAlive(sd)
+	attributes := windows.SecurityAttributes{Length: uint32(unsafe.Sizeof(windows.SecurityAttributes{})), SecurityDescriptor: sd}
+	e = windows.CreateDirectory(name, &attributes)
+	if e != nil && e != windows.ERROR_ALREADY_EXISTS {
+		return unverified
+	}
+	return Check(path, true)
+}

@@ -120,3 +120,59 @@ func TestUnknownACEFailsClosed(t *testing.T) {
 		t.Fatal("unknown ACE accepted", e)
 	}
 }
+
+func TestFullPathChecksAncestors(t *testing.T) {
+	current := currentSID(t)
+	directory := t.TempDir()
+	parent := filepath.Join(directory, "parent")
+	if e := os.Mkdir(parent, 0700); e != nil {
+		t.Fatal(e)
+	}
+	path := filepath.Join(parent, "runtime.exe")
+	if e := os.WriteFile(path, []byte("never executed"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	private := "D:P(A;;FA;;;" + current + ")(A;;FA;;;SY)(A;;FA;;;BA)"
+	setDACL(t, parent, private)
+	setDACL(t, path, private)
+	// This also verifies the real runner's drive/profile ancestry. Unsupported
+	// ownership is reported as a failure, never skipped or treated as permission.
+	if e := Check(path, false); e != nil {
+		t.Fatal("trusted path rejected", e)
+	}
+	setDACL(t, parent, private+"(A;;0x40;;;WD)")
+	if e := Check(path, false); e == nil {
+		t.Fatal("replaceable ancestor accepted")
+	}
+	setDACL(t, parent, private)
+}
+
+func TestPrivateCreationAndInheritedFiles(t *testing.T) {
+	directory := filepath.Join(t.TempDir(), "private", "nested")
+	if e := MkdirPrivate(directory); e != nil {
+		t.Fatal(e)
+	}
+	if e := MkdirPrivate(directory); e != nil {
+		t.Fatal("safe existing directory rejected", e)
+	}
+	file := filepath.Join(directory, "receipt")
+	if e := os.WriteFile(file, []byte("private"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	if e := MkdirPrivate(file); e == nil {
+		t.Fatal("file accepted as directory")
+	}
+	if e := MkdirPrivate(directory + "\x00bad"); e == nil {
+		t.Fatal("NUL path accepted")
+	}
+	if e := Check(file, true); e != nil {
+		t.Fatal("private DACL did not inherit", e)
+	}
+	current := currentSID(t)
+	private := "D:P(A;;FA;;;" + current + ")(A;;FA;;;SY)(A;;FA;;;BA)"
+	setDACL(t, directory, private+"(A;;GR;;;WD)")
+	if e := MkdirPrivate(directory); e == nil {
+		t.Fatal("unsafe existing state repaired or accepted")
+	}
+	setDACL(t, directory, private)
+}
