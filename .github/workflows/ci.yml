@@ -81,3 +81,22 @@ jobs:
       - run: npm ci --ignore-scripts
       - name: Verify durable receipt storage independently of the runtime
         run: node --test tests/receipt-storage.test.mjs tests/sqlite-receipts.test.mjs
+
+  preinstalled-preflight:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-15-intel, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16
+        with:
+          go-version: '1.25.3'
+          cache: false
+      - name: Native diagnostic security boundaries (not MCP acceptance)
+        working-directory: native
+        run: go test -race -count=1 ./...
+      - name: Vet native diagnostic
+        working-directory: native
+        run: go vet ./...
