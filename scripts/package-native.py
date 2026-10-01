@@ -32,7 +32,7 @@ def objects(text):
 
 
 def run(args, env=None):
-    return subprocess.check_output(args, cwd=ROOT/'native', env=env, text=True).strip()
+    return subprocess.check_output(args, cwd=ROOT/'native', env=env, text=True, encoding="utf-8").strip()
 
 
 def archive(path, files):
@@ -55,7 +55,7 @@ def build(target, output):
     env = {**os.environ, 'GOOS': system, 'GOARCH': architecture, 'CGO_ENABLED': '0',
            'GOWORK': 'off', 'GOFLAGS': '', 'GOTOOLCHAIN': 'local',
            'GOAMD64': 'v1', 'GOARM64': 'v8.0', 'GOEXPERIMENT': ''}
-    version = json.loads((ROOT/'package.json').read_text())['version']
+    version = json.loads((ROOT/'package.json').read_text(encoding="utf-8"))['version']
     if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+', version):
         raise ValueError('invalid package version')
     packages = list(objects(run(['go', 'list', '-mod=readonly', '-deps', '-json', './preflight'], env)))
@@ -122,8 +122,8 @@ provenance.json. Checksums detect changed bytes; they do not authenticate a publ
                   'go_version': run(['go', 'env', 'GOVERSION'], env), 'cgo_enabled': False,
                   'binary': binary.name, 'binary_sha256': sha(files[binary.name][0]),
                   'dependencies': dependencies, 'sources': sources,
-                  'ability': json.loads((ROOT/'vendor/LOCK.json').read_text()),
-                  'mcp': json.loads((ROOT/'native/mcp-source.json').read_text())}
+                  'ability': json.loads((ROOT/'vendor/LOCK.json').read_text(encoding="utf-8")),
+                  'mcp': json.loads((ROOT/'native/mcp-source.json').read_text(encoding="utf-8"))}
     files['provenance.json'] = (encoded(provenance), 0o644)
     filename = f'kujo-openai-native-{version}-{system}-{architecture}.zip'
     output.mkdir(parents=True, exist_ok=True)
@@ -137,7 +137,7 @@ provenance.json. Checksums detect changed bytes; they do not authenticate a publ
     finally:
         pending_path.unlink(missing_ok=True)
     digest = sha(destination.read_bytes())
-    (output/(filename+'.sha256')).write_text(digest+'  '+filename+'\n')
+    (output/(filename+'.sha256')).write_bytes((digest+'  '+filename+'\n').encode('utf-8'))
     return {'archive': str(destination), 'sha256': digest, 'target': target, 'files': len(files), 'submission_ready': False}
 
 

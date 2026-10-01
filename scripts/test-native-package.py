@@ -43,7 +43,7 @@ def main():
     runtime = os.environ.get('KUJO_NATIVE_TEST_BIN')
     if not runtime or not pathlib.Path(runtime).is_absolute():
         raise SystemExit('KUJO_NATIVE_TEST_BIN must name a compatible installed runtime; acceptance was not run')
-    target = subprocess.check_output(['go', 'env', 'GOOS', 'GOARCH'], text=True).strip().replace('\n', '/')
+    target = subprocess.check_output(['go', 'env', 'GOOS', 'GOARCH'], text=True, encoding="utf-8").strip().replace('\n', '/')
     subprocess.run([sys.executable, str(ROOT/'scripts/native-assets.py'), '--verify'], check=True)
     with tempfile.TemporaryDirectory(prefix='kujo-native-package-test-') as temporary:
         directory = pathlib.Path(temporary)
@@ -52,7 +52,7 @@ def main():
         assert first['sha256'] == second['sha256'], 'native archive is not reproducible'
         archive = pathlib.Path(first['archive'])
         metadata = inspect(archive)
-        assert archive.with_suffix('.zip.sha256').read_text().split()[0] == package.sha(archive.read_bytes())
+        assert archive.with_suffix('.zip.sha256').read_text(encoding="utf-8").split()[0] == package.sha(archive.read_bytes())
         # Avoid extraction APIs: only the verified executable is materialized.
         executable = directory/metadata['binary']
         with zipfile.ZipFile(archive) as contents:

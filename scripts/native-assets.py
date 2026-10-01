@@ -4,14 +4,14 @@ import hashlib, json, pathlib, subprocess, sys
 root = pathlib.Path(__file__).resolve().parent.parent
 out = root / 'native/internal/bundle/assets'
 files = {}
-ability = json.loads((root/'vendor/LOCK.json').read_text())
+ability = json.loads((root/'vendor/LOCK.json').read_text(encoding="utf-8"))
 for path, expected in ability['files'].items():
     body = (root/'vendor/ability'/path).read_bytes()
     if hashlib.sha256(body).hexdigest() != expected:
         raise SystemExit('canonical Ability integrity failure: '+path)
     files['vendor/ability/'+path] = body
 mcp_lock_path = root/'native/mcp-source.json'
-mcp_lock = json.loads(mcp_lock_path.read_text())
+mcp_lock = json.loads(mcp_lock_path.read_text(encoding="utf-8"))
 # Vendoring is a maintainer action from an exact reviewed Git revision only.
 if '--vendor-mcp' in sys.argv:
     source = root.parent/'mcp'
@@ -21,7 +21,7 @@ if '--vendor-mcp' in sys.argv:
         dest.parent.mkdir(parents=True,exist_ok=True)
         dest.write_bytes(body)
         mcp_lock['files'][path] = hashlib.sha256(body).hexdigest()
-    mcp_lock_path.write_text(json.dumps(mcp_lock,indent=2)+'\n')
+    mcp_lock_path.write_bytes((json.dumps(mcp_lock,indent=2)+'\n').encode('utf-8'))
 for path, expected in mcp_lock['files'].items():
     body = (root/'vendor/mcp'/path).read_bytes()
     if hashlib.sha256(body).hexdigest() != expected:
