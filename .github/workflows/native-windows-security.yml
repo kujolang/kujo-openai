@@ -16,7 +16,7 @@ jobs:
           cache: false
       - name: Exercise real Windows security descriptors and reparse points
         working-directory: native
-        run: go test -count=1 -v ./internal/windowstrust
+        run: go test -count=1 -v ./internal/windowstrust ./internal/receipts
       - name: Vet Windows security implementation
         working-directory: native
-        run: go vet ./internal/windowstrust
+        run: go vet ./internal/windowstrust ./internal/receipts

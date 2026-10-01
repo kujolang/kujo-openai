@@ -1,3 +1,5 @@
+//go:build !windows
+
 // Package receipts retains canonical bytes under content-addressed references.
 // Publication uses synced temporary files and atomic links, never partial writes
 // to a visible receipt name. Unsupported directory durability fails at startup.
