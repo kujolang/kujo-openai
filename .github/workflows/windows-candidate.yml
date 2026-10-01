@@ -1,9 +1,9 @@
-name: Windows candidate runtime contracts
+name: Windows published runtime contracts
 on: [push, pull_request]
 permissions:
   contents: read
 jobs:
-  candidate-review:
+  published-review:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -11,23 +11,6 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with:
-          repository: kujolang/kujo
-          ref: 8c561cacdcb132faa310df2b81f56c27ff4537df
-          path: .local/runtime-source
-      - name: Build pinned candidate (not a published runtime acceptance)
-        shell: pwsh
-        run: |
-          if (-not $env:VCPKG_INSTALLATION_ROOT) { $env:VCPKG_INSTALLATION_ROOT = "C:\vcpkg" }
-          vcpkg install openssl:x64-windows-static-md
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          $env:VCPKG_ROOT = $env:VCPKG_INSTALLATION_ROOT
-          $env:VCPKG_DEFAULT_TRIPLET = "x64-windows-static-md"
-          $env:OPENSSL_DIR = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows-static-md"
-          cargo build --locked --manifest-path .local/runtime-source/Cargo.toml --bin kujo
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          "KUJO_BIN=$pwd\.local\runtime-source\target\debug\kujo.exe" | Out-File -FilePath $env:GITHUB_ENV -Append
       - run: npm ci --ignore-scripts
       - name: Adapter cancellation through the native Windows job
         run: node --test tests/process-cancellation.test.mjs
