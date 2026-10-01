@@ -1,8 +1,8 @@
 // Networked clean-install acceptance: no ecosystem checkout or KUJO_BIN required.
 import assert from 'node:assert/strict';
-import {mkdtemp,mkdir,writeFile,rm,realpath} from 'node:fs/promises';
+import {mkdtemp,mkdir,writeFile,rm,realpath,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
-import {join,resolve} from 'node:path';
+import {join,resolve,delimiter} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {Client} from '@modelcontextprotocol/sdk/client/index.js';
@@ -23,6 +23,12 @@ try {
  const setupModule=pathToFileURL(resolve(entry,'../../lib/setup.mjs')).href;
  const initialScript=`import {setupLocal} from ${JSON.stringify(setupModule)}; console.log(JSON.stringify(await setupLocal({repository:process.argv[1]})));`;
  const first=JSON.parse(execFileSync(process.execPath,['--input-type=module','-e',initialScript,repository],{cwd:repository,env,encoding:'utf8',timeout:600000})),second=setup();assert.equal(first.config,second.config);assert.equal(first.repository,await realpath(repository));
+ const configuration=JSON.parse(await readFile(first.config,'utf8'));
+ // Direct read-only provider probe preserves native diagnostics for this fixture.
+ execFileSync(configuration.kujo,['run',configuration.entry,'--untrusted',...configuration.capabilities],{
+  cwd:configuration.cwd,env:{PATH:process.env.PATH,KUJO_MODULE_PATH:configuration.modulePaths.join(delimiter)},
+  input:JSON.stringify({operation:'discover'}),encoding:'utf8',timeout:60000
+ });
  await mkdir(join(repository,'nested'));
  const catalog=JSON.parse(execFileSync(process.execPath,[entry,'catalog'],{cwd:join(repository,'nested'),env,encoding:'utf8'}));assert.equal(catalog.tools.length,3);
  client=new Client({name:'kujo-clean-install-acceptance',version:'1.0.0'});
