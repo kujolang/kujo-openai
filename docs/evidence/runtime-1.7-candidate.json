@@ -1,0 +1,159 @@
+{
+  "schema": "kujo.openai.versioned-runtime-evidence/v1",
+  "observed_at": "2026-10-01",
+  "runtime_version": "1.7.0",
+  "runtime_commit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+  "pull_request": "https://github.com/kujolang/kujo/pull/17",
+  "workflow": "https://github.com/kujolang/kujo/actions/runs/36817611559",
+  "release_gate": {
+    "job_id": 110225999097,
+    "conclusion": "success",
+    "cargo_test": {
+      "targets": 98,
+      "passed": 2891,
+      "failed": 0,
+      "ignored": 17
+    },
+    "candidate_identity_contract": "passed",
+    "fixture_runs": [
+      {
+        "passed": 150,
+        "failed": 0,
+        "skipped": 11
+      },
+      {
+        "passed": 150,
+        "failed": 0,
+        "skipped": 11
+      }
+    ],
+    "optional_audit_tools": "cargo-audit and cargo-deny absent; skipped, not audited",
+    "log_sha256": "248219be5aba627787e3e915b35c918e439256b80f4992914e85e22f02a88acf"
+  },
+  "native_artifact_jobs": {
+    "windows-x64": 110229780370,
+    "linux-arm64": 110229780371,
+    "macos-x64": 110229780398,
+    "linux-x64": 110229780420,
+    "macos-arm64": 110229780479
+  },
+  "remaining": [
+    "Publication requires explicit release authorization, then published-package verification and adapter dependency update.",
+    "Public ChatGPT local installation support remains a separate host requirement."
+  ],
+  "pull_request_checks": {
+    "passed": 25,
+    "failed": 0,
+    "pending": 0,
+    "log_sha256": "ce15d91f5b17897098bf5caeac995745588a746ddad11eb4aecb8788fc3b8096"
+  },
+  "completed_artifacts": [
+    {
+      "artifact_id": 11143175967,
+      "job_id": 110229780371,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "linux-arm64",
+        "sha256": "b6904478f5abba3afacac2d6ab19819e51808c79ff79f0b2a94afce567814363"
+      },
+      "archive_sha256": "ac0cc908348e7f8f5621e1afb0c37bc171d9cabd409bc4f4ebdf0ba7df02464b",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11142699629,
+      "job_id": 110229780420,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "linux-x64",
+        "sha256": "fda5d00274aafc1a76d5e02faa792836e99babfac1c407c1b66e568f0a9ed2b0"
+      },
+      "archive_sha256": "1b053d0d4f216e0344518520d2c8f0e960651ae6ff605993f4d49f89d5866751",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11143226291,
+      "job_id": 110229780479,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "darwin-arm64",
+        "sha256": "77582d08d638f8ed346b8787126d75ee9b9cce07efe572d73333e6a8361fc48f"
+      },
+      "archive_sha256": "eaafc24d19f148bae1a78ad6ed71aca072faf8610c10661c84e9ab0ae734ada5",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11143966834,
+      "job_id": 110229780370,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "win32-x64",
+        "sha256": "dbc6ba84026d88e993f78978c682e3dfa0116c30d38513c19c522f540f858428"
+      },
+      "archive_sha256": "018a91174afe6be005699df96e37ceec1346a06c15ce59de175fc8afc10bca81",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    },
+    {
+      "artifact_id": 11143347713,
+      "job_id": 110229780398,
+      "metadata": {
+        "runtimeVersion": "1.7.0",
+        "gitCommit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+        "target": "darwin-x64",
+        "sha256": "f185457baa5aca7ac44081dad978a3a876b0f95dca3390f5b1f586a05164345e"
+      },
+      "archive_sha256": "af14877128946c2fa8f45676b5029d1c09aa24bc087cdbd57b1806799e7507ab",
+      "native_npm_binary_match": true,
+      "lifecycle_scripts_absent": true,
+      "native_version_hello_lsp_smoke": "passed"
+    }
+  ],
+  "neutral_runtime": {
+    "artifact_id": 11143473940,
+    "package": "@kujolang/kujo-runtime",
+    "version": "1.7.0",
+    "sha256": "f008f6ee55ed70783e91b3f8223f934a711f7c7356ed940bcdab13cd2a281e5d",
+    "optional_dependency_versions": "1.7.0",
+    "lifecycle_scripts_absent": true,
+    "source_packed_contents_match": true
+  },
+  "workflow_conclusion": "success",
+  "publication_jobs": "skipped",
+  "installed_candidate_acceptance": {
+    "workflow": "https://github.com/kujolang/kujo-openai/actions/runs/36822256533",
+    "adapter_commit": "3d9f081bd731f9ae800544894eb93470f37d9201",
+    "conclusion": "success",
+    "jobs": {
+      "linux-x64": 110240192878,
+      "darwin-x64": 110240192883,
+      "darwin-arm64": 110240192889,
+      "linux-arm64": 110240192901,
+      "win32-x64": 110240192962
+    },
+    "per_platform": {
+      "canonical_tool_executions_passed": 3,
+      "exact_receipt_lookups": "passed",
+      "fresh_repeat_setup_and_nested_discovery": "passed",
+      "lifecycle_scripts": "disabled"
+    },
+    "log_sha256": "bce512854ea3f92096b06d83c65201d51b81b61b879a5752158cf6d0bd676646"
+  },
+  "local_installed_candidate": {
+    "target": "darwin-x64",
+    "platform_artifact_id": 11143347713,
+    "neutral_artifact_id": 11143473940,
+    "result": "passed: fresh/repeat setup, nested discovery, three canonical tools and exact receipts",
+    "log_sha256": "fe431356ccbf2f7ce416d79577b78e9f86fd15651a97c4a5923526ae68ee2f2d"
+  }
+}

@@ -21,13 +21,13 @@ This release is a **single-operator local adapter**, not a sandbox or multi-user
 | Destruction / external effects | Conservative annotations and canonical policy; no unrestricted shell surface | An `allow` policy is application authority; verify it before exposing consequential abilities |
 | Malicious MCP client | Official SDK dispatch, strict framing, lifecycle checks, unknown tool denial | Local process launch credentials remain the host boundary |
 | Dependency compromise | Exact npm lock, vendor commit/checksums, minimal transport dependencies, integrity gate | Checksums do not replace trusted release provenance and review |
-| Cancellation / timeout | Kill local process group, return uncertainty, no retry | Detached children and already committed effects survive; use Workcell isolation for such workloads |
+| Cancellation / timeout | POSIX native cleanup signal then bounded group kill; uncertainty, no retry | Detached children and already committed effects can survive; Windows Kujo 1.7 child cleanup is exercised by native cancellation/timeout tests; externally isolate workloads requiring stronger containment |
 
 ## Authentication
 
 Stdio inherits the local operator's authority to start the configured process. It is not OAuth. The application supplies a fixed principal or independently authenticated context. Do not run the local provider behind a public HTTP proxy and call it multi-tenant.
 
-MCP annotations describe effects; they neither authorize execution nor replace canonical schema checks. Ability v1 lacks precise open-world and destructive/execute metadata; conservative annotations avoid claiming safety without evidence. Public submission remains gated on accurate reviewed semantics.
+MCP annotations describe effects; they neither authorize execution nor replace canonical schema checks. The vendored Ability definitions support explicit semantic metadata; the projection uses it when available and remains conservative when absent. No inference from names or descriptions grants authority.
 
 ## Secrets, audit and receipts
 
@@ -51,3 +51,35 @@ never downloads software or interprets repository files as installation authorit
 The package installation does not grant canonical execution approval. Protect the
 user data directory, package installation and source cache as trusted executable
 state. This is not protection against another process with the same user's rights.
+
+## Preinstalled-runtime preflight
+
+The native diagnostic is not an MCP server or sandbox. It locates an existing binary in the official user install directory, then absolute PATH entries, or an operator-supplied absolute path. It rejects the current/selected project and symlink targets inside those directories. On macOS/Linux it checks every lexical and resolved ancestor for owner and group/world write permissions; it does not accept a writable sticky directory. Windows ACL verification is not implemented and fails closed.
+
+Only fixed `--version` is executed, without a shell, from the installation directory. Environment is empty on POSIX, version stdout is capped at 4 KiB, stderr is discarded, and the probe has a three-second deadline. Reports omit executable/project paths and raw child errors. No download, scan, package manager, retry, telemetry or provider execution occurs.
+
+The local user and administrator remain trusted: this is not protection against same-user replacement between inspection and execution. POSIX ACL grants are not fully audited; require independently trusted installation directories. A malicious user-installed executable is arbitrary code: version probing is not a sandbox. Windows ACL support is an explicit native-product blocker.
+
+A host-selected folder is not automatically an OS sandbox. MCP roots and model-provided paths are not authorization evidence. Before the native product can ship, demonstrate host filesystem enforcement and bind the canonical provider to the selected root across restarts. The current developer adapter's operator configuration does not establish public ChatGPT folder isolation.
+
+## Experimental compiled MCP host
+
+The native executable now also accepts explicit `--serve-config` and `--project` flags. The configuration must be private, absolute and schema-valid; resolved config, code/import/CWD and receipt paths must be outside the selected project. This does not certify that the provider implements a project-scoped filesystem policy. It prevents repository content from becoming launcher code, not all filesystem access by a trusted provider.
+
+The provider runner strips ambient PATH and environment, sends only fixed capabilities and JSON data, and preserves uncertain completion on interruption. Stdio has a 1 MiB input frame, 4 MiB output frame and 32-pending-request bound; notifications cannot be used to make untracked tool calls. The SDK handles protocol dispatch. Receipt files are atomically published only after file sync, then directory sync; `os.Root` confines file operations. Integrity and inode checks reject tampering and link replacement. Runtime discovery additionally compares filesystem identities to catch case aliases on case-insensitive volumes.
+
+The native host does not expose an approval issuer or shell tool. Resume-capable catalogs fail explicitly pending native recovery support. Windows remains blocked at the executable trust boundary; cross-compilation is not certification. The default packaged manifest is still the reference Node profile and must not be presented as this native implementation.
+
+## Native build security
+
+Native packages require Go 1.26.8, pinned in `native/go.mod` and CI. The
+packager rejects other compilers and records the actual compiler in provenance.
+Go and the vulnerability checker are maintainer tools, never end-user dependencies.
+The binary audit uses pinned govulncheck against macOS, Linux and Windows binaries
+on x64 and ARM64. A clean scan reflects the vulnerability database at scan time;
+it does not establish host isolation or publisher authenticity.
+
+The former Go 1.25.3 preview binaries contained affected standard-library symbols
+reported by the binary audit. Rebuild them with the patched toolchain before use.
+See [verification evidence](TESTING.md#native-toolchain-audit). No public release
+was published by this task.

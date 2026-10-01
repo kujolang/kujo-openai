@@ -1,0 +1,11 @@
+{
+  "schema": "kujo.ability-pack/v1",
+  "pack_id": "kujo.mcp.core",
+  "pack_version": "1.0.0",
+  "ability_contract": "1.0.1",
+  "description": "Bounded read-only repository profiling and generated-manifest validation for Kujo MCP.",
+  "definitions": ["kujo.mcp.repository.profile.json", "kujo.mcp.manifest.validate.json"],
+  "effects": ["read"],
+  "runtime": "runtime.kujo",
+  "publication_status": "repository-local"
+}

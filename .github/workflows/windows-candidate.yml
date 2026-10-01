@@ -1,0 +1,37 @@
+name: Windows published runtime contracts
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+jobs:
+  published-review:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Adapter cancellation through the native Windows job
+        run: node --test tests/process-cancellation.test.mjs
+      - name: Fetch pinned canonical products
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/kujolang/patchbrief.git .local/patchbrief
+          git -C .local/patchbrief checkout 0e8d6bd6fd226b09b807f8758ade08096c8b70f0
+          git clone https://github.com/kujolang/changebucket.git .local/changebucket
+          git -C .local/changebucket checkout 030eea63c60449f82c9ba2680227485d318fdb6d
+          git clone https://github.com/kujolang/shipcheck.git .local/shipcheck
+          git -C .local/shipcheck checkout 0a9f5795e9498f3698d5da6bb66642544251dd37
+      - name: Execute canonical review tools and preserve exact receipts over MCP
+        shell: pwsh
+        run: |
+          $env:KUJO_PATCHBRIEF_SOURCE = "$pwd\.local\patchbrief"
+          $env:KUJO_CHANGEBUCKET_SOURCE = "$pwd\.local\changebucket"
+          $env:KUJO_SHIPCHECK_SOURCE = "$pwd\.local\shipcheck"
+          $env:KUJO_REVIEW_RELEASE = "1"
+          npm run test:review

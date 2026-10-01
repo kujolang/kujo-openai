@@ -223,3 +223,184 @@ verification of all 18 vendored canonical files. Linux and macOS CI now run the
 same installed-distribution check independently. This proves npm installation,
 not OpenAI marketplace dependency resolution, automatic repository selection, or
 Windows containment; those remain separate acceptance requirements.
+
+### Windows installation probe — 2026-09-30
+
+Branch `codex/windows-install-acceptance` adds Windows to the installed-package
+matrix and canonicalizes Git-reported roots before comparison. Windows run
+36799379949 exposed Git rejecting Node's null-device path as a configuration
+file. Setup now creates an empty config file and hooks directory inside its
+owned lock instead. Run 36799778867 then passed initial and repeated provisioning
+with the official `kujo-win32-x64` runtime, but native discovery failed with
+`[KUJOVM001] [vm] Runtime Error: absolute executable required`.
+
+The pinned canonical `bindings/json_process.kujo` requires both executable and
+working directory to begin with `/`. This rejects Windows drive-qualified paths.
+The repair belongs in canonical Ability with host-neutral path validation and
+negative tests; the adapter must not patch its vendored semantics independently.
+Windows remains uncertified. Receipt durability, process-tree cancellation and
+the product bindings must also pass before Windows support can be claimed.
+The same run passed contracts (45s), macOS installed-package (18s), and Linux
+installed-package (19s). The overall run failed as expected from the Windows
+failure; it is not a passing release gate.
+
+### Browser release starter with unavailable tunnel — 2026-09-30
+
+Opened the installed 1.0.3 plugin's release-readiness starter and sent its natural
+language prompt in ChatGPT Work. Conversation:
+`6abdb643-4388-83ea-86bf-a0afcf8e8db9` (Check ship readiness).
+ChatGPT announced the ship-review Skill and attempted the three expected review
+tools. All failed with `McpServerError: Session terminated`. The final response
+said readiness was undetermined, identified unavailable evidence, and did not
+claim that tests ran or that the project could ship. No receipt was presented.
+The announcement is routing evidence, not proof of a Skill file-read event.
+
+The existing trusted local configuration still returned its canonical catalog.
+Both `/healthz` and `/readyz` on the tunnel client's recorded loopback endpoint
+returned connection refused. This establishes a stopped local connection at the
+time of the test; it does not invalidate earlier successful live invocations.
+Browser completion needs the user to restart their foreground tunnel and enter
+the credential locally. No credential was recovered or copied into this chat.
+Private screenshot: `.local/browser-tunnel-stopped.jpg`. Re-run this exact starter
+after reconnecting before claiming successful browser release composition.
+
+### Canonical path repair consumed without changing released-runtime behavior
+
+Ability PR #2 passed release verification and application-assurance CI
+(run 36800657436: verify 22s, application-assurance 33s), then merged as
+`bcbecb49b147023877e83d5f2ea647dfede030b5`. The adapter now vendors that exact
+commit. Its JSON process binding uses the pure native absolute-path predicate
+when available and retains the original POSIX behavior on released Kujo 1.6.0.
+No definitions, schemas, effects or receipts changed.
+
+With this pin, local `npm run check` passed **36/36** tests and all 18 vendor
+integrity checks. `npm run test:install` passed isolated npm distribution setup,
+three canonical MCP calls and exact receipt lookups on macOS with released
+runtime 1.6.0. The new standalone receipt-storage test also checks reopening,
+content identity and tampering independently of Kujo execution; its OS matrix is
+pending. Kujo PR #14 adds the native predicate, but its cross-platform CI and
+release are still pending. This is not a Windows support claim.
+
+### Windows receipt storage rejects before execution — 2026-09-30
+
+Independent receipt-storage CI run 36801477359, Windows job 110176552000,
+failed at the parent-directory fsync with `EPERM`. Linux and macOS storage
+jobs passed. This is separate from the canonical native-path compatibility gap.
+The local store now probes directory durability during initialization, before
+MCP admission or provider discovery. Unsupported filesystems return the explicit
+`receipt_storage_durability_unavailable` startup error. Post-execution flush
+failures remain `receipt_persistence_failed` with uncertain completion.
+
+The Windows storage test now asserts this explicit pre-execution rejection;
+it does not skip storage checks or certify Windows support. The full Windows
+installed-package gate remains required and is expected to fail until native
+storage durability, runtime compatibility and containment are implemented.
+No directory flush was removed and no weaker storage guarantee was substituted.
+
+### SQLite native storage acceptance — 2026-09-30
+
+Commit cc51886 adds an equivalent receipt interface using Node bundled SQLite,
+without installation scripts or a native-addon dependency. CI 36802667616 passed
+storage on Linux, macOS and Windows (Windows job 110180229517), covering concurrent
+independent writers, immediate writer termination after commit, reopen, exact
+canonical JSON/hash identity, duplicate verification, tampering and symlink
+rejection. Node >=22.13 is now required for the bundled API without feature flags.
+
+Windows now selects SQLite automatically; POSIX keeps existing receipt files.
+The file-store preflight remains intact and its Windows rejection stays tested.
+The SQLite backend uses native transactional flush/locking with EXTRA synchronous
+mode. This resolves the reproduced storage mechanism gap, not the separate
+released-runtime and process-containment gaps. Full Windows installation must
+still pass before claiming platform support. Earlier Windows fsync failures above
+remain historical evidence, not the current storage-selection behavior.
+
+### Native subprocess cancellation — 2026-09-30
+
+A real Kujo `spawn_process` fixture reproduced a POSIX orphan: the adapter's
+immediate SIGKILL bypassed Kujo's existing cancellation handler, while the native
+subprocess lived in a separate session. The pre-fix test failed because that
+subprocess was still alive after the host returned cancellation.
+
+The adapter now sends SIGTERM first, allowing canonical native cleanup, then
+forces the provider group down after 500 ms and closes retained pipes. Native
+subprocess death is asserted before cancellation resolves. A second real-runtime
+fixture installs the native handler and enters a busy loop; the forced-stop
+fallback must bound the host response. Neither path reports successful execution
+or retries. This is verified POSIX cleanup, not a sandbox or a Windows job-object
+claim. Deliberately detached descendants remain outside the local guarantee.
+
+### Candidate npm artifact acceptance
+
+The initial `runtime-artifact-candidate.yml` cohort installed optimized npm
+tarballs produced by runtime rehearsal [36811793883](https://github.com/kujolang/kujo/actions/runs/36811793883)
+on all five native targets. It first requires a successful manual workflow at
+source `9fbad956eecd37448d6dc2f3568105cd1da7b0b0`. The isolated consumer installs
+both runtime packages and the adapter with lifecycle scripts disabled. Before
+executing Kujo, the test checks the installed binary's source commit, platform,
+version, and SHA-256 against its metadata. It then exercises the real canonical
+review tools and receipts through the installed adapter.
+
+For a local rehearsal, pass absolute `.tgz` paths in
+`KUJO_TEST_RUNTIME_TARBALL` and `KUJO_TEST_PLATFORM_TARBALL`, together with the
+exact 40-character `KUJO_TEST_RUNTIME_COMMIT`, to `npm run test:install`.
+Incomplete inputs fail closed. With all three variables absent, the test uses
+the declared registry dependency as before. Provenance and digest rejection
+contracts run in the normal unit suite.
+
+This opt-in is test-only. Candidate results do not establish published-package
+acceptance, public ChatGPT installation, or authorization to publish a runtime.
+The rehearsal packages retain version 1.6.0 and must never replace that existing
+registry release. Record workflow results separately after they complete.
+
+On 2026-10-01, the optimized Intel Mac platform artifact passed this isolated
+install test with a neutral runtime package packed locally from the same exact
+source commit: fresh setup, repeat setup, nested project discovery, three real
+canonical MCP executions, and exact receipt lookups. Native/npm binary identity,
+metadata and checksums were also verified for both Linux and both macOS targets.
+Windows and the CI-produced neutral package remained pending at that observation.
+See [the artifact evidence](evidence/runtime-artifact-candidate.json).
+The five-platform CI acceptance run is
+[36816195097](https://github.com/kujolang/kujo-openai/actions/runs/36816195097);
+its result must be checked before claiming that milestone.
+
+The rehearsal subsequently completed successfully on all five native targets,
+including Windows, and its neutral npm package passed. Publication steps were
+skipped. Acceptance run 36816195097 then passed **all five installed-candidate
+jobs**: each verified source/binary provenance and ran fresh setup, repeat setup,
+nested discovery, three canonical tools and exact receipt lookups with install
+scripts disabled. The downloaded Windows binary matched its native archive and
+npm package; the CI neutral tarball matched the exact-source local pack's file
+contents. The local Intel Mac install also passed using both CI-produced packages.
+The evidence JSON records every artifact, job ID and binary digest. This closes
+candidate distribution acceptance, not registry publication or host installation.
+
+Candidate mode uses a root-only npm override to bind the adapter's runtime to the
+explicit candidate tarball, including a version newer than the production pin.
+The test asserts the packed adapter dependency declarations remain unchanged and
+rejects mixed resolver/binary versions before execution. This follows npm's
+[documented root overrides and direct-dependency references](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#overrides)
+(accessed 2026-10-01). The override exists only in the disposable test consumer;
+default registry acceptance uses no override. A negative local integration with
+the real 1.7.0 resolver package and 1.6.0 native artifact correctly failed the
+version check before setup or tool execution.
+
+### Versioned 1.7.0 candidate acceptance
+
+The workflow now pins runtime commit `f68750b368e6ebaf4dcaf588b4984651bb4d9670`
+and successful rehearsal
+[36817611559](https://github.com/kujolang/kujo/actions/runs/36817611559).
+All five native artifacts and the neutral npm package are version 1.7.0.
+Native version/hello/LSP smoke checks passed; downloaded archives and npm binaries
+matched, with source, platform, version and digest verification before execution.
+Publication jobs were skipped.
+
+Adapter acceptance [36822256533](https://github.com/kujolang/kujo-openai/actions/runs/36822256533)
+at `3d9f081bd731f9ae800544894eb93470f37d9201` passed on Linux x64/arm64,
+macOS x64/arm64 and Windows x64. Each lifecycle-disabled isolated installation
+performed fresh/repeat setup, nested repository discovery, three real canonical
+tool executions and exact receipt lookups. The local Intel Mac test also passed
+using the same CI-produced neutral and native packages. See the
+[versioned evidence](evidence/runtime-1.7-candidate.json) for jobs, artifacts and
+digests. The production dependency remains 1.6.0 until an authorized 1.7.0
+publication and separate registry-based acceptance; no public ChatGPT local
+installation guarantee follows from these candidate tests.

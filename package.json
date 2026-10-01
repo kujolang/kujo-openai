@@ -5,7 +5,7 @@
   "type": "module",
   "license": "MIT",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "bin": {
     "kujo-openai": "bin/kujo-openai.mjs",
@@ -31,7 +31,13 @@
     ".mcp.json",
     "CHANGELOG.md",
     "scripts/configure-review-pack.mjs",
-    "assets"
+    "assets",
+    "INSTALL.md",
+    "PRIVACY.md",
+    "SUPPORT.md",
+    "TESTING.md",
+    "OPENAI_LOCAL_MCP_APPROVAL.md",
+    "native/README.md"
   ],
   "scripts": {
     "test": "node --test tests/*.test.mjs",
@@ -41,14 +47,17 @@
     "test:integration": "node tests/integration.mjs",
     "test:review": "node tests/review-integration.mjs",
     "test:setup": "node tests/setup-integration.mjs",
-    "test:install": "node tests/package-install-integration.mjs"
+    "test:install": "node tests/package-install-integration.mjs",
+    "test:sandbox": "node tests/sandbox-install.mjs",
+    "check:submission": "node scripts/check-submission.mjs",
+    "package:submission": "node scripts/package.mjs --submission"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/kujolang/kujo-openai.git"
   },
   "dependencies": {
-    "@kujolang/kujo-runtime": "1.6.0",
+    "@kujolang/kujo-runtime": "1.7.0",
     "@modelcontextprotocol/sdk": "1.31.0",
     "ajv": "8.20.0"
   }

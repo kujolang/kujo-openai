@@ -1,0 +1,23 @@
+{
+  "schema": "kujo.ability/v1",
+  "id": "kujo.mcp.repository.profile",
+  "version": "1.0.0",
+  "description": "Inspect a bounded repository and return a redacted MCP-generation profile summary.",
+  "input_schema": { "type": "object", "properties": {}, "additionalProperties": false },
+  "output_schema": {
+    "type": "object",
+    "required": ["repo_name", "detected_languages", "package_manager", "files_scanned", "safe_operation_count", "risky_operation_count", "sensitive_path_count"],
+    "properties": {
+      "repo_name": { "type": "string" },
+      "detected_languages": { "type": "array", "maxItems": 64, "items": { "type": "string" } },
+      "package_manager": { "type": "string" },
+      "files_scanned": { "type": "integer", "minimum": 0, "maximum": 4000 },
+      "safe_operation_count": { "type": "integer", "minimum": 0 },
+      "risky_operation_count": { "type": "integer", "minimum": 0 },
+      "sensitive_path_count": { "type": "integer", "minimum": 0 }
+    },
+    "additionalProperties": false
+  },
+  "effects": [{ "kind": "read", "resource": "kujo.mcp.repository-profile" }],
+  "idempotency": { "mode": "intrinsic" }
+}

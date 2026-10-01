@@ -1,0 +1,16 @@
+{
+  "repository": "https://github.com/kujolang/mcp",
+  "commit": "e02905d4d587a099529b4f4e1ade61060a0c7f94",
+  "files": {
+    "LICENSE": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+    "packs/mcp_core/runtime.kujo": "1747f3998d3cd2571bbba156d07f3980058af49e07fc62b12b6597d0ed02718a",
+    "packs/mcp_core/pack.json": "d51f8bc0678d24e01a55de97acca6b80d41b5cc39ddd87c0b2f169509cb3ead0",
+    "packs/mcp_core/kujo.mcp.repository.profile.json": "9642790f267d62c74353d0c2744496e04b1f7168966c9fb46e20ff0afaf02deb",
+    "packs/mcp_core/kujo.mcp.manifest.validate.json": "b36cf7efc4fa1992e591e44302043670b0c81efbef7b0797d7827f412ab0cdc8",
+    "src/make/analyze_repo.kujo": "b97efdf3cb110c4849d9e46d8cc88f3f5b07453c7e7bd21e380b92884956fcd1",
+    "src/make/common.kujo": "b6a25ed2cb8dda9f0aab6cc1a1b9a0fb8b93a33200a052d5ac983ed8c50a12a2",
+    "src/make/safety.kujo": "cb178bb5eddeaba57276ba1e158064c2c6b5cbbc086a1b203bbf747081736698",
+    "src/make/schemas.kujo": "555d3b231728aa74e353ddc3b13f8877b4a4a4c76aa868d7cf16a6a8695a18d1",
+    "src/core/framework.kujo": "255882bbc72d4f93e5513114e9c5bf63e18d040d771f9c3f02f850e0d25ca1c3"
+  }
+}

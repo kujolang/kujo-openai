@@ -1,89 +1,21 @@
 # Kujo OpenAI
 
-Expose registered **Kujo Abilities** to OpenAI hosts through MCP. Ability owns identity, schemas, effects, handlers, authority and receipts. This adapter owns projection and transport. Clarity. Context. Control.
+**Requires Kujo installed locally. Native-only public plugin: BLOCKED.**
 
-**0.1.0 is a tested local infrastructure milestone, not a public hosted service or a completed ecosystem review product.** Reference integrations run the canonical MCP core pack or Ability’s trusted-local repository-review pack (real PatchBrief, ChangeBucket and optional ShipCheck). Product handlers and contracts live in Ability; this adapter contains no product command wrappers. Scout, Scent and Eval remain unavailable unless registered by an application. Workflows report missing registrations. An embeddable remote OAuth resource-server boundary is tested; its live issuer, isolated provider, ChatGPT acceptance and public submission remain deployment gates.
+Kujo Ability remains the source of truth for identities, schemas, effects, authority, execution and receipts. This repository projects those contracts into MCP tools without product-specific OpenAI wrappers.
 
-```text
-Application-owned Ability registry + policy + stores
-                ↓
-    native Kujo host projection
-                ↓
-   bounded process / official MCP SDK
-                ↓
- local Codex MCP or ChatGPT Secure MCP Tunnel
-```
+The selected product flow is: install Kujo yourself → install the plugin on a supported local client → select a project → run authorized Kujo tools. The plugin must not install software or require Node, npm, Git, GitHub, credentials, tunnels or hosting. Web/mobile local filesystem access is not claimed.
 
-## Install and verify
+That flow is **not implemented end to end yet**. An [experimental compiled native host](native/README.md) now runs canonical Kujo providers over bounded stdio without Node/Git and preserves durable receipts. Kujo itself still exposes `mcp make`, not a stdio server: the compiled adapter invokes the real `kujo run` provider contract. The default plugin manifest remains the legacy Node profile. Native distribution, Windows boundaries and public local-MCP approval remain separate gaps.
 
-Requires Node 22+ and Git. npm installs the pinned Kujo 1.6.0 platform runtime automatically; no separate Kujo installation is needed. macOS/Linux execution is tested. Windows hard process-tree cancellation is not certified. No API key is needed for offline verification.
+## What works today
 
-```sh
-npm ci
-npm run check
-```
+- Existing development adapter: generic Ability projection, canonical policy, bounded MCP transport and durable receipts. Its Node/Git requirements remain explicit in [developer instructions](docs/LEGACY-DEVELOPMENT.md).
+- Native host: bundled canonical read-only project profiling and manifest validation, optional trusted provider configuration, canonical calls/receipts and bounded stdio. Its runtime diagnostic also handles missing/outdated installations. Build-time Go is not an end-user prerequisite. See the [native setup and limitations](native/README.md).
+- Submission guard: `npm run check:submission` and `npm run package:submission` fail closed while native acceptance and public host support remain unverified. Ordinary `npm run package` still produces a legacy development archive, not a submission.
 
-The canonical Ability runtime is vendored unchanged at a reviewed commit with SHA-256 verification. `npm run verify:vendor` checks every pinned file. Node handles protocol and process lifetime only; execution uses Kujo.
+## Read next
 
-## Set up local repository review
+[Install and use](INSTALL.md) · [Runtime contract](docs/PREINSTALLED-RUNTIME.md) · [Tests](TESTING.md) · [Security](SECURITY.md) · [Privacy](PRIVACY.md) · [Support](SUPPORT.md) · [Submission checklist](docs/PREINSTALLED-SUBMISSION.md) · [OpenAI question](OPENAI_LOCAL_MCP_APPROVAL.md)
 
-From this checkout, after `npm ci`:
-
-```sh
-node bin/kujo-openai.mjs setup /path/to/your/repository
-```
-
-Setup acquires the pinned canonical review-tool sources, uses the bundled native
-runtime and stores configuration privately under your user data directory. It
-requires no Kujo account, API key, sibling ecosystem checkouts or environment
-variable editing. Once provisioned, launch the plugin's local MCP server with that
-repository (or a child directory) as its working directory. It discovers the
-saved configuration and exposes PatchBrief, ChangeBucket and ShipCheck through
-Ability. Other application registries still use explicit trusted configuration.
-
-This removes manual provisioning for the local review pack; it is **not yet a
-one-click public-directory installation**. Browser ChatGPT still needs a supported
-connection to the local machine. The public-directory/local bootstrap integration
-and Windows containment remain unverified. `npm run test:setup` exercises fresh
-source acquisition and real MCP calls without a preinstalled Kujo binary.
-
-## Run a real canonical pack
-
-Obtain the MCP repository at the revision recorded in `docs/research-revisions.json`, then:
-
-```sh
-node scripts/configure-mcp-pack.mjs /absolute/path/to/mcp
-export KUJO_OPENAI_CONFIG="$PWD/.local/mcp-core/config.json"
-node bin/kujo-openai.mjs catalog
-node bin/kujo-openai.mjs serve
-```
-
-The configuration command writes only this adapter's ignored `.local/mcp-core` directory. It verifies the MCP source revision and relevant tracked files. It does not modify the MCP checkout or install a plugin into your profile. The reference pack profiles that configured MCP checkout and validates contained generated manifests; it is not an arbitrary-repository reviewer.
-
-Set `KUJO_MCP_SOURCE` for `npm run test:integration`. That integration runs the actual canonical handlers, tests success and malicious paths, compares schemas, and records evidence.
-
-## Connect a host
-
-For Codex, register the absolute Node launcher as a stdio MCP command and pass `KUJO_OPENAI_CONFIG` through the host's trusted environment. Or use this repository's portable plugin after installing its dependencies. Installation does not configure your application automatically.
-
-For ChatGPT, use the current [Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels) path for a private stdio server, then connect it in developer mode. This requires your account's tunnel credentials and workspace association. A local stdio launch is not proof that the ChatGPT connection works. See [setup](docs/SETUP.md).
-
-Public plugins need a stable HTTPS Streamable HTTP endpoint and appropriate user authentication. This repository does not open a public listener or ship a shared-user execution service.
-
-## Extend
-
-Register a definition, binding and enabled `mcp` exposure in your application registry. Import `discover` and `invoke` from this adapter's `openai.kujo`, provide server-owned visibility/context/services, and use the provider contract in [extension guide](docs/EXTENDING.md). A newly registered compatible Ability appears without editing the OpenAI adapter. There is no product switch or generic arbitrary-payload public tool.
-
-## Documentation
-
-- [Research and official sources](docs/RESEARCH.md)
-- [Architecture, projection and receipts](docs/ARCHITECTURE.md)
-- [Local and ChatGPT setup](docs/SETUP.md)
-- [Adding Abilities](docs/EXTENDING.md)
-- [Security and trust boundaries](SECURITY.md)
-- [Remote architecture and OAuth](docs/REMOTE.md)
-- [Skills and acceptance cases](docs/ACCEPTANCE.md)
-- [Packaging and submission](docs/SUBMISSION.md)
-- [Milestone evidence and limitations](docs/MILESTONES.md)
-
-MIT. Source and support: [kujolang/kujo-openai](https://github.com/kujolang/kujo-openai).
+No release was published, submission made, or support request sent. Historical hosted, bootstrap and tunnel documents are not the current product plan.

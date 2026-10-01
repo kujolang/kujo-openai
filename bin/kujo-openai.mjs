@@ -21,6 +21,6 @@ try {
  else {throw new Error('unsupported_command');}
  }
 } catch(error) {
- const messages={project_setup_required:'Run kujo-openai setup once from the repository you want to use.',required_executable_unavailable:'Git must be installed and available on PATH.',setup_in_progress_or_stale_lock:'Another setup is running, or an interrupted setup left a lock. Inspect the Kujo data directory before removing that lock.'};
+ const messages={receipt_storage_durability_unavailable:'This filesystem cannot provide the required durable receipt storage; no Ability was executed.',project_setup_required:'Run kujo-openai setup once from the repository you want to use.',required_executable_unavailable:'Git must be installed and available on PATH.',setup_in_progress_or_stale_lock:'Another setup is running, or an interrupted setup left a lock. Inspect the Kujo data directory before removing that lock.'};
  process.stderr.write((messages[error.message]||'Kujo OpenAI failed; verify the trusted installation and configuration.')+'\n');process.exitCode=1;
 }

@@ -1,0 +1,95 @@
+from ability import ABILITY_BINDING_SCHEMA_ID, ABILITY_EXPOSURE_SCHEMA_ID, ABILITY_INVOCATION_SCHEMA_ID, create_ability_registry, register_ability_definition, register_ability_binding, register_ability_exposure, execute_ability
+from src.make.analyze_repo import analyze_repository
+from src.make.schemas import validate_manifest_contract
+
+func failure(code, message, details) { return {"ok": false, "status": 422, "code": code, "message": message, "details": details} }
+
+func safe_relative_path(value) {
+	raw := trim(to_string(value))
+	if raw == "" || len(raw) > 1024 || starts_with(raw, "/") || contains(raw, "\\") || contains(raw, ":") { return false }
+	for part in split(raw, "/") { if part == "" || part == "." || part == ".." { return false } }
+	return true
+}
+
+func profile_repository(root) {
+	analysis := analyze_repository(root, true)
+	if analysis["ok"] == false { return failure("mcp_repository_profile_failed", "Repository could not be profiled safely", {}) }
+	profile := analysis["profile"]
+	return {"ok": true, "result": {
+		"repo_name": profile["repo_name"],
+		"detected_languages": profile["detected_languages"],
+		"package_manager": profile["package_manager"],
+		"files_scanned": profile["analysis_limits"]["files_scanned"],
+		"safe_operation_count": len(profile["safe_operations"]),
+		"risky_operation_count": len(profile["risky_operations"]),
+		"sensitive_path_count": len(profile["sensitive_paths_detected"])
+	}}
+}
+
+func validate_manifest(root, input) {
+	relative := trim(to_string(input["manifest"]))
+	if safe_relative_path(relative) == false { return failure("invalid_manifest_path", "manifest must be a contained relative path", {}) }
+	if path_is_symlink(root) == true { return failure("manifest_read_rejected", "MCP repository root must not be a symbolic link", {}) }
+	cursor := root
+	for part in split(relative, "/") {
+		cursor = path_join(cursor, part)
+		if path_is_symlink(cursor) == true { return failure("manifest_read_rejected", "MCP manifest path must not traverse symbolic links", {}) }
+	}
+	if path_is_file(cursor) == false { return failure("manifest_not_found", "MCP manifest was not found", {}) }
+	if file_size(cursor) > 1048576 { return failure("manifest_too_large", "MCP manifest exceeds 1 MiB", {}) }
+	raw := read_file(cursor)
+	manifest := null
+	parse_error := null
+	try { manifest = parse_json(raw) } except e { parse_error = e }
+	if type(parse_error) != "null" || type(manifest) != "dict" { return failure("invalid_manifest_json", "MCP manifest must contain a JSON object", {}) }
+	result := null
+	validation_error := null
+	try { result = validate_manifest_contract(manifest) } except e { validation_error = e }
+	if type(validation_error) != "null" || type(result) != "dict" { return failure("invalid_manifest_contract", "MCP manifest contract validation failed closed", {}) }
+	if len(result["errors"]) > 200 { return failure("manifest_error_limit", "MCP manifest produced too many validation errors", {}) }
+	return {"ok": true, "result": result}
+}
+
+func handler_for(definition, root) {
+	if definition["id"] == "kujo.mcp.repository.profile" { return func(input, context) { return profile_repository(root) } }
+	if definition["id"] == "kujo.mcp.manifest.validate" { return func(input, context) { return validate_manifest(root, input) } }
+	return func(input, context) { return failure("mcp_pack_handler_missing", "MCP Ability handler is not implemented", {}) }
+}
+
+// Source definitions are trusted installed code; project contents never select
+// handlers or definitions. Hosts choose the project outside model tool input.
+export create_mcp_core_ability_registry_for_project := func(source_input, project_input) {
+ source := trim(to_string(source_input))
+ root := trim(to_string(project_input))
+ if source == "" || path_is_dir(source) == false { return failure("invalid_mcp_root", "MCP source must be an existing directory", {}) }
+ if root == "" || path_is_dir(root) == false || path_is_symlink(root) { return failure("invalid_project_root", "Project root must be an existing non-symlink directory", {}) }
+	registry := create_ability_registry()
+	for file in ["kujo.mcp.repository.profile.json", "kujo.mcp.manifest.validate.json"] {
+		definition := parse_json(read_file(path_join(path_join(source, "packs/mcp_core"), file)))
+		step := register_ability_definition(registry, definition)
+		if step["ok"] == false { return step }
+		registry = step["registry"]
+		step = register_ability_binding(registry, {"schema": ABILITY_BINDING_SCHEMA_ID, "ability_id": definition["id"], "ability_version": definition["version"], "handler_id": definition["id"] + ".local", "handler_version": "1.0.0", "handler": handler_for(definition, root), "result_mode": "kujo.result/v1", "timeout_ms": 120000, "metadata": {"pack": "kujo.mcp.core"}})
+		if step["ok"] == false { return step }
+		registry = step["registry"]
+		step = register_ability_exposure(registry, {"schema": ABILITY_EXPOSURE_SCHEMA_ID, "ability_id": definition["id"], "ability_version": definition["version"], "surface": "sdk", "name": definition["id"], "enabled": true, "public": false, "metadata": {"pack": "kujo.mcp.core"}})
+		if step["ok"] == false { return step }
+		registry = step["registry"]
+	}
+	return {"ok": true, "registry": registry}
+}
+
+// Preserve the original single-root API for existing consumers.
+export create_mcp_core_ability_registry := func(root_input) {
+ return create_mcp_core_ability_registry_for_project(root_input, root_input)
+}
+
+export make_mcp_core_invocation := func(definition, input, invocation_id) {
+	return {"schema": ABILITY_INVOCATION_SCHEMA_ID, "invocation_id": invocation_id, "ability_id": definition["id"], "ability_version": definition["version"], "definition_digest": "", "input": input, "principal": {"type": "workload", "id": "kujo-mcp-local", "tenant_id": "local", "claims": {}}, "request_id": invocation_id, "trace_id": invocation_id, "surface": "sdk", "idempotency_key": "", "approval": {}, "metadata": {"pack": "kujo.mcp.core"}}
+}
+
+export execute_mcp_core_ability := func(registry, invocation, services) { return execute_ability(registry, invocation, services) }
+
+export mcp_core_policy := func(definition, invocation, exposure) {
+	return {"schema": "kujo.ability.policy-decision/v1", "decision_id": "mcp-core-local-read", "outcome": "allow", "reason": "Bounded repository metadata and manifest validation reads are allowed.", "requirements": [], "policy_id": "kujo.mcp.core.local", "policy_version": "1.0.0"}
+}

@@ -1,8 +1,10 @@
+> Historical development evidence/design. Superseded for the product plan by [preinstalled runtime](PREINSTALLED-RUNTIME.md) and [current submission checklist](PREINSTALLED-SUBMISSION.md). Do not use bootstrap, tunnel or hosted instructions as the selected install flow.
+
 # Local setup and ChatGPT validation
 
 ## Trusted local application
 
-1. Install Node 22+ and Git. npm installs the pinned Kujo 1.6.0 native runtime.
+1. Install Node 22.13+ and Git. npm installs the pinned Kujo 1.7.0 native runtime.
 2. Clone this repository and run `npm ci && npm run check`.
 3. Configure an application using `examples/operator-config.json`. All executable, source, working-directory and state paths must be absolute. Keep this file and its application code outside untrusted repositories.
 4. Implement the application provider contract in [EXTENDING](EXTENDING.md). Supply only necessary runtime capabilities. Kujo capability flags are not path-specific sandboxing.
@@ -37,7 +39,7 @@ The installed Codex CLI 0.144.4 required the supported `.codex-plugin/plugin.jso
 
 ## Trusted local change review
 
-Use Ability's canonical repository-review pack to expose actual PatchBrief and ChangeBucket tools. Obtain clean source checkouts at PatchBrief `a4da5942e9668924cd2f2869859bf05b006edda5` and ChangeBucket `030eea63c60449f82c9ba2680227485d318fdb6d` (siblings by default; override `KUJO_PATCHBRIEF_SOURCE` / `KUJO_CHANGEBUCKET_SOURCE`). From this adapter checkout:
+Use Ability's canonical repository-review pack to expose actual PatchBrief and ChangeBucket tools. Obtain clean source checkouts at PatchBrief `0e8d6bd6fd226b09b807f8758ade08096c8b70f0` and ChangeBucket `030eea63c60449f82c9ba2680227485d318fdb6d` (siblings by default; override `KUJO_PATCHBRIEF_SOURCE` / `KUJO_CHANGEBUCKET_SOURCE`). From this adapter checkout:
 
 ```sh
 KUJO_BIN=/absolute/path/to/kujo node scripts/configure-review-pack.mjs /absolute/trusted/repository
@@ -52,7 +54,7 @@ The test config points at a disposable repository after testing; rerun provision
 
 ## Release signals in the review pack
 
-To add canonical ShipCheck release metadata scanning, obtain its clean reviewed checkout at `111bfc83c832050877cb9d4fd82908aaf6d14749` (sibling `shipcheck`, or `KUJO_SHIPCHECK_SOURCE`) and provision with:
+To add canonical ShipCheck release metadata scanning, obtain its clean reviewed checkout at `0a9f5795e9498f3698d5da6bb66642544251dd37` (sibling `shipcheck`, or `KUJO_SHIPCHECK_SOURCE`) and provision with:
 
 ```sh
 KUJO_BIN=/absolute/path/to/kujo node scripts/configure-review-pack.mjs /absolute/trusted/repository --release-signals
@@ -130,7 +132,7 @@ operator override. The host must launch local MCP in the selected project; if it
 does not, use its supported project/configuration mechanism. Repository selection
 and host trust cannot be silently inferred from a web plugin installation.
 
-Supported runtime artifacts are determined by `@kujolang/kujo-runtime@1.6.0`.
+Supported runtime artifacts are determined by `@kujolang/kujo-runtime@1.7.0`.
 This does not certify every OS's process containment or the host's dependency
 installation behavior. The local ZIP contains the build machine's installed
 platform dependencies; use npm dependency resolution on the target platform,
