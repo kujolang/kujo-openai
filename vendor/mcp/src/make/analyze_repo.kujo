@@ -190,19 +190,19 @@ func is_ignored_dir(dir_name) {
 func detect_frameworks(target_abs, package_json) {
     frameworks := []
 
-    if file_exists(target_abs + "/next.config.js") || file_exists(target_abs + "/next.config.mjs") {
+    if file_exists(path_join(target_abs, "next.config.js")) || file_exists(path_join(target_abs, "next.config.mjs")) {
         frameworks := push_unique(frameworks, "Next.js")
     }
 
-    if file_exists(target_abs + "/vite.config.js") || file_exists(target_abs + "/vite.config.ts") {
+    if file_exists(path_join(target_abs, "vite.config.js")) || file_exists(path_join(target_abs, "vite.config.ts")) {
         frameworks := push_unique(frameworks, "Vite")
     }
 
-    if file_exists(target_abs + "/artisan") {
+    if file_exists(path_join(target_abs, "artisan")) {
         frameworks := push_unique(frameworks, "Laravel")
     }
 
-    if file_exists(target_abs + "/wp-config.php") {
+    if file_exists(path_join(target_abs, "wp-config.php")) {
         frameworks := push_unique(frameworks, "WordPress")
     }
 
@@ -261,25 +261,25 @@ func read_small_json(file_path, max_bytes) {
 }
 
 func detect_package_manager(target_abs) {
-    if file_exists(target_abs + "/pnpm-lock.yaml") {
+    if file_exists(path_join(target_abs, "pnpm-lock.yaml")) {
         return {"name": "pnpm", "install": "pnpm install", "runner": "pnpm"}
     }
-    if file_exists(target_abs + "/yarn.lock") {
+    if file_exists(path_join(target_abs, "yarn.lock")) {
         return {"name": "yarn", "install": "yarn install --frozen-lockfile", "runner": "yarn"}
     }
-    if file_exists(target_abs + "/package-lock.json") {
+    if file_exists(path_join(target_abs, "package-lock.json")) {
         return {"name": "npm", "install": "npm ci", "runner": "npm"}
     }
-    if file_exists(target_abs + "/package.json") {
+    if file_exists(path_join(target_abs, "package.json")) {
         return {"name": "npm", "install": "npm install", "runner": "npm"}
     }
-    if file_exists(target_abs + "/Cargo.toml") {
+    if file_exists(path_join(target_abs, "Cargo.toml")) {
         return {"name": "cargo", "install": "cargo fetch", "runner": "cargo"}
     }
-    if file_exists(target_abs + "/pyproject.toml") || file_exists(target_abs + "/requirements.txt") {
+    if file_exists(path_join(target_abs, "pyproject.toml")) || file_exists(path_join(target_abs, "requirements.txt")) {
         return {"name": "python", "install": "pip install -r requirements.txt", "runner": "python"}
     }
-    if file_exists(target_abs + "/go.mod") {
+    if file_exists(path_join(target_abs, "go.mod")) {
         return {"name": "go", "install": "go mod download", "runner": "go"}
     }
     return {"name": "unknown", "install": "", "runner": ""}
@@ -316,8 +316,11 @@ export func analyze_repository(target_repo_path, no_ai) {
 
     cwd_abs := path_absolute(".")
     relative_path := target_abs
-    if starts_with(target_abs, cwd_abs + "/") {
-        relative_path := substring(target_abs, len(cwd_abs) + 1, len(target_abs))
+    // Normalize separators only for display comparison, never filesystem access.
+    display_target := replace(target_abs, "\\", "/")
+    display_cwd := replace(cwd_abs, "\\", "/")
+    if starts_with(display_target, display_cwd + "/") {
+        relative_path := substring(display_target, len(display_cwd) + 1, len(display_target))
     }
 
     repo_name := basename(target_abs)
@@ -341,7 +344,7 @@ export func analyze_repository(target_repo_path, no_ai) {
     file_count := 0
     entry_count := 0
 
-    queue := [{"path": target_abs, "depth": 0}]
+    queue := [{"path": target_abs, "relative": "", "depth": 0}]
     queue_idx := 0
 
     while queue_idx < len(queue) {
@@ -364,10 +367,10 @@ export func analyze_repository(target_repo_path, no_ai) {
             entry_idx := entry_idx + 1
             entry_count := entry_count + 1
 
-            full := current_path + "/" + name
+            full := path_join(current_path, name)
             rel := name
-            if starts_with(full, target_abs + "/") {
-                rel := substring(full, len(target_abs) + 1, len(full))
+            if current["relative"] != "" {
+                rel := current["relative"] + "/" + name
             }
 
             is_link := path_is_symlink(full)
@@ -395,7 +398,7 @@ export func analyze_repository(target_repo_path, no_ai) {
                 }
 
                 if !is_ignored_dir(name) && current_depth < max_depth {
-                    queue := push(queue, {"path": full, "depth": current_depth + 1})
+                    queue := push(queue, {"path": full, "relative": rel, "depth": current_depth + 1})
                 }
             } else if !is_link {
                 file_count := file_count + 1
@@ -454,7 +457,7 @@ export func analyze_repository(target_repo_path, no_ai) {
 
     package_manager := detect_package_manager(target_abs)
     package_json := {}
-    package_json_result := read_small_json(target_abs + "/package.json", 1048576)
+    package_json_result := read_small_json(path_join(target_abs, "package.json"), 1048576)
     if package_json_result["ok"] {
         package_json := package_json_result["data"]
     }
@@ -495,13 +498,13 @@ export func analyze_repository(target_repo_path, no_ai) {
     }
 
     if likely_test == "" {
-        if file_exists(target_abs + "/Cargo.toml") {
+        if file_exists(path_join(target_abs, "Cargo.toml")) {
             likely_test := "cargo test"
         } else {
-            if file_exists(target_abs + "/pytest.ini") || file_exists(target_abs + "/pyproject.toml") || len(test_dirs) > 0 {
+            if file_exists(path_join(target_abs, "pytest.ini")) || file_exists(path_join(target_abs, "pyproject.toml")) || len(test_dirs) > 0 {
                 likely_test := "pytest"
             } else {
-                if file_exists(target_abs + "/go.mod") {
+                if file_exists(path_join(target_abs, "go.mod")) {
                     likely_test := "go test ./..."
                 }
             }
@@ -509,13 +512,13 @@ export func analyze_repository(target_repo_path, no_ai) {
     }
 
     if likely_lint == "" {
-        if file_exists(target_abs + "/Cargo.toml") {
+        if file_exists(path_join(target_abs, "Cargo.toml")) {
             likely_lint := "cargo clippy"
         } else {
-            if file_exists(target_abs + "/pyproject.toml") {
+            if file_exists(path_join(target_abs, "pyproject.toml")) {
                 likely_lint := "kujo check ."
             } else {
-                if file_exists(target_abs + "/go.mod") {
+                if file_exists(path_join(target_abs, "go.mod")) {
                     likely_lint := "go vet ./..."
                 }
             }
@@ -523,17 +526,17 @@ export func analyze_repository(target_repo_path, no_ai) {
     }
 
     if likely_build == "" {
-        if file_exists(target_abs + "/Cargo.toml") {
+        if file_exists(path_join(target_abs, "Cargo.toml")) {
             likely_build := "cargo build"
         } else {
-            if file_exists(target_abs + "/go.mod") {
+            if file_exists(path_join(target_abs, "go.mod")) {
                 likely_build := "go build ./..."
             }
         }
     }
 
     if likely_typecheck == "" {
-        if file_exists(target_abs + "/pyproject.toml") {
+        if file_exists(path_join(target_abs, "pyproject.toml")) {
             likely_typecheck := "kujo check ."
         }
     }
@@ -637,7 +640,7 @@ export func analyze_repository(target_repo_path, no_ai) {
     ]
 
     missing_docs := []
-    if file_exists(target_abs + "/README.md") == false && file_exists(target_abs + "/readme.md") == false {
+    if file_exists(path_join(target_abs, "README.md")) == false && file_exists(path_join(target_abs, "readme.md")) == false {
         missing_docs := push(missing_docs, "Repository README file is missing")
     }
 
@@ -653,7 +656,7 @@ export func analyze_repository(target_repo_path, no_ai) {
 
     dependency_assumptions := []
     if package_manager["name"] == "npm" || package_manager["name"] == "yarn" || package_manager["name"] == "pnpm" {
-        if file_exists(target_abs + "/package-lock.json") == false && file_exists(target_abs + "/pnpm-lock.yaml") == false && file_exists(target_abs + "/yarn.lock") == false {
+        if file_exists(path_join(target_abs, "package-lock.json")) == false && file_exists(path_join(target_abs, "pnpm-lock.yaml")) == false && file_exists(path_join(target_abs, "yarn.lock")) == false {
             dependency_assumptions := push(dependency_assumptions, "Node dependency lockfile not detected; install command assumptions may be wrong")
         }
     }

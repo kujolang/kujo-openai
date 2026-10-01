@@ -180,3 +180,28 @@ func TestWindowsUnsupportedVersion(t *testing.T) {
 		t.Fatal("version compatibility bypass", e)
 	}
 }
+
+func TestWindowsProjectImportAliasRejected(t *testing.T) {
+	root := windowsTestRoot(t)
+	project := filepath.Join(root, "project")
+	if e := makePrivateDirectory(project); e != nil {
+		t.Fatal(e)
+	}
+	code := filepath.Join(root, "code")
+	if e := makePrivateDirectory(code); e != nil {
+		t.Fatal(e)
+	}
+	entry := filepath.Join(code, "provider.kujo")
+	if e := os.WriteFile(entry, []byte("unused"), 0600); e != nil {
+		t.Fatal(e)
+	}
+	alias := filepath.Join(project, "imports")
+	if e := os.Symlink(code, alias); e != nil {
+		t.Fatal(e)
+	}
+	config := operatorConfig{Schema: "kujo.openai.local/v1", Entry: entry, CWD: code, StateDirectory: root, ModulePaths: []string{alias}}
+	e := serveOperator(context.Background(), config, code, project)
+	if e == nil || e.Error() != "trusted_code_must_be_outside_project" {
+		t.Fatal("project import alias accepted", e)
+	}
+}

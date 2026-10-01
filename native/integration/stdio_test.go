@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -49,6 +52,7 @@ func TestNativeExecutableWithoutNodeOrGit(t *testing.T) {
 		t.Fatal(e)
 	}
 	root, _ := filepath.Abs("../..")
+	root = copyProviderFixture(t, root, filepath.Join(trusted, "provider"))
 	project := t.TempDir()
 	config := map[string]any{"schema": "kujo.openai.local/v1", "kujo": runtimeCopy, "entry": filepath.Join(root, "tests/provider.kujo"), "cwd": root, "stateDirectory": state, "capabilities": []string{"--allow-clock"}}
 	raw, _ := json.Marshal(config)
@@ -69,6 +73,7 @@ func TestNativeExecutableWithoutNodeOrGit(t *testing.T) {
 		if e != nil {
 			t.Fatalf("native connect failed: %v; %s", e, stderr.String())
 		}
+		t.Cleanup(func() { session.Close() })
 		return session, stderr
 	}
 	session, stderr := start()
@@ -188,6 +193,7 @@ func TestBundledProjectWithoutSourceCheckout(t *testing.T) {
 		if e != nil {
 			t.Fatalf("connect: %v %s", e, stderr.String())
 		}
+		t.Cleanup(func() { session.Close() })
 		return session
 	}
 	session := start()
@@ -232,4 +238,43 @@ func TestBundledProjectWithoutSourceCheckout(t *testing.T) {
 	if e != nil || len(evidence.Contents) != 1 {
 		t.Fatal("bundle restart lost evidence", e)
 	}
+}
+
+// Copy reviewed fixture sources into private operator-owned state, just as the
+// shipped bundle is materialized privately. CI checkout ACLs are not authority.
+func copyProviderFixture(t *testing.T, source, destination string) string {
+	t.Helper()
+	for _, directory := range []string{"tests", "src", "vendor/ability"} {
+		e := filepath.WalkDir(filepath.Join(source, filepath.FromSlash(directory)), func(path string, entry fs.DirEntry, e error) error {
+			if e != nil {
+				return e
+			}
+			if entry.IsDir() {
+				return nil
+			}
+			if !strings.HasSuffix(path, ".kujo") && !strings.HasSuffix(path, ".json") {
+				return nil
+			}
+			if !entry.Type().IsRegular() {
+				return fmt.Errorf("nonregular fixture source")
+			}
+			rel, e := filepath.Rel(source, path)
+			if e != nil {
+				return e
+			}
+			target := filepath.Join(destination, rel)
+			if e = os.MkdirAll(filepath.Dir(target), 0700); e != nil {
+				return e
+			}
+			raw, e := os.ReadFile(path)
+			if e != nil {
+				return e
+			}
+			return os.WriteFile(target, raw, 0600)
+		})
+		if e != nil {
+			t.Fatal(e)
+		}
+	}
+	return destination
 }

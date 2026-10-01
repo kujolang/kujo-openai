@@ -41,7 +41,7 @@ jobs:
           "KUJO_NATIVE_HOST_BIN=$((Resolve-Path ../dist/kujo-openai-native.exe).Path)" >> $env:GITHUB_ENV
       - name: Native Windows MCP acceptance without Node or Git on child PATH
         working-directory: native
-        run: go test -count=1 -v ./integration ./preflight
+        run: go test -count=1 -v ./integration ./preflight ./internal/provider
       - name: Vet native launcher
         working-directory: native
-        run: go vet ./preflight ./integration
+        run: go vet ./preflight ./integration ./internal/provider
