@@ -52,3 +52,12 @@ three real canonical review tools, negative inputs, and exact receipts over
 MCP. Candidate validation is separate from the installed-package matrix.
 The dependency remains published runtime 1.6.0; Windows installation support
 must not be claimed until a verified release is pinned and that matrix passes.
+
+On 2026-10-01, the corrected Windows source-built cohort passed all nine real
+release-review MCP cases, including positive Git detection and exact canonical
+receipt/source-revision checks. Native cancellation and timeout tests passed
+(two tests; one POSIX-only case skipped). See
+[evidence/windows-candidate.json](evidence/windows-candidate.json) for immutable
+source pins and the successful workflow run. This closes candidate integration,
+not published-package acceptance: runtime 1.6.0 is still the dependency and the
+new optimized five-platform artifact cohort is still being rehearsed.
