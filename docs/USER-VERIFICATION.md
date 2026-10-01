@@ -40,12 +40,28 @@ Do not treat a missing capability, denied invocation or unreachable tunnel as a
 successful review. Automatic Skill selection and the displayed brand icon need
 separate checks in the actual ChatGPT UI.
 
-## Crates.io status
+## Distribution scope and remaining steps
 
-Native and npm runtime installation works independently of crates.io. The
-registry-compatible HTTP dependency fix is under review in runtime PR #18.
-Its fork test suite and normalized package dry run passed, but it is not yet
-published. Publishing requires local `cargo login`, followed by dependency
-publication and a successful normalized root-package verification. Never paste
-a registry token into a chat. The signed 1.7.0 tag must not be rewritten; a runtime
-release containing the dependency fix requires a new signed version.
+As of 2026-10-01, the publisher has deferred Cargo/crates.io packaging. Do not
+request Cargo login, publish the HTTP fork, or make crates.io a plugin release
+gate. The prepared runtime PR #18 is separate, deferred work. Kujo's compiled
+runtime is already distributed through native releases and platform-specific
+npm packages; plugin users do not need Rust or Cargo.
+
+The next steps for the plugin are:
+
+1. Finish verification and delivery of the pending runtime and website installer
+   updates using the published 1.7.0 native/npm artifacts.
+2. Confirm OpenAI supports installing and launching the npm package and its
+   platform binary dependencies for public local MCP plugins, including Node/Git
+   provisioning and explicit repository access. npm packaging alone does not
+   establish one-click installation in ChatGPT.
+3. Verify a fresh ChatGPT installation, workflow selection, three real tools,
+   matching receipts, and the displayed Kujo K icon.
+4. Complete submission metadata and review evidence, then submit through the
+   supported distribution route. The private tunnel is a development connection,
+   not evidence of public installation support.
+
+See [the prepared support request](OPENAI-HOST-SUPPORT-REQUEST.md). A hosted
+execution service is a separate architectural choice, not an automatic replacement
+for the requested local installation experience.
