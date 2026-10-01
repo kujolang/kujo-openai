@@ -39,7 +39,7 @@ This ledger preserves the requested end state. A green local milestone does not 
 
 Do not claim remote readiness from local filesystem permissions, a simulated approval, a fixture identity, a green MCP client test, or the existing gateway's fixture-only execution path. Complete each outstanding proof against the intended host and distribution before closing the goal. Preserve the owner's local-first requirement: testing an optional hosted profile does not establish automatic installation or local repository access for public plugin users.
 
-### Windows candidate adapter gate
+### Historical Windows candidate adapter gate
 
 The adapter now always requests the runtime's `--kill-children-on-exit`
 job boundary when launching a provider on Windows. There is no fallback to
@@ -102,3 +102,31 @@ The private tunnel is offline and must be restarted for ChatGPT validation.
 These results supersede the earlier 1.6.0 dependency/Windows-pending observations.
 Crates.io remains a separate packaging/authentication gate; its dependency fix
 is being prepared without rewriting the signed 1.7.0 release.
+
+### npm-first follow-through (2026-10-01)
+
+Cargo registry publication is deferred by the publisher and is not a plugin gate.
+The Windows workflow now tests the published npm runtime directly; it no longer
+compiles the historical candidate. Local published-runtime process cleanup tests
+passed all three cases, and the adapter suite passed 43 tests.
+
+The website built with Kujo 1.7.0, generated 1,140 responsive images, passed its
+site contract and validated all 242 HTML files. Website PR #2 merged as
+029066de787c8df1ec3fbbef58d554e66642bcfe. Deployment run 36874066982 is queued;
+live installer delivery is not yet verified.
+
+Runtime PR #19's identity test passed. A newer Rust compiler deprecated three
+existing atomic calls; scoped compatibility allowances preserve Rust 1.89 and
+unchanged runtime behavior. Clippy and MSRV passed at 5c7c031; the field-note-only
+follow-up 36aacc3 passed its local template guard. Final CI remains outstanding.
+
+GitHub refused to start the adapter Windows published-runtime job in run
+36873462762 (job 110406810783). Its check annotation reports failed recent
+account payments or an insufficient spending limit. This is an account-side
+blocker, not a test pass or a code failure. Restore GitHub Actions availability
+before rerunning failed jobs and accepting final remote checks.
+
+The private ChatGPT connection still has three enabled Skills, but its tunnel
+health endpoint is unavailable. Live workflow and brand acceptance cannot be
+completed until the local tunnel is restarted. Public local npm installation
+support remains unconfirmed; the prepared support request has not been sent.
