@@ -80,4 +80,4 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - name: Verify durable receipt storage independently of the runtime
-        run: node --test tests/receipt-storage.test.mjs
+        run: node --test tests/receipt-storage.test.mjs tests/sqlite-receipts.test.mjs

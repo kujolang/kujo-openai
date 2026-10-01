@@ -68,3 +68,27 @@ With `receipt_uri`, the helper returns the original integrity-checked receipt. W
 Local access follows the existing single-operator receipt boundary. Remote access filters and rechecks subject, tenant and issuer through the same authenticated receipt resource guard; it requires the existing `mcp:read ability:invoke` tool-call scopes. A shared remote store index covers the last 32 global entries before principal filtering, so a user's older entries may be absent. Absence is not evidence that a call never ran. Custom stores without `recent()` retain resource reads and do not advertise this optional helper.
 
 The leading underscore reserves the helper outside generated canonical Ability tool names. Missing, corrupt, unauthorized and symlink receipts return a generic failure without filesystem or principal diagnostics. This helper has protocol/isolation coverage; live ChatGPT visibility must be verified separately after the host refreshes its tool catalog.
+
+### Native SQLite receipt store (platform acceptance in progress)
+
+`SqliteReceiptStore` is a separate candidate local backend, not yet selected by
+startup. It keeps identical JSON bytes and SHA-256 references, uses parameterized
+SQL, checks database/journal paths, and closes each connection after the operation.
+It uses Node's bundled SQLite (Node >=22.13), with extension loading disabled,
+`trusted_schema=OFF`, DELETE journaling, `synchronous=EXTRA`, and fullfsync enabled.
+Publication follows transaction commit; duplicates must match the original bytes.
+The store preserves the bounded instance-local recent index and verifies hashes
+on reads. SQLite owns native locks, rollback and filesystem flushing.
+
+The native Windows VFS uses FlushFileBuffers, avoiding an unsupported Node
+directory-fsync call. This is a local-filesystem design; network shares and
+multi-tenant authorization are unsupported. As with the file store, durability
+depends on honest OS/device flush semantics; no software test proves arbitrary
+hardware power-loss behavior. Concurrent subprocess writers, writer termination
+after commit, reopening, tampering and linked-file rejection are tested on the
+three-OS CI matrix before enabling this implementation for Windows.
+
+Sources accessed 2026-09-30:
+- https://sqlite.org/atomiccommit.html (native commit and flush semantics)
+- https://sqlite.org/pragma.html#pragma_synchronous (EXTRA durability)
+- https://nodejs.org/download/release/v22.13.1/docs/api/sqlite.html (bundled API)
