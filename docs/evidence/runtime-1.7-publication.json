@@ -15,12 +15,11 @@
     "github_reason": "valid"
   },
   "publication_workflow": "https://github.com/kujolang/kujo/actions/runs/36850604536",
-  "publication_status": "in_progress",
+  "publication_status": "success",
   "limitations": [
-    "Tag existence does not prove artifacts or npm packages were published.",
-    "Published native and npm installation smoke tests remain required.",
-    "Adapter remains pinned to 1.6.0 until publication and registry acceptance.",
-    "Public OpenAI local-host installation support remains unconfirmed."
+    "crates.io publication blocked until registry-compatible HTTP fork is published and root packaging passes.",
+    "Public OpenAI local-host installation support remains unconfirmed.",
+    "Live ChatGPT requires restarting the local tunnel; public install is not established by private tunnel tests."
   ],
   "tagged_release_gate": {
     "job_id": 110331068275,
@@ -55,5 +54,53 @@
     "policy_exception": "Runtime RELEASE_PROCESS.md section 8: independent registry gate does not block tested native release.",
     "log_sha256": "77f5d830ac2855d660d80cd891e085d53bfb08d026d9ea5c30535e87b01ddfc7",
     "existing_signalbox_capture": "cap_a49f425e-eeb8-447d-b82d-4aca9d560b98"
+  },
+  "published_native_smoke": {
+    "run": 36857820990,
+    "all_five_platforms": "passed",
+    "initial_windows_failure": "GitHub denied request/rate limit after installation; failed-job rerun passed without artifact changes"
+  },
+  "published_npm_smoke": {
+    "run": 36866507729,
+    "all_five_platforms": "passed"
+  },
+  "adapter_registry_acceptance": {
+    "run": 36866757041,
+    "commit": "5f0ce507e34337781f7b8da37d175ee7df35eb6e",
+    "platforms_passed": [
+      "linux-x64",
+      "linux-arm64",
+      "darwin-x64",
+      "darwin-arm64",
+      "win32-x64"
+    ],
+    "contracts": "passed",
+    "receipt_storage": "passed on Linux/macOS/Windows",
+    "local_unit_tests": {
+      "passed": 43,
+      "failed": 0
+    },
+    "local_install": "passed"
+  },
+  "user_local_mcp": {
+    "runtime_version": "1.7.0",
+    "tools_and_exact_receipts": [
+      {
+        "ability": "kujo.changebucket.changes.measure",
+        "receipt_uri": "kujo-receipt://sha256/ba213cee127a674f551141c6e1b70bcce8c737cbdf59b4aa247e5ddf7f82b6fa",
+        "status": "succeeded"
+      },
+      {
+        "ability": "kujo.patchbrief.changes.summarize",
+        "receipt_uri": "kujo-receipt://sha256/11e7f5666261557f54e78bb4f0bc34301913a0b0e3d79a21fe58113241c60678",
+        "status": "succeeded"
+      },
+      {
+        "ability": "kujo.shipcheck.repository.scan",
+        "receipt_uri": "kujo-receipt://sha256/4acda25da3c3eb4d4b30a936ce99f6af58f43d4d981a732030763183ed8225c2",
+        "status": "succeeded"
+      }
+    ],
+    "tunnel": "offline; wrapper now points to freshly provisioned 1.7 configuration"
   }
 }

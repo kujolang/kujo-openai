@@ -19,7 +19,7 @@ This ledger preserves the requested end state. A green local milestone does not 
 | Change Review skill | Real PatchBrief + ChangeBucket through Ability/MCP, six integration cases | Installed three-Skill package performed live ChatGPT change review; explicit automatic Skill-file loading remains unproven |
 | Release/Ship Review skill | Optional canonical PatchBrief + ChangeBucket + ShipCheck catalog, nine actual MCP cases and composition skill | Installed Skill loaded in Codex and composed all three live tools with exact receipt lookups; browser automatic Skill selection remains unproven |
 | Spec/Eval/Scent/Scout workflows where applicable | Source-backed skill guidance and missing-capability handling | Corresponding production canonical registrations/compositions incomplete |
-| Local transport and installation | Official SDK stdio tests; isolated Codex profile; real npm tarball installation on Linux/macOS with canonical tool/receipt calls (CI 36798888691) | Verified on Linux/macOS; Windows provisioning passes; native path/lifetime fixes and portable product Git calls are merged, but published-runtime and combined Windows acceptance remain pending |
+| Local transport and installation | Official SDK stdio tests; isolated Codex profile; real npm tarball installation on Linux/macOS with canonical tool/receipt calls (CI 36798888691) | Published runtime 1.7.0 and isolated adapter installation passed on Linux x64/arm64, macOS x64/arm64 and Windows x64 (CI 36866757041) |
 | Install-and-use on each user computer | Owner clarification in SETUP.md; setup provisions pinned runtime and canonical sources | Node/Git, explicit repository setup and a supported local host remain prerequisites; automatic public-directory dependency installation and browser-to-local connectivity are unproven |
 | Official Kujo K branding | Exact kujolang.ai SVG provenance and derived PNG are packaged | Installed ChatGPT still displays its placeholder; host asset ingestion remains unresolved |
 | ChatGPT local client route | Official Secure MCP Tunnel/developer-mode setup documented | Private tunnel connected; three canonical read-only tools invoked successfully in ChatGPT (ACCEPTANCE.md); three Skills installed and live combined review verified; automatic browser Skill activation remains unproven |
@@ -88,3 +88,17 @@ The [tagged publication workflow](https://github.com/kujolang/kujo/actions/runs/
 is running. This removes the authorization blocker; it does not establish
 publication, registry installation or public-host support. See
 [publication evidence](evidence/runtime-1.7-publication.json).
+
+### Published runtime and user-local acceptance
+
+Runtime 1.7.0 native and npm publication completed. Published native smoke
+36857820990 and npm smoke 36866507729 passed on all five platforms. The native
+Windows smoke initially hit GitHub rate limiting; its failed-job rerun passed
+without changing artifacts. Adapter commit `5f0ce50` pins 1.7.0; registry-based
+installation run 36866757041 passed on all five platforms, with contracts and
+receipt-storage checks green. Local tests passed 43/43. The user's configured
+repository ran all three canonical tools and exact receipt lookups through MCP.
+The private tunnel is offline and must be restarted for ChatGPT validation.
+These results supersede the earlier 1.6.0 dependency/Windows-pending observations.
+Crates.io remains a separate packaging/authentication gate; its dependency fix
+is being prepared without rewriting the signed 1.7.0 release.
