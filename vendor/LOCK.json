@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/kujolang/ability",
-  "commit": "bcbecb49b147023877e83d5f2ea647dfede030b5",
+  "commit": "d1391ae5cf68448f0e8286be5958b701f4d6b07b",
   "files": {
     "services/local_sqlite.kujo": "ee7bd3671b972f0d1c7f1f24d6ecdbc22be09e488d01b02b9f9112f9cdcfcb14",
     "bindings/json_process.kujo": "e3e5623de251dc11d854d651c62393cc7474038cb1d8aa5a51b8b3f385b71554",
@@ -17,7 +17,7 @@
     "src/profile.kujo": "05d0fea46b5497801cb8a283c596b6b164f808b5fc8cba6984d5afc6c797164e",
     "schema/ability.schema.json": "9be20428a46bb5f6383b4c1d8b904e44f4d8e6f9286041e36651790336b74da2",
     "examples/content_find.json": "a9f902e575ac6c418db1eb61e4c41dcb0b2e8440e60ca07cf91750a653797990",
-    "tests/contract_tests.kujo": "f07a871b8dd8e9614b32a18769e4f3be888ffc006454de6cd593a36e755c644e",
+    "tests/contract_tests.kujo": "447e432e9ce715f0f265e3d483104903c7c2054fb506c0aa66bc4df97ac6d67d",
     "tests/fixtures/semantics_conformance.json": "329b7b1de93b49f0546e2d16dd5ffaddbdaf59756d882faa57d3ab3a8d4afc4a",
     "tests/runtime_contract_tests.kujo": "f7964a9b006ad87eca8aa453c7837c999070b4114385f67f46719fda24401542"
   }
