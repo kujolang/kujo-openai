@@ -35,7 +35,7 @@ def main():
         raise ValueError('native archive checksum mismatch')
     with zipfile.ZipFile(archive) as z:
         meta = json.loads(z.read('provenance.json'))
-        if meta['target'] != f'{system}/{arch}' or meta['go_version'] != 'go1.26.8':
+        if meta['target'] != f'{system}/{arch}' or meta['go_version'] != 'go1.26.10':
             raise ValueError('unexpected native target or compiler')
         name = 'kujo-openai-native.exe' if system=='windows' else 'kujo-openai-native'
         if meta['binary'] != name:

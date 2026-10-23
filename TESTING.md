@@ -13,7 +13,7 @@ go test -race -count=1 -v ./...
 go vet ./...
 ```
 
-Without both environment variables, actual runtime/host cases explicitly skip. They must be provided for acceptance evidence. Go 1.26.8 and build-time Python are maintainer dependencies, not end-user requirements. See [native instructions](native/README.md) for archive verification and isolated extracted-binary acceptance.
+Without both environment variables, actual runtime/host cases explicitly skip. They must be provided for acceptance evidence. Go 1.26.10 and build-time Python are maintainer dependencies, not end-user requirements. See [native instructions](native/README.md) for archive verification and isolated extracted-binary acceptance.
 
 Native tests cover runtime discovery and version rejection, repository shadowing, unsafe paths, environment/argument isolation, canonical schemas/effects/approvals, continuation recovery, bounded stdio, malformed traffic, cancellation, timeouts, crash uncertainty, receipt integrity and restart. Executable acceptance runs the compiled host with an empty PATH against a separately installed real Kujo runtime and a plain selected project. Fixtures support isolated boundary tests; canonical integration cases use the actual Ability implementation.
 
@@ -48,7 +48,7 @@ found four affected standard-library vulnerabilities in the Go 1.25.3 Windows
 binary and five in macOS/Linux binaries: GO-2026-6218, GO-2026-4971,
 GO-2026-4970 (Unix only), GO-2026-4602 and GO-2026-4601. Binary-symbol
 findings are not proof that every issue is exploitable through the adapter.
-Builds and packaging now pin Go 1.26.8; previous previews must be rebuilt.
+At that time, builds and packaging pinned Go 1.26.8; those historical results do not certify later toolchains.
 [Go's vulnerability-checker documentation](https://go.dev/doc/security/vuln/)
 and [GO-2026-4970](https://pkg.go.dev/vuln/GO-2026-4970) were reviewed on 2026-10-01.
 
@@ -109,3 +109,5 @@ passed the full native race/vet/archive workflow on Linux x64/ARM64 and macOS
 x64/ARM64, including the newly added protocol matrix. Its legacy installation
 and receipt jobs also passed. These five native execution platforms still do
 not constitute public ChatGPT installation, signing, or folder-grant acceptance.
+
+The 2026-10-23 PR repair pins Go 1.26.10 consistently across native builds, packaging and demo provenance. The October 21 binary audit identified GO-2026-6617, GO-2026-6613, GO-2026-6612, GO-2026-6611 and GO-2026-6603, fixed in 1.26.9. Version 1.26.10 also includes the subsequent crypto/x509 fix. Fresh native CI must pass before merge; historical test results above are unchanged.

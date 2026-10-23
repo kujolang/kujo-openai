@@ -72,7 +72,7 @@ The native host does not expose an approval issuer or shell tool. Resume-capable
 
 ## Native build security
 
-Native packages require Go 1.26.8, pinned in `native/go.mod` and CI. The
+Native packages require Go 1.26.10, pinned in `native/go.mod` and CI. The
 packager rejects other compilers and records the actual compiler in provenance.
 Go and the vulnerability checker are maintainer tools, never end-user dependencies.
 The binary audit uses pinned govulncheck against macOS, Linux and Windows binaries
