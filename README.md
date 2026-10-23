@@ -1,5 +1,9 @@
 # Kujo OpenAI
 
+[![Version](https://img.shields.io/badge/version-0.1.0-black)](https://github.com/kujolang/kujo-openai)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
+[![built for Kujo](https://img.shields.io/badge/built%20for-Kujo-white.svg)](https://github.com/kujolang/kujo)
+
 Expose registered **Kujo Abilities** to OpenAI hosts through MCP. Ability owns identity, schemas, effects, handlers, authority and receipts. This adapter owns projection and transport. Clarity. Context. Control.
 
 **0.1.0 is a tested local infrastructure milestone, not a public hosted service or a completed ecosystem review product.** Reference integrations run the canonical MCP core pack or Ability’s trusted-local repository-review pack (real PatchBrief, ChangeBucket and optional ShipCheck). Product handlers and contracts live in Ability; this adapter contains no product command wrappers. Scout, Scent and Eval remain unavailable unless registered by an application. Workflows report missing registrations. An embeddable remote OAuth resource-server boundary is tested; its live issuer, isolated provider, ChatGPT acceptance and public submission remain deployment gates.
