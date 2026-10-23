@@ -1,5 +1,9 @@
 # Kujo OpenAI
 
+[![Version](https://img.shields.io/badge/version-0.1.0-black)](https://github.com/kujolang/kujo-openai)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
+[![built for Kujo](https://img.shields.io/badge/built%20for-Kujo-white.svg)](https://github.com/kujolang/kujo)
+
 **Requires Kujo installed locally. Native-only public plugin: BLOCKED.**
 
 Kujo Ability remains the source of truth for identities, schemas, effects, authority, execution and receipts. This repository projects those contracts into MCP tools without product-specific OpenAI wrappers.
