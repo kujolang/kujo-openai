@@ -1,0 +1,18 @@
+{
+  "schema": "kujo.ability/v1",
+  "id": "kujo.mcp.manifest.validate",
+  "version": "1.0.0",
+  "description": "Validate one contained generated MCP manifest without executing its tools.",
+  "input_schema": {
+    "type": "object", "required": ["manifest"],
+    "properties": { "manifest": { "type": "string", "minLength": 1, "maxLength": 1024 } },
+    "additionalProperties": false
+  },
+  "output_schema": {
+    "type": "object", "required": ["passed", "error_count", "checks_passed", "checks_failed", "errors"],
+    "properties": { "passed": { "type": "boolean" }, "error_count": { "type": "integer", "minimum": 0 }, "checks_passed": { "type": "integer", "minimum": 0 }, "checks_failed": { "type": "integer", "minimum": 0 }, "errors": { "type": "array", "maxItems": 200, "items": { "type": "string" } } },
+    "additionalProperties": false
+  },
+  "effects": [{ "kind": "read", "resource": "kujo.mcp.generated-manifest" }],
+  "idempotency": { "mode": "intrinsic" }
+}

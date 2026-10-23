@@ -4,7 +4,7 @@ from vendor.ability.services.local_sqlite import initialize_local_store, local_s
 from vendor.ability.ability import create_ability_registry, register_ability_definition, register_ability_binding, register_ability_exposure, execute_ability
 from src.projection import discover, prepare_invocation
 from tests.registry import definition, policy, visible
-path:=path_absolute(".")+"/continuation.sqlite"
+path:=path_join(path_absolute("."),"continuation.sqlite")
 mode:=env_or("CONTINUATION_MODE","provider")
 if mode=="init" {
  initialize_local_store(path)

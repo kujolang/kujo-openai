@@ -1,11 +1,11 @@
 {
-  "date": "2026-09-30T22:25:16.245Z",
+  "date": "2026-10-01T17:06:23.613Z",
   "transport": "official MCP SDK stdio client",
   "checks": [
     {
       "ability": "kujo.changebucket.changes.measure",
       "status": "succeeded",
-      "receipt_id": "receipt-817b09199d04c3a585560a4d"
+      "receipt_id": "receipt-82466b500972175cc99c8f2d"
     },
     {
       "ability": "kujo.changebucket.changes.measure",
@@ -15,7 +15,7 @@
     {
       "ability": "kujo.patchbrief.changes.summarize",
       "status": "succeeded",
-      "receipt_id": "receipt-e6c856158fefd9b14ecc7f13"
+      "receipt_id": "receipt-eafd22710f8da0e021211a34"
     },
     {
       "ability": "kujo.patchbrief.changes.summarize",
@@ -25,7 +25,7 @@
     {
       "ability": "kujo.shipcheck.repository.scan",
       "status": "succeeded",
-      "receipt_id": "receipt-a3086e0631eeb289c0dc926a"
+      "receipt_id": "receipt-c90e70d3ffcb98d285979ddb"
     },
     {
       "ability": "kujo.shipcheck.repository.scan",

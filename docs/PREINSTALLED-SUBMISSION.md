@@ -1,0 +1,29 @@
+# Preinstalled-only submission checklist
+
+**Status: BLOCKED.** Accessed official [packaging](https://developers.openai.com/plugins/build/plugins) and [submission](https://developers.openai.com/plugins/deploy/submission) docs on 2026-10-01. An internal technical/publisher blocker is labeled separately below: calling it “BLOCKED BY OPENAI” would be inaccurate.
+
+| Requirement | State | Evidence / remaining work |
+|---|---|---|
+| Portable and Codex manifests | PASS (development profile) | Versioned schema/parity tests; actual entrypoint still Node |
+| Prerequisite and honest listing | FIXED | Both manifests disclose preinstalled goal and current dependency gap |
+| Brand | PASS (packaged asset) | Existing Kujo K PNG/SVG and manifest references; actual host rendering must be accepted again |
+| Native local entrypoint | BLOCKED — implementation | Experimental compiled adapter verified locally; default manifest/distribution not migrated |
+| No Node/Git runtime dependencies | BLOCKED — implementation | Experimental native runner needs neither; default package/setup still require them |
+| Missing-runtime diagnosis | FIXED (standalone diagnostic) | Native bounded preflight; not connected to host onboarding |
+| Declared platform local launch | BLOCKED — implementation/acceptance | Actual native execution recorded on macOS/Linux x64 and ARM64 and Windows x64; final host launch remains unverified; Windows ARM64 unsupported for verified execution |
+| Selected-folder isolation | BLOCKED — implementation/acceptance | Operator-root setup differs from verified host grants |
+| Ability semantics, approvals, receipts | PASS (tested native contracts) | Real canonical schema/approval/failure/receipt tests plus native continuation/restart; live-host acceptance remains separate |
+| Local execution/privacy disclosures | FIXED | README, INSTALL, SECURITY, PRIVACY, SUPPORT |
+| Public website/support URLs | PASS (existing repo links) | Publisher identity verification is separate |
+| Public privacy and terms URLs | BLOCKED — publisher | Local privacy notice supplied; publisher-approved terms and public listing metadata still needed |
+| Five positive / three negative review cases | BLOCKED — acceptance | Rerun against final native-only package; legacy cases do not qualify |
+| Reviewer walkthrough / host visuals | BLOCKED — acceptance | Record actual final flow; no fabricated recording or screenshots |
+| Publisher verification / policies / rights | BLOCKED — publisher | Confirm in portal; no submission or acceptance performed |
+| Public local MCP distribution | BLOCKED BY OPENAI | Exact question prepared in OPENAI_LOCAL_MCP_APPROVAL.md, not sent |
+| Remote HTTPS/OAuth deployment | NOT APPLICABLE to chosen architecture | No hosted substitute; local exception still required |
+| Automatic installation/hooks | NOT APPLICABLE | Not implemented or required |
+| Release publication | NOT APPLICABLE now | Explicitly prohibited by task |
+
+`npm run package:submission` intentionally exits 1 before creating a ZIP. The development guard always reports not ready until a final native plugin profile is implemented and independently reviewed; it accepts neither invented commands nor caller-supplied approval booleans as evidence. It does not validate legal terms, publisher identity or all review requirements. `npm run package` remains a legacy developer build and must not be submitted as this product.
+
+Reviewer plan once final native packaging and host authorization are resolved: positive discovery, repository read-only result, structured output, canonical receipt retrieval, restart/reconnect; negative missing runtime, unauthorized project, denied effect. Expand with actual workflow prompts and exact projected tool identities after catalog selection. Do not insert these unexecuted plans as passed review metadata.

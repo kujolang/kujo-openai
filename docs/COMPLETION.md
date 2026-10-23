@@ -1,3 +1,5 @@
+> Historical development evidence/design. Superseded for the product plan by [preinstalled runtime](PREINSTALLED-RUNTIME.md) and [current submission checklist](PREINSTALLED-SUBMISSION.md). Do not use bootstrap, tunnel or hosted instructions as the selected install flow.
+
 # Full-mission completion ledger
 
 This ledger preserves the requested end state. A green local milestone does not complete the mission. Status is evidence-based as of 2026-09-30; live deployment and host behavior require fresh verification.
@@ -19,10 +21,12 @@ This ledger preserves the requested end state. A green local milestone does not 
 | Change Review skill | Real PatchBrief + ChangeBucket through Ability/MCP, six integration cases | Installed three-Skill package performed live ChatGPT change review; explicit automatic Skill-file loading remains unproven |
 | Release/Ship Review skill | Optional canonical PatchBrief + ChangeBucket + ShipCheck catalog, nine actual MCP cases and composition skill | Installed Skill loaded in Codex and composed all three live tools with exact receipt lookups; browser automatic Skill selection remains unproven |
 | Spec/Eval/Scent/Scout workflows where applicable | Source-backed skill guidance and missing-capability handling | Corresponding production canonical registrations/compositions incomplete |
-| Local transport and installation | Official SDK stdio tests; bounded frames/processes; isolated Codex plugin installation | Verified; Windows process containment not certified |
+| Local transport and installation | Official SDK stdio tests; isolated Codex profile; real npm tarball installation on Linux/macOS with canonical tool/receipt calls (CI 36798888691) | Published runtime 1.7.0 and isolated adapter installation passed on Linux x64/arm64, macOS x64/arm64 and Windows x64 (CI 36866757041) |
+| Install-and-use on each user computer | Owner clarification in SETUP.md; setup provisions pinned runtime and canonical sources | Node/Git, explicit repository setup and a supported local host remain prerequisites; automatic public-directory dependency installation and browser-to-local connectivity are unproven |
+| Official Kujo K branding | Exact kujolang.ai SVG provenance and derived PNG are packaged | Installed ChatGPT still displays its placeholder; host asset ingestion remains unresolved |
 | ChatGPT local client route | Official Secure MCP Tunnel/developer-mode setup documented | Private tunnel connected; three canonical read-only tools invoked successfully in ChatGPT (ACCEPTANCE.md); three Skills installed and live combined review verified; automatic browser Skill activation remains unproven |
 | Remote trust architecture | REMOTE.md and inspected existing Ability gateway | Resource-server boundary tested with native Ability fixtures; isolated production provider/deployment incomplete |
-| Publicly installable remote plugin | Portable current-format package, skills, metadata, starters | Stable public endpoint, authentication, verified domain and reviewer evidence incomplete |
+| Publicly installable plugin | Portable current-format package, skills, metadata, starters; local and optional hosted profiles | Local distribution requires the host support documented in SUBMISSION.md. Hosted operation is optional, not a substitute for the owner's local install-and-use requirement; no production hosted execution is claimed |
 | OAuth, per-user grants, isolation, credential custody, revocation/scopes | Official requirements and gateway source reviewed | Introspection, scope and principal/receipt isolation boundary tested; live issuer flows, credential custody and deployment tests incomplete |
 | Workcell/Dispatch/process boundaries | SECURITY/REMOTE mark unrestricted remote execution unsupported | Correctly withheld; certified remote execution profiles still required if enabled |
 | Security threat model and introduced local boundaries | SECURITY.md; injection/path/schema/receipt/approval/limits tests; PatchBrief textconv regression | Local tests pass. Remote threats require remote implementation and isolation tests |
@@ -35,4 +39,118 @@ This ledger preserves the requested end state. A green local milestone does not 
 | End-to-end “@Kujo review these changes” | Canonical tools + real MCP + receipts proven | Live three-tool change review and grounded domain explanation verified; exact receipt visibility verified; packaged Skill selection remains pending |
 | Commit/push/clean state and durable memory | Git remote refs, CI runs and Strata handoffs | Recheck at each milestone |
 
-Do not claim remote readiness from local filesystem permissions, a simulated approval, a fixture identity, a green MCP client test, or the existing gateway's fixture-only execution path. Complete each outstanding proof against the intended host and deployment before closing the goal.
+Do not claim remote readiness from local filesystem permissions, a simulated approval, a fixture identity, a green MCP client test, or the existing gateway's fixture-only execution path. Complete each outstanding proof against the intended host and distribution before closing the goal. Preserve the owner's local-first requirement: testing an optional hosted profile does not establish automatic installation or local repository access for public plugin users.
+
+### Historical Windows candidate adapter gate
+
+The adapter now always requests the runtime's `--kill-children-on-exit`
+job boundary when launching a provider on Windows. There is no fallback to
+uncontained execution: older runtimes reject that option before running the
+provider. This option does not grant capabilities or prove rollback.
+
+`.github/workflows/windows-candidate.yml` builds immutable runtime candidate
+`8c561cacdcb132faa310df2b81f56c27ff4537df`, then tests adapter cancellation and
+three real canonical review tools, negative inputs, and exact receipts over
+MCP. Candidate validation is separate from the installed-package matrix.
+The dependency remains published runtime 1.6.0; Windows installation support
+must not be claimed until a verified release is pinned and that matrix passes.
+
+On 2026-10-01, the corrected Windows source-built cohort passed all nine real
+release-review MCP cases, including positive Git detection and exact canonical
+receipt/source-revision checks. Native cancellation and timeout tests passed
+(two tests; one POSIX-only case skipped). See
+[evidence/windows-candidate.json](evidence/windows-candidate.json) for immutable
+source pins and the successful workflow run. This closes candidate integration,
+not published-package acceptance: runtime 1.6.0 is still the dependency and the
+optimized five-platform artifact cohort and installed-candidate matrix have now
+passed; see [artifact evidence](evidence/runtime-artifact-candidate.json). A newly
+versioned, authorized runtime release and registry-based acceptance remain required.
+
+The unpublished 1.7.0 preparation is tracked in
+[runtime PR #17](https://github.com/kujolang/kujo/pull/17). Its corrected commit
+`f68750b368e6ebaf4dcaf588b4984651bb4d9670` passed the full release gate:
+2,891 Rust tests passed, none failed, 17 ignored; both fixture runs passed
+150 tests with 11 skipped. The candidate identity contract also passed.
+Optional cargo-audit/cargo-deny were absent and skipped. All 25 PR checks passed.
+All five optimized native artifacts and the neutral npm package have verified
+source/version/digests, native/npm binary identity and lifecycle-script absence.
+The versioned candidate installation matrix passed on all five targets, including
+Windows: each performed fresh/repeat setup, nested discovery, three canonical
+tool executions and exact receipt lookups. A local Intel Mac installation of the
+same CI packages also passed. Publication jobs were skipped. Runtime publication,
+registry-based acceptance and public ChatGPT local-host support remain outstanding.
+See [versioned candidate evidence](evidence/runtime-1.7-candidate.json).
+
+### Authorized 1.7.0 publication
+
+On 2026-10-01 the owner supplied `UNBLOCK_V1_RELEASE`. Runtime PR #17 was
+merged as `813072040a1ac643312f5163fcfa4f26474c9095`; its tree exactly matches
+the tested candidate. Signed tag `v1.7.0` was verified locally and by GitHub.
+The [tagged publication workflow](https://github.com/kujolang/kujo/actions/runs/36850604536)
+is running. This removes the authorization blocker; it does not establish
+publication, registry installation or public-host support. See
+[publication evidence](evidence/runtime-1.7-publication.json).
+
+### Published runtime and user-local acceptance
+
+Runtime 1.7.0 native and npm publication completed. Published native smoke
+36857820990 and npm smoke 36866507729 passed on all five platforms. The native
+Windows smoke initially hit GitHub rate limiting; its failed-job rerun passed
+without changing artifacts. Adapter commit `5f0ce50` pins 1.7.0; registry-based
+installation run 36866757041 passed on all five platforms, with contracts and
+receipt-storage checks green. Local tests passed 43/43. The user's configured
+repository ran all three canonical tools and exact receipt lookups through MCP.
+The private tunnel is offline and must be restarted for ChatGPT validation.
+These results supersede the earlier 1.6.0 dependency/Windows-pending observations.
+Crates.io remains a separate packaging/authentication gate; its dependency fix
+is being prepared without rewriting the signed 1.7.0 release.
+
+### npm-first follow-through (2026-10-01)
+
+Cargo registry publication is deferred by the publisher and is not a plugin gate.
+The Windows workflow now tests the published npm runtime directly; it no longer
+compiles the historical candidate. Local published-runtime process cleanup tests
+passed all three cases, and the adapter suite passed 43 tests.
+
+The website built with Kujo 1.7.0, generated 1,140 responsive images, passed its
+site contract and validated all 242 HTML files. Website PR #2 merged as
+029066de787c8df1ec3fbbef58d554e66642bcfe. Deployment run 36874066982 is queued;
+live installer delivery is not yet verified.
+
+Runtime PR #19's identity test passed. A newer Rust compiler deprecated three
+existing atomic calls; scoped compatibility allowances preserve Rust 1.89 and
+unchanged runtime behavior. Clippy and MSRV passed at 5c7c031; the field-note-only
+follow-up 36aacc3 passed its local template guard. Final CI remains outstanding.
+
+GitHub refused to start the adapter Windows published-runtime job in run
+36873462762 (job 110406810783). Its check annotation reports failed recent
+account payments or an insufficient spending limit. This is an account-side
+blocker, not a test pass or a code failure. Restore GitHub Actions availability
+before rerunning failed jobs and accepting final remote checks.
+
+The private ChatGPT connection still has three enabled Skills, but its tunnel
+health endpoint is unavailable. Live workflow and brand acceptance cannot be
+completed until the local tunnel is restarted. Public local npm installation
+support remains unconfirmed; the prepared support request has not been sent.
+
+### Public repository and resumed CI (2026-10-01)
+
+The publisher explicitly authorized making kujolang/kujo-openai public to remove
+the private-repository Actions billing gate. GitHub confirms visibility=public.
+A bounded known-token/private-key scan of all 340 reachable history blobs found
+no matching credentials; ignored .local tunnel state was not published. This is
+not a claim of exhaustive secret detection.
+
+Both retry attempts completed successfully at 3d64605:
+- Ability host contracts 36874370702, attempt 2: all five installed-package
+  platforms, three receipt-storage platforms and contracts passed.
+- Windows published runtime contracts 36874370567, attempt 2: passed.
+
+This supersedes the adapter billing blocker above. Public GitHub visibility
+does not establish public ChatGPT directory support.
+
+Pages deployment 36874066982 completed successfully. The live installer at
+https://kujolang.ai/install.sh exactly matches the merged, locally tested script:
+SHA256 9764501717e7f7494c81be62c7f17a3c2a927ff2593eb1ebb91a2e0bca23efbd.
+The identical script completed a disposable core installation reporting Kujo
+1.7.0. No Cargo publication was performed.

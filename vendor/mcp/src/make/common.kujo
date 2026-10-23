@@ -1,0 +1,227 @@
+from src.core.framework import check_path
+
+export func dict_has_key(dict_value, key_name) {
+    probe := has_key(dict_value, key_name)
+    if type(probe) == "bool" {
+        return probe
+    }
+    if type(probe) == "int" {
+        return probe == 1
+    }
+    return false
+}
+
+export func safe_to_string(value) {
+    text := ""
+    try {
+        text := to_string(value)
+    } except err {
+        text := ""
+    }
+    return text
+}
+
+export func resolve_absolute_existing(path_value) {
+    clean := trim(to_string(path_value))
+    if clean == "" {
+        return {"ok": false, "path": "", "error": "Path is required"}
+    }
+
+    if !path_exists(clean) {
+        return {"ok": false, "path": "", "error": "Path does not exist: " + clean}
+    }
+
+    try {
+        return {"ok": true, "path": path_absolute(clean), "error": ""}
+    } except err {
+        return {"ok": false, "path": "", "error": "Path cannot be resolved"}
+    }
+}
+
+export func resolve_absolute_output(path_value) {
+    clean := trim(to_string(path_value))
+    if clean == "" {
+        return {"ok": false, "path": "", "error": "Output path is required"}
+    }
+
+    try {
+        if path_exists(clean) {
+            return {"ok": true, "path": path_absolute(clean), "error": ""}
+        }
+
+        cursor := clean
+        suffix_parts := []
+
+        while !path_exists(cursor) {
+            base := basename(cursor)
+            suffix_parts := push(suffix_parts, base)
+
+            parent := dirname(cursor)
+            if parent == "" || parent == cursor {
+                return {"ok": false, "path": "", "error": "Output path cannot be resolved"}
+            }
+
+            cursor := parent
+        }
+
+        if !path_is_dir(cursor) {
+            return {"ok": false, "path": "", "error": "Nearest existing output ancestor is not a directory"}
+        }
+
+        resolved := path_absolute(cursor)
+        idx := len(suffix_parts) - 1
+        while idx >= 0 {
+            part := suffix_parts[idx]
+            if part != "" {
+                if resolved == "/" {
+                    resolved := "/" + part
+                } else {
+                    resolved := resolved + "/" + part
+                }
+            }
+            idx := idx - 1
+        }
+
+        return {"ok": true, "path": resolved, "error": ""}
+    } except err {
+        return {"ok": false, "path": "", "error": "Output path cannot be resolved"}
+    }
+}
+
+export func is_within_boundary(candidate_abs, allowed_abs) {
+    if candidate_abs == allowed_abs {
+        return true
+    }
+    return starts_with(candidate_abs, allowed_abs + "/")
+}
+
+export func ensure_dir_recursive(dir_abs) {
+    clean := trim(to_string(dir_abs))
+    if clean == "" {
+        return {"ok": false, "error": "Directory path is required"}
+    }
+
+    if path_exists(clean) {
+        if path_is_dir(clean) {
+            return {"ok": true, "error": ""}
+        }
+        return {"ok": false, "error": "Path exists but is not a directory: " + clean}
+    }
+
+    working := ""
+    if starts_with(clean, "/") {
+        working := "/"
+    }
+
+    parts := split(clean, "/")
+    idx := 0
+    while idx < len(parts) {
+        part := parts[idx]
+        idx := idx + 1
+
+        if part == "" {
+        } else {
+            if working == "" {
+                working := part
+            } else {
+                if working == "/" {
+                    working := "/" + part
+                } else {
+                    working := working + "/" + part
+                }
+            }
+
+            if !path_exists(working) {
+                create_dir(working)
+            } else {
+                if !path_is_dir(working) {
+                    return {"ok": false, "error": "Path component is not a directory: " + working}
+                }
+            }
+        }
+    }
+
+    return {"ok": true, "error": ""}
+}
+
+export func ensure_parent_dir(file_abs) {
+    parent := dirname(file_abs)
+    if parent == "" {
+        parent := "."
+    }
+    return ensure_dir_recursive(parent)
+}
+
+export func write_output_file(file_abs, content, allowed_roots) {
+    dir_result := ensure_parent_dir(file_abs)
+    if !dir_result["ok"] {
+        return {"ok": false, "error": dir_result["error"]}
+    }
+
+    chk := check_path(file_abs, allowed_roots, [], true)
+    if !chk["ok"] {
+        return {"ok": false, "error": "Write denied: " + chk["reason"]}
+    }
+
+    try {
+        write_file(file_abs, content, true)
+        return {"ok": true, "error": ""}
+    } except err {
+        err_text := "unknown write failure"
+        try {
+            err_text := to_string(err)
+        } except nested_err {
+        }
+        return {"ok": false, "error": "Write failed: " + err_text}
+    }
+}
+
+export func push_unique(values, value) {
+    target := trim(to_string(value))
+    if target == "" {
+        return values
+    }
+
+    idx := 0
+    while idx < len(values) {
+        if values[idx] == target {
+            return values
+        }
+        idx := idx + 1
+    }
+
+    return push(values, target)
+}
+
+export func render_markdown_bullets(lines) {
+    output := ""
+    idx := 0
+    while idx < len(lines) {
+        output := output + "- " + to_string(lines[idx]) + "\n"
+        idx := idx + 1
+    }
+    return output
+}
+
+export func render_markdown_numbered(lines) {
+    output := ""
+    idx := 0
+    while idx < len(lines) {
+        output := output + to_string(idx + 1) + ". " + to_string(lines[idx]) + "\n"
+        idx := idx + 1
+    }
+    return output
+}
+
+export func render_lines(lines) {
+    output := ""
+    idx := 0
+    while idx < len(lines) {
+        if idx > 0 {
+            output := output + "\n"
+        }
+        output := output + to_string(lines[idx])
+        idx := idx + 1
+    }
+    return output
+}

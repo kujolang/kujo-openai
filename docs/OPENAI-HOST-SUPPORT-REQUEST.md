@@ -1,0 +1,59 @@
+> Historical development evidence/design. Superseded for the product plan by [preinstalled runtime](PREINSTALLED-RUNTIME.md) and [current submission checklist](PREINSTALLED-SUBMISSION.md). Do not use bootstrap, tunnel or hosted instructions as the selected install flow.
+
+# Draft: Kujo local MCP distribution support
+
+Status: prepared for the publisher to send; not sent to OpenAI.
+Sources checked: 2026-10-01.
+
+**Subject:** Confirm public local-MCP installation support for Kujo
+
+We are building [Kujo OpenAI](https://github.com/kujolang/kujo-openai), a generic
+MCP adapter for Kujo Ability. Our intended experience is: install Kujo in ChatGPT,
+select a local repository with explicit host authorization, and immediately use
+registered Kujo tools. No GitHub account or GitHub repository ownership is a
+prerequisite; local files are selected through the host. Users should not need
+a developer tunnel, API key, terminal
+commands, or a separately configured Kujo runtime.
+
+The adapter projects canonical Ability definitions, enforces Kujo authority, and
+preserves execution receipts. It has a lifecycle-script-free npm package with a
+platform-selected native runtime dependency and works through local stdio MCP.
+Published runtime 1.7.0 native and npm installations passed on Linux x64/arm64,
+macOS x64/arm64 and Windows x64. Adapter registry-install tests verified three
+canonical review tools and matching receipts on all five platforms. Private-tunnel
+ChatGPT calls also verified the review tools and receipts. These tests do not
+establish public local installation support. Cargo/crates.io publication is
+outside the current plugin scope; users should consume precompiled npm binaries.
+
+The [packaging guide](https://developers.openai.com/plugins/build/plugins)
+directs publishers with local MCP requirements to an OpenAI contact. Please
+confirm the supported route for these requirements:
+
+1. Which public directory clients can install and start local stdio MCP servers
+   on macOS, Windows and Linux? Does ChatGPT web have a supported authenticated
+   connection to that local execution environment?
+2. Does installation from an npm source install exact transitive and optional
+   native dependencies, or extract only the top-level package? How are Node and
+   Git prerequisites supplied? We do not rely on install/postinstall scripts.
+3. What host mechanism provides the explicitly selected repository, persists
+   the user's authorization and handles updates/uninstall? Model-generated
+   paths or approval claims cannot grant filesystem authority.
+4. What signing, platform testing and submission evidence is required for a
+   local plugin? Is this available to public publishers now, or partner-gated?
+
+Separately, our private ChatGPT plugin accepts package updates and shows the
+updated skills/version, but its listing and starter prompts still display a
+compass placeholder. Both portable and Codex manifests reference the included
+Kujo PNG through logo/composerIcon and their dark variants. The image is square,
+256 by 256 pixels and 7,020 bytes. These match the documented
+[branding requirements](https://developers.openai.com/plugins/deploy/submission).
+The current app management UI exposes no icon editor. Which supported flow
+updates branding for an existing private MCP-backed plugin without deleting its
+connection? We can provide the package and plugin identifier through your
+preferred support channel.
+
+We are not requesting silent machine-wide privileges. Repository authorization
+and consequential execution approval must remain explicit. Our existing public
+MCP domain serves a read-only catalog and is not a remote code execution service.
+If the requested local experience is unsupported, please identify the supported
+client/deployment boundary so we can accurately describe the product.

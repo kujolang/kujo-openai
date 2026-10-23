@@ -1,0 +1,86 @@
+from vendor.ability.ability import validate_ability_definition, ability_definition_digest, list_ability_definitions, resolve_ability, execute_ability
+
+func get(obj, key, fallback) {
+    if type(obj) == "dict" && has_key(obj, key) { return obj[key] }
+    return fallback
+}
+func fail(code) { return {"ok": false, "code": code} }
+
+// The suffix is an identity hash, not a definition hash: edits never rename a tool.
+// Exact reverse lookup uses the catalog, never a guessed underscore split.
+export func tool_name(definition) {
+    prefix := substring(replace(definition["id"], ".", "_"), 0, 26)
+    return prefix + "_" + substring(sha256(definition["id"] + "@" + definition["version"]), 0, 32)
+}
+
+export func project_ability(definition, digest) {
+    checked := validate_ability_definition(definition)
+    if checked["ok"] == false { return checked }
+    if get(definition["input_schema"], "type", "") != "object" || get(definition["output_schema"], "type", "") != "object" { return fail("unsupported_mcp_object_schema") }
+    read_only := true
+    for effect in definition["effects"] { if effect["kind"] != "read" { read_only = false } }
+    semantics := get(definition, "semantics", null)
+    open_world := true
+    destructive := read_only == false
+    precision := "conservative-v1"
+    if type(semantics) == "dict" {
+        open_world = semantics["open_world"]
+        destructive = semantics["destructive"]
+        precision = "canonical-semantics-v1"
+    }
+    return {"ok": true, "tool": {
+        "name": tool_name(definition), "title": get(definition, "title", definition["id"]), "description": definition["description"],
+        "inputSchema": definition["input_schema"], "outputSchema": definition["output_schema"],
+        "annotations": {"readOnlyHint": read_only, "destructiveHint": destructive, "openWorldHint": open_world, "idempotentHint": definition["idempotency"]["mode"] == "intrinsic"},
+        "_meta": {"kujo/abilityId": definition["id"], "kujo/abilityVersion": definition["version"], "kujo/definitionDigest": digest, "kujo/effects": definition["effects"], "kujo/idempotency": definition["idempotency"], "kujo/annotationPrecision": precision, "kujo/semantics": semantics}
+    }}
+}
+
+// Visibility callback belongs to the application, never to MCP arguments.
+export func discover(registry, context, visible) {
+    tools := []
+    unsupported := []
+    names := {}
+    for entry in list_ability_definitions(registry, "mcp") {
+        if visible(entry, context) == true {
+            definition := entry["definition"]
+            resolved := resolve_ability(registry, definition["id"], definition["version"], "mcp")
+            projected := project_ability(definition, entry["digest"])
+            if resolved["ok"] == false { projected = resolved }
+            if projected["ok"] == false {
+                unsupported = push(unsupported, {"ability_id": definition["id"], "version": definition["version"], "code": projected["code"]})
+            } else {
+                tool := projected["tool"]
+                name := tool["name"]
+                if has_key(names, name) { return fail("ability_tool_name_collision") }
+                names[name] := true
+                tools = push(tools, tool)
+            }
+        }
+    }
+    return {"ok": true, "schema": "kujo.openai.catalog/v1", "tools": tools, "unsupported": unsupported}
+}
+
+export func prepare_invocation(registry, name, input, context, visible) {
+    catalog := discover(registry, context, visible)
+    if catalog["ok"] == false { return catalog }
+    selected := null
+    for tool in catalog["tools"] { if tool["name"] == name { selected = tool } }
+    if type(selected) == "null" { return fail("ability_tool_not_available") }
+    metadata := selected["_meta"]
+    invocation := {
+        "schema": "kujo.ability.invocation/v1", "invocation_id": context["invocation_id"],
+        "ability_id": metadata["kujo/abilityId"], "ability_version": metadata["kujo/abilityVersion"], "definition_digest": metadata["kujo/definitionDigest"],
+        "input": input, "principal": context["principal"], "surface": "mcp",
+        "request_id": context["invocation_id"], "trace_id": context["invocation_id"],
+        "idempotency_key": get(context, "idempotency_key", ""), "approval": get(context, "approval", {}),
+        "metadata": {"host": "openai", "projection": "kujo.openai/v1"}
+    }
+    return {"ok":true,"invocation":invocation}
+}
+
+export func invoke(registry, name, input, context, services, visible) {
+    prepared:=prepare_invocation(registry,name,input,context,visible)
+    if prepared["ok"]==false {return prepared}
+    return execute_ability(registry,prepared["invocation"],services)
+}

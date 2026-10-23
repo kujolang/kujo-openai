@@ -1,35 +1,35 @@
 {
-  "date": "2026-09-29T23:14:31.476Z",
+  "date": "2026-10-01T17:07:02.013Z",
   "source_commit": "a7ec0dd8e6bcae303ab1431b4586dfe3e91f3a5a",
   "checks": [
     {
       "ability": "kujo.mcp.repository.profile",
       "status": "succeeded",
-      "receipt_id": "receipt-a16f07ffb72b46182e9b4956",
+      "receipt_id": "receipt-3b0dc9d67359fb5aa38b662f",
       "passed": true
     },
     {
       "ability": "kujo.mcp.manifest.validate",
       "status": "succeeded",
-      "receipt_id": "receipt-3ef218b8c797c80cf7576014",
+      "receipt_id": "receipt-9868bcc16f63615041877a96",
       "passed": true
     },
     {
       "ability": "kujo.mcp.manifest.validate",
       "status": "failed",
-      "receipt_id": "receipt-549c683f4112eaa5d0623206",
+      "receipt_id": "receipt-354538f0151721c7c5ce64a8",
       "passed": true
     },
     {
       "ability": "kujo.mcp.manifest.validate",
       "status": "failed",
-      "receipt_id": "receipt-5929b9e76e1791abbd6cc85a",
+      "receipt_id": "receipt-7f9500feac647683401813d1",
       "passed": true
     },
     {
       "ability": "kujo.mcp.manifest.validate",
       "status": "failed",
-      "receipt_id": "receipt-8d77bd8b659e617117ab86cb",
+      "receipt_id": "receipt-49ff0ade57970a207df5f48f",
       "passed": true
     }
   ]

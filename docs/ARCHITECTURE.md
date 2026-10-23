@@ -1,3 +1,5 @@
+> Current product decision: [preinstalled runtime contract](PREINSTALLED-RUNTIME.md). This document describes the existing development adapter; its Node transport is not the requested native-only implementation.
+
 # Architecture and projection contract
 
 ## Ownership
@@ -21,7 +23,7 @@ flowchart LR
 
 The application is trusted installed code. Repository content cannot choose its entrypoint, module paths, runtime, principal or services. `lib/backend.mjs` launches one bounded process per operation using an operator configuration. No shell interpolation; arguments travel over bounded stdin. The application owns durable state because each call has a fresh process. In-memory approvals or idempotency maps are unsuitable here.
 
-Node's official MCP SDK handles protocol negotiation and dispatch. The bounded transport adds input framing, lifecycle and concurrency guards. The process backend handles quotas, timeout and cancellation. Cancellation kills the process group on macOS/Linux; it cannot undo effects or kill a deliberately detached descendant. Such execution requires external isolation.
+Node's official MCP SDK handles protocol negotiation and dispatch. The bounded transport adds input framing, lifecycle and concurrency guards. The process backend handles quotas, timeout and cancellation. On macOS/Linux cancellation first sends SIGTERM so Kujo can terminate its isolated native subprocess groups, then escalates after 500 ms to SIGKILL of the provider group. The host closes retained pipes and reports uncertain completion at that bound. Cancellation cannot undo effects or guarantee termination of a deliberately detached descendant. Windows currently kills only the provider; process-tree containment remains uncertified. Such execution requires external isolation.
 
 ## Projection
 
@@ -47,7 +49,7 @@ Unsupported scalar schemas or missing bindings appear in the operator catalog's 
 
 Successful `structuredContent` is exactly `receipt.result`, validated against the advertised output schema. Text contains a small status/identity/reference summary plus result text for clients lacking structured-result support. Failed calls have `isError: true`, preserve the canonical status/error, and do not masquerade as successful domain output.
 
-The adapter verifies response identity against discovery and invocation, then durably stores the complete canonical receipt without rewriting it. Content-addressed `kujo-receipt://sha256/<digest>` references can be read with MCP `resources/read`; the resource API does not enumerate receipts. Private files use exclusive creation, no-follow opens, fsync and content verification. Existing records survive server restarts. The local store is single-operator, not a multi-tenant authorization design. Operators own retention, backups, disk quotas and deletion.
+The adapter verifies response identity against discovery and invocation, then durably stores the complete canonical receipt without rewriting it. Content-addressed `kujo-receipt://sha256/<digest>` references can be read with MCP `resources/read`; the resource API does not enumerate receipts. Private files use exclusive creation, no-follow opens, fsync and content verification. The store probes directory fsync at initialization and rejects unsupported filesystems before execution. Windows uses the SQLite store below because Node directory fsync fails this preflight. Existing records survive server restarts. The local store is single-operator, not a multi-tenant authorization design. Operators own retention, backups, disk quotas and deletion.
 
 Canonical receipts contain execution identity, handler/version, status, result/error, policy, approval reference, idempotency, timing, principal and audit/provenance metadata. They do not necessarily include input bytes or an input hash. Application audit must preserve safe input references when required. The adapter must not silently modify a canonical receipt to claim evidence that was never emitted. Hashes detect modification; they are not third-party signatures.
 
@@ -68,3 +70,28 @@ With `receipt_uri`, the helper returns the original integrity-checked receipt. W
 Local access follows the existing single-operator receipt boundary. Remote access filters and rechecks subject, tenant and issuer through the same authenticated receipt resource guard; it requires the existing `mcp:read ability:invoke` tool-call scopes. A shared remote store index covers the last 32 global entries before principal filtering, so a user's older entries may be absent. Absence is not evidence that a call never ran. Custom stores without `recent()` retain resource reads and do not advertise this optional helper.
 
 The leading underscore reserves the helper outside generated canonical Ability tool names. Missing, corrupt, unauthorized and symlink receipts return a generic failure without filesystem or principal diagnostics. This helper has protocol/isolation coverage; live ChatGPT visibility must be verified separately after the host refreshes its tool catalog.
+
+### Native SQLite receipt store
+
+`SqliteReceiptStore` is selected automatically on Windows; other systems retain
+the existing file store. It keeps identical JSON bytes and SHA-256 references, uses parameterized
+SQL, checks database/journal paths, and closes each connection after the operation.
+It uses Node's bundled SQLite (Node >=22.13), with extension loading disabled,
+`trusted_schema=OFF`, DELETE journaling, `synchronous=EXTRA`, and fullfsync enabled.
+Publication follows transaction commit; duplicates must match the original bytes.
+The store preserves the bounded instance-local recent index and verifies hashes
+on reads. SQLite owns native locks, rollback and filesystem flushing.
+
+The native Windows VFS uses FlushFileBuffers, avoiding an unsupported Node
+directory-fsync call. This is a local-filesystem design; network shares and
+multi-tenant authorization are unsupported. As with the file store, durability
+depends on honest OS/device flush semantics; no software test proves arbitrary
+hardware power-loss behavior. Concurrent subprocess writers, writer termination
+after commit, reopening, tampering and linked-file rejection are tested on the
+three-OS CI matrix (run 36802667616 passed all storage jobs). This proves the
+storage contract; it does not establish runtime or process containment support.
+
+Sources accessed 2026-09-30:
+- https://sqlite.org/atomiccommit.html (native commit and flush semantics)
+- https://sqlite.org/pragma.html#pragma_synchronous (EXTRA durability)
+- https://nodejs.org/download/release/v22.13.1/docs/api/sqlite.html (bundled API)

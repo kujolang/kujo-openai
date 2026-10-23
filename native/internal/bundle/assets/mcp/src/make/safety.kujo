@@ -1,0 +1,146 @@
+from src.make.common import push_unique
+
+BLOCK_TERMS := [
+    "deploy",
+    "publish",
+    "release",
+    "migrate",
+    "reset",
+    "clean",
+    "delete",
+    "unlink",
+    "remove",
+    "destroy",
+    "drop",
+    "truncate",
+    "push",
+    "upload",
+    "credential",
+    "secret",
+    "token",
+    "key"
+]
+
+SAFE_HINTS := [
+    "test",
+    "lint",
+    "check",
+    "typecheck",
+    "build",
+    "format",
+    "verify",
+    "validate"
+]
+
+SENSITIVE_PATH_HINTS := [
+    ".env",
+    "id_rsa",
+    "id_dsa",
+    ".pem",
+    ".p12",
+    ".key",
+    "credentials",
+    "secret",
+    "token",
+    "auth",
+    "cloud",
+    "aws",
+    "gcp",
+    "azure",
+    "ssh"
+]
+
+export func classify_script(script_name, command_text) {
+    name_text := to_lower(trim(to_string(script_name)))
+    cmd_text := to_lower(trim(to_string(command_text)))
+    probe := name_text + " " + cmd_text
+
+    block_idx := 0
+    while block_idx < len(BLOCK_TERMS) {
+        term := BLOCK_TERMS[block_idx]
+        block_idx := block_idx + 1
+        if index_of(probe, term) >= 0 {
+            return {
+                "tier": "blocked",
+                "reason": "Command contains blocked term: " + term
+            }
+        }
+    }
+
+    safe_idx := 0
+    while safe_idx < len(SAFE_HINTS) {
+        hint := SAFE_HINTS[safe_idx]
+        safe_idx := safe_idx + 1
+        if index_of(name_text, hint) >= 0 || index_of(cmd_text, hint) >= 0 {
+            return {
+                "tier": "safe_command",
+                "reason": "Command matches safe hint: " + hint
+            }
+        }
+    }
+
+    return {
+        "tier": "review_required",
+        "reason": "Command requires manual review"
+    }
+}
+
+export func detect_sensitive_path(path_text) {
+    clean := to_lower(trim(to_string(path_text)))
+    if clean == "" {
+        return {"sensitive": false, "reason": ""}
+    }
+
+    idx := 0
+    while idx < len(SENSITIVE_PATH_HINTS) {
+        hint := SENSITIVE_PATH_HINTS[idx]
+        idx := idx + 1
+        if index_of(clean, hint) >= 0 {
+            return {"sensitive": true, "reason": "Path matched sensitive hint: " + hint}
+        }
+    }
+
+    return {"sensitive": false, "reason": ""}
+}
+
+export func blocked_terms() {
+    return BLOCK_TERMS
+}
+
+export func summarize_safety(scripts) {
+    safe_commands := []
+    blocked_commands := []
+    review_required := []
+
+    idx := 0
+    while idx < len(scripts) {
+        entry := scripts[idx]
+        idx := idx + 1
+
+        name := ""
+        if has_key(entry, "name") == 1 {
+            name := to_string(entry["name"])
+        }
+
+        tier := "review_required"
+        if has_key(entry, "safety_tier") == 1 {
+            tier := to_string(entry["safety_tier"])
+        }
+
+        if tier == "safe_command" {
+            safe_commands := push_unique(safe_commands, name)
+        } else {
+            if tier == "blocked" {
+                blocked_commands := push_unique(blocked_commands, name)
+            } else {
+                review_required := push_unique(review_required, name)
+            }
+        }
+    }
+
+    return {
+        "safe_commands": safe_commands,
+        "blocked_commands": blocked_commands,
+        "review_required": review_required
+    }
+}

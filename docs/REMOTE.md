@@ -1,5 +1,12 @@
 # Remote architecture and authentication plan
 
+**Inactive alternative:** the owner selected automatic local installation on
+2026-10-01. Existing remote code is retained; hosted provisioning and GitHub
+onboarding are not release prerequisites for the selected local product.
+
+See [the hosted execution design](HOSTED-EXECUTION-DESIGN.md) for the researched
+reuse decision, repository access flow and staged implementation boundaries.
+
 The repository now implements an embeddable authenticated Streamable HTTP resource-server boundary. A production deployment, authorization server connection and isolated canonical execution provider are **not yet configured or verified**. Do not expose the local stdio provider or its receipt directory to multiple users. The local CLI does not automatically become a remote server.
 
 ```mermaid

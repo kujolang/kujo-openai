@@ -1,0 +1,411 @@
+# Manifest schema contract validator
+#
+# Validates generated mcp.manifest.json against structural rules.
+# This is a deterministic, in-process validator that checks required
+# fields, types, minimum lengths, and allowed enumeration values.
+# It does not require an external JSON Schema engine.
+
+from src.make.common import dict_has_key
+
+VALID_SAFETY_TIERS := {
+    "read_only": true,
+    "safe_command": true,
+    "write_scaffold": true,
+    "review_required": true,
+    "blocked": true
+}
+
+func validate_non_empty_string(value, path) {
+    if type(value) != "string" {
+        return {"ok": false, "error": path + " must be a string, got " + type(value)}
+    }
+    if trim(to_string(value)) == "" {
+        return {"ok": false, "error": path + " must be a non-empty string"}
+    }
+    return {"ok": true, "error": ""}
+}
+
+func validate_string_enum(value, allowed_values, path) {
+    str_result := validate_non_empty_string(value, path)
+    if !str_result["ok"] {
+        return str_result
+    }
+
+    check_text := trim(to_string(value))
+    if dict_has_key(allowed_values, check_text) == false {
+        return {"ok": false, "error": path + " value '" + check_text + "' is not in allowed set"}
+    }
+    return {"ok": true, "error": ""}
+}
+
+func validate_required_object_key(obj, key_name, path) {
+    if type(obj) != "dict" {
+        return {"ok": false, "error": path + " must be an object"}
+    }
+    if dict_has_key(obj, key_name) == false {
+        return {"ok": false, "error": path + "." + key_name + " is required but missing"}
+    }
+    return {"ok": true, "error": ""}
+}
+
+func validate_server_block(server_block) {
+    prefix := "manifest.server"
+
+    if type(server_block) != "dict" {
+        return [{"ok": false, "error": prefix + " must be an object"}]
+    }
+
+    results := []
+    results := push(results, validate_required_object_key(server_block, "name", prefix))
+    results := push(results, validate_required_object_key(server_block, "version", prefix))
+    results := push(results, validate_required_object_key(server_block, "generated_at", prefix))
+    results := push(results, validate_required_object_key(server_block, "source_repo", prefix))
+
+    check_idx := 0
+    while check_idx < len(results) {
+        entry := results[check_idx]
+        check_idx := check_idx + 1
+        if !entry["ok"] {
+            return results
+        }
+    }
+
+    results := push(results, validate_non_empty_string(server_block["name"], prefix + ".name"))
+    results := push(results, validate_non_empty_string(server_block["version"], prefix + ".version"))
+    results := push(results, validate_non_empty_string(server_block["generated_at"], prefix + ".generated_at"))
+    results := push(results, validate_non_empty_string(server_block["source_repo"], prefix + ".source_repo"))
+
+    return results
+}
+
+func validate_tools_array(tools) {
+    prefix := "manifest.tools"
+    results := []
+
+    if type(tools) != "array" {
+        results := push(results, {"ok": false, "error": prefix + " must be an array"})
+        return results
+    }
+
+    if len(tools) == 0 {
+        results := push(results, {"ok": false, "error": prefix + " must contain at least one tool"})
+        return results
+    }
+
+    seen_names := {}
+    idx := 0
+    while idx < len(tools) {
+        tool := tools[idx]
+        idx := idx + 1
+
+        if type(tool) != "dict" {
+            results := push(results, {"ok": false, "error": prefix + "[" + to_string(idx - 1) + "] must be an object"})
+        } else {
+            name_check := validate_required_object_key(tool, "name", prefix + "[" + to_string(idx - 1) + "]")
+            if name_check["ok"] {
+                desc_check := validate_required_object_key(tool, "description", prefix + "[" + to_string(idx - 1) + "]")
+                schema_check := validate_required_object_key(tool, "input_schema", prefix + "[" + to_string(idx - 1) + "]")
+                tier_check := validate_required_object_key(tool, "safety_tier", prefix + "[" + to_string(idx - 1) + "]")
+
+                results := push(results, name_check)
+                results := push(results, desc_check)
+                results := push(results, schema_check)
+                results := push(results, tier_check)
+
+                if dict_has_key(tool, "name") {
+                    name_val := trim(to_string(tool["name"]))
+                    if name_val != "" {
+                        if dict_has_key(seen_names, name_val) == false {
+                            seen_names[name_val] := true
+                        } else {
+                            results := push(results, {"ok": false, "error": prefix + " duplicate tool name: " + name_val})
+                        }
+                    }
+                    results := push(results, validate_non_empty_string(tool["name"], prefix + "[" + to_string(idx - 1) + "].name"))
+                }
+
+                if dict_has_key(tool, "description") {
+                    results := push(results, validate_non_empty_string(tool["description"], prefix + "[" + to_string(idx - 1) + "].description"))
+                }
+
+                if dict_has_key(tool, "safety_tier") {
+                    results := push(results, validate_string_enum(tool["safety_tier"], VALID_SAFETY_TIERS, prefix + "[" + to_string(idx - 1) + "].safety_tier"))
+                }
+            } else {
+                results := push(results, name_check)
+            }
+        }
+    }
+
+    return results
+}
+
+func validate_resources_array(resources) {
+    prefix := "manifest.resources"
+    results := []
+
+    if type(resources) != "array" {
+        results := push(results, {"ok": false, "error": prefix + " must be an array"})
+        return results
+    }
+
+    if len(resources) == 0 {
+        results := push(results, {"ok": false, "error": prefix + " must contain at least one resource"})
+        return results
+    }
+
+    seen_uris := {}
+    idx := 0
+    while idx < len(resources) {
+        resource := resources[idx]
+        idx := idx + 1
+
+        if type(resource) != "dict" {
+            results := push(results, {"ok": false, "error": prefix + "[" + to_string(idx - 1) + "] must be an object"})
+        } else {
+            uri_check := validate_required_object_key(resource, "uri", prefix + "[" + to_string(idx - 1) + "]")
+            if uri_check["ok"] {
+                name_check := validate_required_object_key(resource, "name", prefix + "[" + to_string(idx - 1) + "]")
+                desc_check := validate_required_object_key(resource, "description", prefix + "[" + to_string(idx - 1) + "]")
+                mime_check := validate_required_object_key(resource, "mime_type", prefix + "[" + to_string(idx - 1) + "]")
+                path_check := validate_required_object_key(resource, "path", prefix + "[" + to_string(idx - 1) + "]")
+
+                results := push(results, name_check)
+                results := push(results, desc_check)
+                results := push(results, mime_check)
+                results := push(results, path_check)
+
+                if dict_has_key(resource, "uri") {
+                    uri_val := trim(to_string(resource["uri"]))
+                    if uri_val != "" {
+                        if dict_has_key(seen_uris, uri_val) == false {
+                            seen_uris[uri_val] := true
+                        } else {
+                            results := push(results, {"ok": false, "error": prefix + " duplicate resource uri: " + uri_val})
+                        }
+                    }
+                }
+            } else {
+                results := push(results, uri_check)
+            }
+        }
+    }
+
+    return results
+}
+
+func validate_prompts_array(prompts) {
+    prefix := "manifest.prompts"
+    results := []
+
+    if type(prompts) != "array" {
+        results := push(results, {"ok": false, "error": prefix + " must be an array"})
+        return results
+    }
+
+    if len(prompts) == 0 {
+        results := push(results, {"ok": false, "error": prefix + " must contain at least one prompt"})
+        return results
+    }
+
+    seen_prompt_names := {}
+    idx := 0
+    while idx < len(prompts) {
+        prompt := prompts[idx]
+        idx := idx + 1
+
+        if type(prompt) != "dict" {
+            results := push(results, {"ok": false, "error": prefix + "[" + to_string(idx - 1) + "] must be an object"})
+        } else {
+            name_check := validate_required_object_key(prompt, "name", prefix + "[" + to_string(idx - 1) + "]")
+            if name_check["ok"] {
+                desc_check := validate_required_object_key(prompt, "description", prefix + "[" + to_string(idx - 1) + "]")
+                path_check := validate_required_object_key(prompt, "path", prefix + "[" + to_string(idx - 1) + "]")
+
+                results := push(results, name_check)
+                results := push(results, desc_check)
+                results := push(results, path_check)
+
+                if dict_has_key(prompt, "name") {
+                    pname_val := trim(to_string(prompt["name"]))
+                    if pname_val != "" {
+                        if dict_has_key(seen_prompt_names, pname_val) == false {
+                            seen_prompt_names[pname_val] := true
+                        } else {
+                            results := push(results, {"ok": false, "error": prefix + " duplicate prompt name: " + pname_val})
+                        }
+                    }
+                }
+            } else {
+                results := push(results, name_check)
+            }
+        }
+    }
+
+    return results
+}
+
+func validate_safe_command_map(safe_command_map) {
+    if type(safe_command_map) != "dict" {
+        return [{"ok": false, "error": "manifest.safe_command_map must be an object"}]
+    }
+
+    results := [{"ok": true, "error": ""}]
+    command_names := keys(safe_command_map)
+    idx := 0
+    while idx < len(command_names) {
+        command_name := to_string(command_names[idx])
+        idx := idx + 1
+
+        if trim(command_name) == "" {
+            results := push(results, {"ok": false, "error": "manifest.safe_command_map keys must be non-empty tool names"})
+        } else {
+            command_value := safe_command_map[command_name]
+            value_check := validate_non_empty_string(command_value, "manifest.safe_command_map." + command_name)
+            results := push(results, value_check)
+        }
+    }
+
+    return results
+}
+
+func validate_blocked_commands(blocked_commands) {
+    if type(blocked_commands) != "array" {
+        return [{"ok": false, "error": "manifest.blocked_commands must be an array"}]
+    }
+
+    results := [{"ok": true, "error": ""}]
+    idx := 0
+    while idx < len(blocked_commands) {
+        blocked := blocked_commands[idx]
+        results := push(results, validate_non_empty_string(blocked, "manifest.blocked_commands[" + to_string(idx) + "]"))
+        idx := idx + 1
+    }
+
+    return results
+}
+
+func validate_safety_tiers(safety_tiers) {
+    if type(safety_tiers) != "array" {
+        return [{"ok": false, "error": "manifest.safety_tiers must be an array"}]
+    }
+    if len(safety_tiers) < 3 {
+        return [{"ok": false, "error": "manifest.safety_tiers must have at least 3 tiers"}]
+    }
+    return [{"ok": true, "error": ""}]
+}
+
+func collect_errors(results) {
+    errors := []
+    idx := 0
+    while idx < len(results) {
+        entry := results[idx]
+        idx := idx + 1
+        if type(entry) == "dict" {
+            if !entry["ok"] {
+                errors := push(errors, entry["error"])
+            }
+        }
+    }
+    return errors
+}
+
+export func validate_manifest_contract(manifest) {
+    if type(manifest) != "dict" {
+        return {
+            "passed": false,
+            "error_count": 1,
+            "errors": ["manifest must be a JSON object"],
+            "checks_passed": 0,
+            "checks_failed": 1
+        }
+    }
+
+    all_results := []
+
+    server_checks := validate_server_block(manifest["server"])
+    cidx := 0
+    while cidx < len(server_checks) {
+        all_results := push(all_results, server_checks[cidx])
+        cidx := cidx + 1
+    }
+
+    if dict_has_key(manifest, "tools") {
+        tool_checks := validate_tools_array(manifest["tools"])
+        tidx := 0
+        while tidx < len(tool_checks) {
+            all_results := push(all_results, tool_checks[tidx])
+            tidx := tidx + 1
+        }
+    } else {
+        all_results := push(all_results, {"ok": false, "error": "manifest.tools is required"})
+    }
+
+    if dict_has_key(manifest, "resources") {
+        resource_checks := validate_resources_array(manifest["resources"])
+        ridx := 0
+        while ridx < len(resource_checks) {
+            all_results := push(all_results, resource_checks[ridx])
+            ridx := ridx + 1
+        }
+    } else {
+        all_results := push(all_results, {"ok": false, "error": "manifest.resources is required"})
+    }
+
+    if dict_has_key(manifest, "prompts") {
+        prompt_checks := validate_prompts_array(manifest["prompts"])
+        pidx := 0
+        while pidx < len(prompt_checks) {
+            all_results := push(all_results, prompt_checks[pidx])
+            pidx := pidx + 1
+        }
+    } else {
+        all_results := push(all_results, {"ok": false, "error": "manifest.prompts is required"})
+    }
+
+    if dict_has_key(manifest, "safe_command_map") {
+        scm_checks := validate_safe_command_map(manifest["safe_command_map"])
+        scm_idx := 0
+        while scm_idx < len(scm_checks) {
+            all_results := push(all_results, scm_checks[scm_idx])
+            scm_idx := scm_idx + 1
+        }
+    } else {
+        all_results := push(all_results, {"ok": false, "error": "manifest.safe_command_map is required"})
+    }
+
+    if dict_has_key(manifest, "blocked_commands") {
+        blk_checks := validate_blocked_commands(manifest["blocked_commands"])
+        blk_idx := 0
+        while blk_idx < len(blk_checks) {
+            all_results := push(all_results, blk_checks[blk_idx])
+            blk_idx := blk_idx + 1
+        }
+    } else {
+        all_results := push(all_results, {"ok": false, "error": "manifest.blocked_commands is required"})
+    }
+
+    if dict_has_key(manifest, "safety_tiers") {
+        st_checks := validate_safety_tiers(manifest["safety_tiers"])
+        st_idx := 0
+        while st_idx < len(st_checks) {
+            all_results := push(all_results, st_checks[st_idx])
+            st_idx := st_idx + 1
+        }
+    } else {
+        all_results := push(all_results, {"ok": false, "error": "manifest.safety_tiers is required"})
+    }
+
+    errors := collect_errors(all_results)
+    total_checks := len(all_results)
+    failed_checks := len(errors)
+    passed_checks := total_checks - failed_checks
+
+    return {
+        "passed": failed_checks == 0,
+        "error_count": failed_checks,
+        "errors": errors,
+        "checks_passed": passed_checks,
+        "checks_failed": failed_checks
+    }
+}

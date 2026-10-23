@@ -1,0 +1,22 @@
+{
+  "schema": "kujo.openai.sandbox-acceptance/v1",
+  "platform": "linux",
+  "architecture": "x64",
+  "node": "v22.23.3",
+  "codex": "codex-cli 0.144.4",
+  "npm_install": true,
+  "canonical_tools_and_receipts": true,
+  "bare_launch_requires_setup": true,
+  "local_marketplace_install": true,
+  "cached_launch_exit": 1,
+  "cached_dependencies_missing": true,
+  "bundled_cache_dependencies_present": true,
+  "bundled_cache_tools_and_receipts": true,
+  "public_directory_install_verified": false,
+  "date": "2026-10-01T14:58:11.352Z",
+  "source_commit": "7a0d55067d41b1f13d8dd7ab176118a358e4e951",
+  "package_sha256": "27093c0cb8f6ad8e9fd4fd096486d0499beda9bf294443bb3f97db46bc2d8cb2",
+  "image_id": "sha256:9566b99a1f1d8205c897ef573434d9a4acf3f0b8aafb4661e722a92be7e62411",
+  "host_mounts": false,
+  "unprivileged_user": true
+}

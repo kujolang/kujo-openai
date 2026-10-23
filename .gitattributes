@@ -1,0 +1,6 @@
+# Reproducible native source and manifests must not depend on checkout OS.
+* text=auto eol=lf
+# Canonical source is checksum-pinned; never transform upstream bytes.
+/vendor/** -text
+/native/internal/bundle/assets/** -text
+/assets/** -text

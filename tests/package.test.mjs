@@ -15,10 +15,23 @@ test('portable plugin and MCP manifests validate against official versioned sche
  assert.equal((await readdir('skills')).length,3);
  for(const name of await readdir('skills')) {const text=await readFile(`skills/${name}/SKILL.md`,'utf8');assert.ok(text.startsWith(`---\nname: ${name}\n`));assert.ok(text.includes('description:'));assert.ok(text.length<12000);assert.equal(text.includes('/Users/'),false);}
  assert.equal(JSON.stringify(plugin).includes('ai-plugin'),false);
+ // OpenAI extension fields are not constrained by the portable JSON schema.
+ // Public submission limits: developers.openai.com/plugins/deploy/submission.
+ const listing=plugin.extensions['com.openai'].interface;
+ for(const [field,limit] of [['displayName',30],['shortDescription',30],['longDescription',4000],['developerName',80]]) {
+  assert.equal(typeof listing[field],'string');assert.ok(listing[field].trim());assert.ok(listing[field].length<=limit,field);
+ }
+ assert.equal(listing.category,'Developer Tools');
+ assert.ok(Array.isArray(listing.capabilities));assert.ok(listing.capabilities.length<=20);
+ for(const label of listing.capabilities)assert.ok(typeof label==='string'&&label.trim()&&label.length<=120);
+ assert.ok(plugin.author.name&&plugin.author.name.length<=120);
+ assert.ok(listing.defaultPrompt.length<=3);assert.equal(new Set(listing.defaultPrompt).size,listing.defaultPrompt.length);
+ for(const prompt of listing.defaultPrompt)assert.ok(prompt.length<=128&&!prompt.includes('@'));
+
 });
 test('Codex compatibility metadata matches portable package',async()=>{
  const portable=JSON.parse(await readFile('plugin.json')),compat=JSON.parse(await readFile('.codex-plugin/plugin.json'));
- assert.equal(compat.name,portable.name);assert.equal(compat.version,portable.version);assert.deepEqual(compat.interface,portable.extensions['com.openai'].interface);
+ assert.deepEqual(compat.author,portable.author);assert.equal(compat.name,portable.name);assert.equal(compat.version,portable.version);assert.deepEqual(compat.interface,portable.extensions['com.openai'].interface);
  const mcp=JSON.parse(await readFile('mcp.json')),legacy=JSON.parse(await readFile('.mcp.json'));
  assert.deepEqual(legacy.mcpServers.kujo.args,mcp.mcpServers.kujo.args);assert.equal(legacy.mcpServers.kujo.command,mcp.mcpServers.kujo.command);
 });
@@ -69,6 +82,30 @@ test('review metadata preserves operator cases and rejects incomplete or unsafe 
  assert.equal(plugin.extensions['com.openai'].review,undefined);
  result.plugin.extensions['com.openai'].review.test_cases.positive[0].prompt='Changed';
  assert.equal(review.test_cases.positive[0].prompt,example.prompt);
- const invalid=[null,[],{...review,test_cases:{...review.test_cases,positive:review.test_cases.positive.slice(1)}},{...review,test_cases:{...review.test_cases,negative:[]}}, {...review,demo_recording_url:'https://user:secret@kujo.example/demo'}, {...review,credentials:'secret'}, {...review,commerce:'false'}, {...review,test_cases:{...review.test_cases,negative:[...review.test_cases.negative,{...example,file_attachment_urls:['https://kujo.example/file?token=secret']}]}}];
+ const invalid=[null,[],{...review,test_cases:{...review.test_cases,positive:review.test_cases.positive.slice(1)}},{...review,test_cases:{...review.test_cases,negative:[]}}, {...review,demo_recording_url:'https://user:secret@kujo.example/demo'}, {...review,credentials:'secret'}, {...review,commerce:'false'}, {...review,test_cases:{...review.test_cases,negative:[...review.test_cases.negative.slice(1),{...example,file_attachment_urls:['https://kujo.example/file?token=secret']}]}}];
+ for(const kind of ['positive','negative'])invalid.push({...review,test_cases:{...review.test_cases,[kind]:[...review.test_cases[kind],example]}});
  for(const value of invalid)assert.throws(()=>remotePackageManifests(plugin,{...configuration,review:value}),error=>!String(error).includes('secret'));
+});
+
+test('public review boundaries enforce listing URLs and positive case requirements',async()=>{
+ const {remotePackageManifests}=await import('../lib/remote-package.mjs');
+ const plugin=JSON.parse(await readFile('plugin.json'));
+ const configuration={schema:'kujo.openai.remote-package/v1',resource:'https://kujo.example/mcp',websiteURL:'https://kujo.example',supportURL:'https://kujo.example/support',privacyPolicyURL:'https://kujo.example/privacy',termsOfServiceURL:'https://kujo.example/terms'};
+ const urlOfLength=length=>'https://kujo.example/'+ 'a'.repeat(length-'https://kujo.example/'.length);
+ for(const field of ['websiteURL','supportURL','privacyPolicyURL','termsOfServiceURL']) {
+  assert.doesNotThrow(()=>remotePackageManifests(plugin,{...configuration,[field]:urlOfLength(1024)}));
+  assert.throws(()=>remotePackageManifests(plugin,{...configuration,[field]:urlOfLength(1025)}));
+ }
+ const review=reviewFixture();
+ review.test_cases.positive[0].description='a'.repeat(4000);
+ assert.doesNotThrow(()=>remotePackageManifests(plugin,{...configuration,review}));
+ review.test_cases.positive[0].description+='a';
+ assert.throws(()=>remotePackageManifests(plugin,{...configuration,review}));
+ review.test_cases.positive[0].description='Valid case';
+ for(const value of ['', '   ']) {
+  review.test_cases.positive[0].tools_triggered=value;
+  assert.throws(()=>remotePackageManifests(plugin,{...configuration,review}));
+ }
+ review.test_cases.positive[0].tools_triggered='fixture_inspect';
+ assert.doesNotThrow(()=>remotePackageManifests(plugin,{...configuration,review}));
 });

@@ -1,14 +1,19 @@
 import {mkdtemp,mkdir,cp,readdir,stat,utimes,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve,isAbsolute} from 'node:path';
-import {remotePackageManifests} from '../lib/remote-package.mjs';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 const pkg=JSON.parse(await readFile('package.json'));
 const args=process.argv.slice(2);
+if(args.includes('--submission')) {
+ const {preinstalledReadiness}=await import('../lib/submission-readiness.mjs');
+ const status=preinstalledReadiness({mcp:JSON.parse(await readFile('mcp.json'))});
+ console.error(JSON.stringify(status));
+ process.exit(1); // Do not create or relabel the legacy archive as a submission.
+}
 if(args.length && (args.length!==2||args[0]!=='--remote'||!isAbsolute(args[1])))throw new Error('Usage: package.mjs [--remote /absolute/operator/package.json]');
 let remote=null;
-if(args.length){try{remote=remotePackageManifests(JSON.parse(await readFile('plugin.json')),JSON.parse(await readFile(args[1])));}catch{throw new Error('Remote package configuration could not be validated');}}
+if(args.length){try{const {remotePackageManifests}=await import('../lib/remote-package.mjs');remote=remotePackageManifests(JSON.parse(await readFile('plugin.json')),JSON.parse(await readFile(args[1])));}catch{throw new Error('Remote package configuration could not be validated');}}
 const archiveName=`kujo-openai-${pkg.version}${remote?'-remote':''}.zip`;
 const output=remote?'dist/remote':'dist';
 const temporary=await mkdtemp(join(tmpdir(),'kujo-openai-package-')),stage=join(temporary,'kujo-openai');

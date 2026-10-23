@@ -1,0 +1,106 @@
+{
+  "schema": "kujo.openai.runtime-publication-evidence/v1",
+  "observed_at": "2026-10-01",
+  "version": "1.7.0",
+  "owner_authorization": "UNBLOCK_V1_RELEASE supplied directly in this chat on 2026-10-01",
+  "preparation_pr": "https://github.com/kujolang/kujo/pull/17",
+  "merge_commit": "813072040a1ac643312f5163fcfa4f26474c9095",
+  "candidate_commit": "f68750b368e6ebaf4dcaf588b4984651bb4d9670",
+  "merge_candidate_trees_identical": true,
+  "tag": "v1.7.0",
+  "tag_object": "7ac17556895f3a6cf3a962aa29ddcc85265deb65",
+  "signature": {
+    "local_verification": "passed",
+    "github_verified": true,
+    "github_reason": "valid"
+  },
+  "publication_workflow": "https://github.com/kujolang/kujo/actions/runs/36850604536",
+  "publication_status": "success",
+  "limitations": [
+    "crates.io publication blocked until registry-compatible HTTP fork is published and root packaging passes.",
+    "Public OpenAI local-host installation support remains unconfirmed.",
+    "Live ChatGPT requires restarting the local tunnel; public install is not established by private tunnel tests."
+  ],
+  "tagged_release_gate": {
+    "job_id": 110331068275,
+    "conclusion": "success",
+    "initial_cargo_test": {
+      "targets": 98,
+      "passed": 2891,
+      "failed": 0,
+      "ignored": 17
+    },
+    "fixture_runs": [
+      {
+        "passed": 150,
+        "failed": 0,
+        "skipped": 11
+      },
+      {
+        "passed": 150,
+        "failed": 0,
+        "skipped": 11
+      }
+    ],
+    "optional_audit_tools": "absent; skipped",
+    "log_sha256": "08c18c74da088a0b2ddb3a50507074f129faee9f73e377ff2ada43a7ed40a635"
+  },
+  "crates_io": {
+    "status": "blocked; not published",
+    "command": "cargo publish --dry-run --locked",
+    "commit": "813072040a1ac643312f5163fcfa4f26474c9095",
+    "exit_code": 101,
+    "reason": "Normalized package drops local tiny_http patch; upstream 0.12.0 lacks Server::http_with_read_timeout (VM and interpreter E0599).",
+    "policy_exception": "Runtime RELEASE_PROCESS.md section 8: independent registry gate does not block tested native release.",
+    "log_sha256": "77f5d830ac2855d660d80cd891e085d53bfb08d026d9ea5c30535e87b01ddfc7",
+    "existing_signalbox_capture": "cap_a49f425e-eeb8-447d-b82d-4aca9d560b98"
+  },
+  "published_native_smoke": {
+    "run": 36857820990,
+    "all_five_platforms": "passed",
+    "initial_windows_failure": "GitHub denied request/rate limit after installation; failed-job rerun passed without artifact changes"
+  },
+  "published_npm_smoke": {
+    "run": 36866507729,
+    "all_five_platforms": "passed"
+  },
+  "adapter_registry_acceptance": {
+    "run": 36866757041,
+    "commit": "5f0ce507e34337781f7b8da37d175ee7df35eb6e",
+    "platforms_passed": [
+      "linux-x64",
+      "linux-arm64",
+      "darwin-x64",
+      "darwin-arm64",
+      "win32-x64"
+    ],
+    "contracts": "passed",
+    "receipt_storage": "passed on Linux/macOS/Windows",
+    "local_unit_tests": {
+      "passed": 43,
+      "failed": 0
+    },
+    "local_install": "passed"
+  },
+  "user_local_mcp": {
+    "runtime_version": "1.7.0",
+    "tools_and_exact_receipts": [
+      {
+        "ability": "kujo.changebucket.changes.measure",
+        "receipt_uri": "kujo-receipt://sha256/ba213cee127a674f551141c6e1b70bcce8c737cbdf59b4aa247e5ddf7f82b6fa",
+        "status": "succeeded"
+      },
+      {
+        "ability": "kujo.patchbrief.changes.summarize",
+        "receipt_uri": "kujo-receipt://sha256/11e7f5666261557f54e78bb4f0bc34301913a0b0e3d79a21fe58113241c60678",
+        "status": "succeeded"
+      },
+      {
+        "ability": "kujo.shipcheck.repository.scan",
+        "receipt_uri": "kujo-receipt://sha256/4acda25da3c3eb4d4b30a936ce99f6af58f43d4d981a732030763183ed8225c2",
+        "status": "succeeded"
+      }
+    ],
+    "tunnel": "offline; wrapper now points to freshly provisioned 1.7 configuration"
+  }
+}

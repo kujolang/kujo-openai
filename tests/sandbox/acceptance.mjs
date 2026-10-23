@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import {execFileSync,spawnSync} from 'node:child_process';
+import {mkdir,writeFile,readFile} from 'node:fs/promises';
+import {join} from 'node:path';
+const root='/work';
+const installed=join(root,'node_modules/@kujolang/kujo-openai');
+const entry=join(installed,'bin/kujo-openai.mjs');
+const env={...process.env,KUJO_OPENAI_HOME:'/tmp/kujo-state'};
+const before=spawnSync(process.execPath,[entry,'serve'],{cwd:'/tmp',env,encoding:'utf8',timeout:10000});
+assert.equal(before.status,1);
+assert.match(before.stderr,/setup once/);
+console.log('VERIFIED: package installation alone does not authorize or configure a repository.');
+execFileSync(process.execPath,['/work/setup-integration.mjs'],{cwd:root,env:{...env,KUJO_TEST_INSTALLED_ENTRY:entry},stdio:'inherit',timeout:600000});
+const market='/tmp/market';await mkdir(join(market,'.agents/plugins'),{recursive:true});
+// Use the real host copy operation; no preinstalled host profile or credentials.
+execFileSync('cp',['-R',installed,join(market,'kujo-openai')]);
+await writeFile(join(market,'.agents/plugins/marketplace.json'),JSON.stringify({name:'kujo-sandbox',plugins:[{name:'kujo-openai',source:{source:'local',path:'./kujo-openai'},policy:{installation:'AVAILABLE',authentication:'ON_INSTALL'},category:'Developer Tools'}]}));
+await mkdir('/home/node/codex-sandbox');
+const hostEnv={...process.env,CODEX_HOME:'/home/node/codex-sandbox'};
+const codex=args=>execFileSync('/work/node_modules/.bin/codex',args,{env:hostEnv,encoding:'utf8',timeout:60000});
+codex(['plugin','marketplace','add',market,'--json']);
+const hostInstall=JSON.parse(codex(['plugin','add','kujo-openai@kujo-sandbox','--json']));
+const cached=spawnSync(process.execPath,[join(hostInstall.installedPath,'bin/kujo-openai.mjs'),'serve'],{cwd:'/tmp',env,encoding:'utf8',timeout:10000});
+codex(['plugin','remove','kujo-openai@kujo-sandbox']);
+// The distributable ZIP bundles dependencies; verify that supported local shape.
+await writeFile(join(market,'kujo-openai/package-lock.json'),await readFile('/work/adapter-lock.json'));
+execFileSync('npm',['ci','--ignore-scripts','--no-audit','--no-fund'],{cwd:join(market,'kujo-openai'),stdio:'pipe',timeout:600000});
+const bundled=JSON.parse(codex(['plugin','add','kujo-openai@kujo-sandbox','--json']));
+const bundledEntry=join(bundled.installedPath,'bin/kujo-openai.mjs');
+const bundledStart=spawnSync(process.execPath,[bundledEntry,'serve'],{cwd:'/tmp',env,encoding:'utf8',timeout:10000});
+assert.equal(bundledStart.status,1);assert.match(bundledStart.stderr,/setup once/);
+execFileSync(process.execPath,['/work/setup-integration.mjs'],{cwd:root,env:{...env,KUJO_TEST_INSTALLED_ENTRY:bundledEntry},stdio:'inherit',timeout:600000});
+const report={schema:'kujo.openai.sandbox-acceptance/v1',platform:process.platform,architecture:process.arch,node:process.version,codex:codex(['--version']).trim(),npm_install:true,canonical_tools_and_receipts:true,bare_launch_requires_setup:true,local_marketplace_install:true,cached_launch_exit:cached.status,cached_dependencies_missing:/ERR_MODULE_NOT_FOUND|Cannot find package/.test(cached.stderr),bundled_cache_dependencies_present:true,bundled_cache_tools_and_receipts:true,public_directory_install_verified:false};
+await writeFile('/tmp/kujo-sandbox-result.json',JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify(report));
+codex(['plugin','remove','kujo-openai@kujo-sandbox']);
+codex(['plugin','marketplace','remove','kujo-sandbox']);

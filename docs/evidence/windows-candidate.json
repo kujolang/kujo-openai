@@ -1,0 +1,25 @@
+{
+  "schema": "kujo.openai.windows-candidate-evidence/v1",
+  "observed_at": "2026-10-01",
+  "workflow_run": "https://github.com/kujolang/kujo-openai/actions/runs/36812155500",
+  "job_id": 110209353364,
+  "adapter_commit": "41aff430b4d8c79100eb39dba489f9620c89340f",
+  "runtime_source_commit": "8c561cacdcb132faa310df2b81f56c27ff4537df",
+  "runtime_distribution": "source-built candidate; not published-package acceptance",
+  "products": {
+    "patchbrief": "0e8d6bd6fd226b09b807f8758ade08096c8b70f0",
+    "changebucket": "030eea63c60449f82c9ba2680227485d318fdb6d",
+    "shipcheck": "0a9f5795e9498f3698d5da6bb66642544251dd37"
+  },
+  "results": {
+    "mcp_review_cases_passed": 9,
+    "native_cancellation_and_timeout_passed": 2,
+    "native_failures": 0,
+    "posix_only_tests_skipped": 1,
+    "workflow_conclusion": "success"
+  },
+  "limitations": [
+    "Published runtime 1.6.0 still lacks required Windows primitives.",
+    "This candidate run does not establish public ChatGPT local installation or production remote isolation."
+  ]
+}
