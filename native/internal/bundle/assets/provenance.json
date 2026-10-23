@@ -1,6 +1,6 @@
 {
   "ability": {
-    "commit": "bcbecb49b147023877e83d5f2ea647dfede030b5",
+    "commit": "d1391ae5cf68448f0e8286be5958b701f4d6b07b",
     "files": {
       "LICENSE": "37488fedc85c43ba96a6dd438cade3f3c4293792dd97c89591c4832378c2b63d",
       "ability.kujo": "9225d04d8b281fa84f70a7d66a8a5f37d7f1f3f421200fd625582fc3d567c21d",
@@ -17,7 +17,7 @@
       "src/profile.kujo": "05d0fea46b5497801cb8a283c596b6b164f808b5fc8cba6984d5afc6c797164e",
       "src/registry.kujo": "243c5f2dd0caee5004da4589c24ffc278dd3ffe0765de942b7bd2e21014eefd6",
       "src/runtime.kujo": "15f4487483ea2e2131bae0b5b274db4fc86bb495163235ae9e69d682fda50fe3",
-      "tests/contract_tests.kujo": "f07a871b8dd8e9614b32a18769e4f3be888ffc006454de6cd593a36e755c644e",
+      "tests/contract_tests.kujo": "447e432e9ce715f0f265e3d483104903c7c2054fb506c0aa66bc4df97ac6d67d",
       "tests/fixtures/semantics_conformance.json": "329b7b1de93b49f0546e2d16dd5ffaddbdaf59756d882faa57d3ab3a8d4afc4a",
       "tests/runtime_contract_tests.kujo": "f7964a9b006ad87eca8aa453c7837c999070b4114385f67f46719fda24401542"
     },
